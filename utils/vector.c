@@ -52,7 +52,7 @@ float cub_utils_vec3_magnitude(cub_vec3* v) {
 }
 
 cub_vec3 cub_utils_vec3_normalize(cub_vec3 v) {
-    return cub_utils_vec3_scalar(1.0f / cub_utils_vec3_magnitude(&v), v);
+    return CUB_VEC3_SCALE(1.0f / CUB_VEC3_MAG(&v), v);
 }
 
 cub_quaternion cub_utils_quaternion_normalize(cub_quaternion q) {
@@ -61,7 +61,7 @@ cub_quaternion cub_utils_quaternion_normalize(cub_quaternion q) {
                 q.vect.coords[2] * q.vect.coords[2] +
                 q.w * q.w;
     sum = sqrt(sum);
-    q.vect = cub_utils_vec3_scalar(1.0f / sum, q.vect);
+    q.vect = CUB_VEC3_SCALE(1.0f / sum, q.vect);
     q.w /= sum;
     return q;
 }
@@ -74,12 +74,10 @@ cub_quaternion cub_utils_quaternion_conjugate(cub_quaternion q) {
 cub_quaternion cub_utils_quaternion_product(cub_quaternion q1,
                                             cub_quaternion q2) {
     cub_quaternion result;
-    result.w = q1.w * q2.w - cub_utils_vec3_dot_product(&q1.vect, &q2.vect);
-    result.vect = cub_utils_vec3_add(cub_utils_vec3_scalar(q1.w, q2.vect),
-                                     cub_utils_vec3_scalar(q2.w, q1.vect));
-    result.vect = cub_utils_vec3_add(
-                    cub_utils_vec3_cross_product(q1.vect, q2.vect),
-                    result.vect);
+    result.w = q1.w * q2.w - CUB_VEC3_DOT(&q1.vect, &q2.vect);
+    result.vect = CUB_VEC3_ADD( CUB_VEC3_SCALE(q1.w, q2.vect),
+                                CUB_VEC3_SCALE(q2.w, q1.vect) );
+    result.vect = CUB_VEC3_ADD( CUB_VEC3_CROSS(q1.vect, q2.vect), result.vect);
     return result;
 }
 
@@ -88,7 +86,6 @@ cub_vec3 cub_utils_vec3_rotate(cub_vec3 to_rotate, cub_vec3 axis, float angle) {
     cub_quaternion axis_q;
     axis_q.vect = cub_utils_vec3_scalar(sin(angle / 2.0f), axis);
     axis_q.w = cos(angle / 2.0f);
-    return cub_utils_quaternion_product(
-                cub_utils_quaternion_product(axis_q, init),
-                cub_utils_quaternion_conjugate(axis_q)).vect;
+    return CUB_QUAT_PROD(CUB_QUAT_PROD(axis_q, init),
+                         CUB_QUAT_CONJ(axis_q)).vect;
 }

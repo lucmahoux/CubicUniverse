@@ -81,10 +81,8 @@ cub_mat4 cub_utils_mat4_perspective(float fov, float aspect_ratio,
 cub_mat4 cub_utils_mat4_view_matrix(cub_vec3 position, cub_vec3 target,
                                     cub_vec3 up) {
     cub_mat4 view = cub_utils_mat4(1.0f);
-    cub_vec3 direction = cub_utils_vec3_sub(position, target);
-    direction = cub_utils_vec3_normalize(direction);
-    cub_vec3 right = cub_utils_vec3_cross_product(up, direction);
-    right = cub_utils_vec3_normalize(right);
+    cub_vec3 direction = CUB_VEC3_NORM(CUB_VEC3_SUB(position, target));
+    cub_vec3 right = CUB_VEC3_NORM(CUB_VEC3_CROSS(up, direction));
     up = cub_utils_vec3_cross_product(direction, right);
     view.coeffs[0] = right.coords[0];
     view.coeffs[1] = up.coords[0];
@@ -95,8 +93,7 @@ cub_mat4 cub_utils_mat4_view_matrix(cub_vec3 position, cub_vec3 target,
     view.coeffs[8] = right.coords[2];
     view.coeffs[9] = up.coords[2];
     view.coeffs[10] = direction.coords[2];
-    cub_mat4 cam_position = cub_utils_mat4(1.0f);
-    cam_position = cub_utils_mat4_translate(cam_position,
-                        cub_utils_vec3_scalar(-1.0f, position));
+    cub_mat4 cam_position = CUB_MAT4_TRANS( CUB_MAT4(1.0f),
+                                            CUB_VEC3_SCALE(-1.0f, position) );
     return cub_utils_mat4_product(view, cam_position);
 }

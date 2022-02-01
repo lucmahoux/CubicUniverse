@@ -1,7 +1,14 @@
 #ifndef CUB_UTILS_MATRIX_H
 #define CUB_UTILS_MATRIX_H
+
 #include "utils/utils.h"
 #include "utils/vector.h"
+
+#define CUB_MAT4(coeff) cub_utils_mat4(coeff)
+#define CUB_MAT4_PROD(m1, m2) cub_utils_mat4_product(m1, m2)
+#define CUB_MAT4_TRANS(m, v) cub_utils_mat4_translate(m, v)
+#define CUB_MAT4_SCALE(m, v) cub_utils_mat4_scale(m, v)
+#define CUB_MAT4_ROT(m, theta, axis) cub_utils_mat4_rotate(m, theta, axis)
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846

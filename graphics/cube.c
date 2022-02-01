@@ -173,8 +173,7 @@ int cub_graphics_open_window() {
     int projection_loc = glGetUniformLocation(cubeSP, "projection");
     glUniformMatrix4fv(projection_loc, 1, GL_FALSE, projection.coeffs);
     glUseProgram(0);
-    cub_vec3 rot_axis = cub_utils_vec3(1.0f, 0.3f, 0.5f);
-    rot_axis = cub_utils_vec3_normalize(rot_axis);
+    cub_vec3 rot_axis = CUB_VEC3_NORM(CUB_VEC3(1.0f, 0.3f, 0.5f));
     const float radius = 10.0f;
 
     while (!glfwWindowShouldClose(window)) {
@@ -199,19 +198,18 @@ int cub_graphics_open_window() {
         float camX = sin(glfwGetTime()) * radius;
         float camZ = cos(glfwGetTime()) * radius;
         cub_mat4 view = cub_utils_mat4_view_matrix(
-                    cub_utils_vec3(camX, 0.0f, camZ),
-                    cub_utils_vec3(0.0f, 0.0f, 0.0f),
-                    cub_utils_vec3(0.0f, 1.0f, 0.0f));
+                    CUB_VEC3(camX, 0.0f, camZ),
+                    CUB_VEC3(0.0f, 0.0f, 0.0f),
+                    CUB_VEC3(0.0f, 1.0f, 0.0f));
         int view_loc = glGetUniformLocation(cubeSP, "view");
         glUniformMatrix4fv(view_loc, 1, GL_FALSE, view.coeffs);
 
         for (uint8_t i = 0; i < 10; ++i) {
             // Model matrix
-            cub_mat4 model = cub_utils_mat4(1.0f);
-            model = cub_utils_mat4_translate(model, cube_positions[i]);
+            cub_mat4 model = CUB_MAT4_TRANS(CUB_MAT4(1.0f), cube_positions[i]);
+            model = CUB_MAT4_ROT(model, glfwGetTime() * RAD(20.0f * i),
+                                 rot_axis);
             int model_loc = glGetUniformLocation(cubeSP, "model");
-            model = cub_utils_mat4_rotate(model, glfwGetTime() * RAD(20.0f * i),
-                    rot_axis);
             glUniformMatrix4fv(model_loc, 1, GL_FALSE, model.coeffs);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
