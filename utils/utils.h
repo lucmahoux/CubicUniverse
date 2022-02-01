@@ -3,14 +3,17 @@
 #define cub_unused __attribute__((unused))
 
 #include <err.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
 extern char ASSETS_PATH[];
 extern char SHADERS_PATH[];
+extern char TEXTURES_PATH[];
 
 /* Concatenate two strings and return the total length (excluding '\0') */
 char* cub_utils_strconcat(const char* s1, const char* s2, size_t* len);

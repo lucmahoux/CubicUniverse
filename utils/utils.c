@@ -2,6 +2,7 @@
 
 char ASSETS_PATH[] = "../assets/";
 char SHADERS_PATH[] = "../assets/shaders/";
+char TEXTURES_PATH[] = "../assets/textures/";
 
 char* cub_utils_strconcat(const char* s1, const char* s2, size_t* len) {
     size_t s1_len = strlen(s1);

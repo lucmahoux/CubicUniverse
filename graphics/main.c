@@ -1,5 +1,5 @@
-#include "draw_triangle.h"
+#include "cube.h"
 
 int main() {
-    return open_window();
+    return cub_graphics_open_window();
 }
