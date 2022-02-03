@@ -10,5 +10,6 @@
 /* Load the texture from the texture folder - check for errors */
 GLchar* cub_graphics_load_texture(GLint* width, GLint* height,
                                     GLint* nb_channels, const char* img_name);
-
+/* Bind & load the texture from with its openGL id */
+void cub_graphics_bind_load_texture(GLuint* texture_id, const char* name);
 #endif

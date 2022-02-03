@@ -11,3 +11,22 @@ GLchar* cub_graphics_load_texture(GLint* width, GLint* height,
     free(fpath);
     return (GLchar*)data;
 }
+
+void cub_graphics_bind_load_texture(GLuint* texture_id, const char* name) {
+    glBindTexture(GL_TEXTURE_2D, *texture_id);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    int width, height, nb_channels;
+    GLchar* data = cub_graphics_load_texture(&width, &height,
+                                             &nb_channels, name);
+    if (nb_channels != 4)
+        errx(1, "cub_graphics_bind_load_texture: all textures are expected\
+                to have an alpha channel (RGBA not RGB)!");
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    free(data);
+}

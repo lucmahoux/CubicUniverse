@@ -153,7 +153,7 @@ int cub_graphics_open_window() {
 
     glEnable(GL_DEPTH_TEST); // Enable depth testing
 
-    cub_vec3 cube_positions[] = {
+    cubVec3 cube_positions[] = {
         cub_utils_vec3(0.0f, 0.0f, 0.0f),
         cub_utils_vec3(2.0f, 5.0f, -15.0f),
         cub_utils_vec3(-1.5f, -2.2f, -2.5f),
@@ -168,12 +168,12 @@ int cub_graphics_open_window() {
 
     glUseProgram(cubeSP);
     // Projection matrix
-    cub_mat4 projection = cub_utils_mat4_perspective(RAD(45.0f),
+    cubMat4 projection = cub_utils_mat4_perspective(RAD(45.0f),
                                  1024.0f / 768.0f, 0.1f, 100.0f);
     int projection_loc = glGetUniformLocation(cubeSP, "projection");
     glUniformMatrix4fv(projection_loc, 1, GL_FALSE, projection.coeffs);
     glUseProgram(0);
-    cub_vec3 rot_axis = CUB_VEC3_NORM(CUB_VEC3(1.0f, 0.3f, 0.5f));
+    cubVec3 rot_axis = CUB_VEC3_NORM(CUB_VEC3(1.0f, 0.3f, 0.5f));
     const float radius = 10.0f;
 
     while (!glfwWindowShouldClose(window)) {
@@ -197,7 +197,7 @@ int cub_graphics_open_window() {
         // "Camera"
         float camX = sin(glfwGetTime()) * radius;
         float camZ = cos(glfwGetTime()) * radius;
-        cub_mat4 view = cub_utils_mat4_view_matrix(
+        cubMat4 view = cub_utils_mat4_view_matrix(
                     CUB_VEC3(camX, 0.0f, camZ),
                     CUB_VEC3(0.0f, 0.0f, 0.0f),
                     CUB_VEC3(0.0f, 1.0f, 0.0f));
@@ -206,7 +206,7 @@ int cub_graphics_open_window() {
 
         for (uint8_t i = 0; i < 10; ++i) {
             // Model matrix
-            cub_mat4 model = CUB_MAT4_TRANS(CUB_MAT4(1.0f), cube_positions[i]);
+            cubMat4 model = CUB_MAT4_TRANS(CUB_MAT4(1.0f), cube_positions[i]);
             model = CUB_MAT4_ROT(model, glfwGetTime() * RAD(20.0f * i),
                                  rot_axis);
             int model_loc = glGetUniformLocation(cubeSP, "model");

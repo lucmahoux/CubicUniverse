@@ -15,11 +15,15 @@ EXTRA_FLAGS += -fsanitize=address
 endif
 
 LIBUTILS_DIR = ../utils
-LIBUTILS_SRC = utils.c matrix.c vector.c
+LIBUTILS_SRC = utils.c matrix.c vector.c list.c
 LIBUTILS_SRC := $(addprefix $(LIBUTILS_DIR)/,$(LIBUTILS_SRC))
 
 LIBGRAPHICS_DIR = graphics
 LIBGRAPHICS_SRC = shader.c open_gl.c cube.c
+
+LIBSTRUCT_DIR = ../struct
+LIBSTRUCT_SRC = block.c
+LIBSTRUCT_SRC := $(addprefix $(LIBSTRUCT_DIR)/,$(LIBSTRUCT_SRC))
 
 ALL_FLAGS = $(IMPOSED_FLAGS) $(EXTRA_FLAGS) $(CPP_FLAGS)
 
