@@ -1,7 +1,6 @@
 #ifndef CUB_UTILS_MATRIX_H
 #define CUB_UTILS_MATRIX_H
 
-#include "utils/utils.h"
 #include "utils/vector.h"
 
 #define CUB_MAT4(coeff) cub_utils_mat4(coeff)

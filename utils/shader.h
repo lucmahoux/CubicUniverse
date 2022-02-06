@@ -1,7 +1,7 @@
-#ifndef CUB_GRAPHICS_SHADER_H
-#define CUB_GRAPHICS_SHADER_H
+#ifndef CUB_UTILS_SHADER_H
+#define CUB_UTILS_SHADER_H
 
-#include "graphics/open_gl.h"
+#include "utils/utils.h"
 
 #define BUFFER_SIZE 512
 

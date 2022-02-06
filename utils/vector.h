@@ -1,7 +1,12 @@
 #ifndef CUB_UTILS_VECTOR_H
 #define CUB_UTILS_VECTOR_H
 
-#include "utils/utils.h"
+#include <err.h>
+#include <math.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define CUB_VEC3(x, y, z) cub_utils_vec3(x, y, z)
 #define CUB_VEC3_CROSS(u, v) cub_utils_vec3_cross_product(u, v)

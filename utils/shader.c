@@ -1,4 +1,4 @@
-#include "shader.h"
+#include "utils/shader.h"
 
 void cub_utils_get_shader_source(char* file, ShaderSource* shader) {
     printf("Searching for shader: %s\n", file);

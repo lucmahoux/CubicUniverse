@@ -1,8 +1,8 @@
 INCLUDES = $(GL_INCLUDES)
 LIBS = $(GL_LIBS)
-SRC = main.c $(LIBGRAPHICS_SRC) $(LIBUTILS_SRC) $(LIBSTRUCT_SRC)
+SRC = main.c $(LIBRENDER_SRC) $(LIBUTILS_SRC) $(LIBINPUT_SRC) $(LIBGAME_SRC)
 CFLAGS = $(ALL_FLAGS) $(INCLUDES) $(LIBS)
-EXEC = graphics
+EXEC = game
 
 .PHONY = phony_explicit all clean
 

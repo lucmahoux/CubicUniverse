@@ -15,21 +15,25 @@ EXTRA_FLAGS += -fsanitize=address
 endif
 
 LIBUTILS_DIR = ../utils
-LIBUTILS_SRC = utils.c matrix.c vector.c list.c
+LIBUTILS_SRC = utils.c matrix.c vector.c list.c shader.c open_gl.c window.c
 LIBUTILS_SRC := $(addprefix $(LIBUTILS_DIR)/,$(LIBUTILS_SRC))
 
-LIBGRAPHICS_DIR = graphics
-LIBGRAPHICS_SRC = shader.c open_gl.c cube.c
+LIBRENDER_DIR = ../render
+LIBRENDER_SRC = block.c camera.c
+LIBRENDER_SRC := $(addprefix $(LIBRENDER_DIR)/,$(LIBRENDER_SRC))
 
-LIBSTRUCT_DIR = ../struct
-LIBSTRUCT_SRC = block.c
-LIBSTRUCT_SRC := $(addprefix $(LIBSTRUCT_DIR)/,$(LIBSTRUCT_SRC))
+LIBINPUT_DIR = ../input
+LIBINPUT_SRC = 
+LIBINPUT_SRC := $(addprefix $(LIBINPUT_DIR)/,$(LIBINPUT_SRC))
+
+LIBGAME_DIR = ../game
+LIBGAME_SRC = game.c
 
 ALL_FLAGS = $(IMPOSED_FLAGS) $(EXTRA_FLAGS) $(CPP_FLAGS)
 
 export
 
-EXECS = graphics
+EXECS = game
 MAKE += --no-print-directory
 SUB_RULES = all clean
 

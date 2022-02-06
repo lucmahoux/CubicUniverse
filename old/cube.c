@@ -105,7 +105,7 @@ int cub_graphics_open_window() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    GLuint cubeSP = cub_utils_build_shader("cube");
+    GLuint cubeSP = cub_graphics_build_shader("cube");
 
     // Generate the textures
     stbi_set_flip_vertically_on_load(true);

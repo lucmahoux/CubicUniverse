@@ -1,8 +1,8 @@
-#include "graphics/open_gl.h"
+#include "utils/open_gl.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "utils/stb_image.h"
 
-GLchar* cub_graphics_load_texture(GLint* width, GLint* height,
+GLchar* cub_utils_load_texture(GLint* width, GLint* height,
                                 GLint* nb_channels, const char* img_name) {
     char* fpath = cub_utils_strconcat(TEXTURES_PATH, img_name, NULL);
     uint8_t* data = stbi_load(fpath, width, height, nb_channels, 0);
@@ -12,21 +12,22 @@ GLchar* cub_graphics_load_texture(GLint* width, GLint* height,
     return (GLchar*)data;
 }
 
-void cub_graphics_bind_load_texture(GLuint* texture_id, const char* name) {
+void cub_utils_bind_load_texture(GLuint* texture_id, const char* name) {
     glBindTexture(GL_TEXTURE_2D, *texture_id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                    GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     int width, height, nb_channels;
-    GLchar* data = cub_graphics_load_texture(&width, &height,
+    GLchar* data = cub_utils_load_texture(&width, &height,
                                              &nb_channels, name);
-    if (nb_channels != 4)
-        errx(1, "cub_graphics_bind_load_texture: all textures are expected\
-                to have an alpha channel (RGBA not RGB)!");
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
+    GLenum format = nb_channels == 3 ? GL_RGB :
+                    nb_channels == 4 ? GL_RGBA : GL_RED;
+    if (format == GL_RED)
+        errx(1, "cub_utils_bind_load_texture: Wrong number of channels!"
+                " Must be either 3 or 4: %s!", name);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format,
                  GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
     free(data);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }

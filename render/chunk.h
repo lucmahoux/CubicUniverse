@@ -1,7 +1,7 @@
-#ifndef CUB_STRUCT_CHUNK_H
-#define CUB_STRUCT_CHUNK_H
+#ifndef CUB_RENDER_CHUNK_H
+#define CUB_RENDER_CHUNK_H
 
-#include "struct/block.h"
+#include "render/block.h"
 
 typedef struct cubSubChunk {
     // Y position of the subchunk relative to the bottom of the chunk it belongs
