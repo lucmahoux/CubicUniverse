@@ -11,11 +11,16 @@ typedef struct cubCamera {
     float fov; // Field Of View
     float aspect_ratio; // Aspect ration = width / height
     float near, far; // Near and Far planes distances
+    cubVec3 position;
+    cubVec3 up_side;
+    cubVec3 front;
+    float deltaTime;
+    float lastFrame;
 } cubCamera;
 
 /* Should be called once, at the beginning of the game to setup the camera */
 void cub_render_setup_camera(cubCamera* camera, GLuint shader_program,
-                             cubVec3 position, float fov, float aspect_ratio,
+                            cubVec3 position, float fov, float aspect_ratio,
                              float near, float far);
 
 /* Update the view matrix of the camera when the player 'moves' his head.

@@ -13,6 +13,13 @@ void cub_render_setup_camera(cubCamera* camera, GLuint shader_program,
     camera->aspect_ratio = aspect_ratio;
     camera->near = near;
     camera->far = far;
+
+    // New features for controlling camerA
+    camera->position = position;
+    camera->up_side = CUB_VEC3(0.0f,1.0f,0.0f);
+    camera->front = CUB_VEC3(0.0f,0.0f,-1.0f);
+    camera->deltaTime = 0.0f;
+    camera->lastFrame = 0.0f;
     cub_render_update_camera_projection(camera, shader_program);
 }
 
@@ -27,13 +34,13 @@ void cub_render_update_camera_projection(cubCamera* camera,
 }
 
 void cub_render_update_camera_view(cubCamera* camera) {
-    const float radius = 10.0f;
-    float camX = sin(glfwGetTime()) * radius;
-    float camZ = cos(glfwGetTime()) * radius;
+    //const float radius = 10.0f;
+    //float camX = sin(glfwGetTime()) * radius;
+    //float camZ = cos(glfwGetTime()) * radius;
     camera->view_matrix = cub_utils_mat4_view_matrix(
-            CUB_VEC3(camX, 5.0f, camZ),
-            CUB_VEC3(0.0f, 0.0f, 0.0f),
-            CUB_VEC3(0.0f, 1.0f, 0.0f));
+            camera->position,
+            cub_utils_vec3_add_new(camera->position,camera->front),
+            camera->up_side);
     glUniformMatrix4fv(camera->view_uni_loc, 1, GL_FALSE,
                         camera->view_matrix.coeffs);
 }
