@@ -1,8 +1,11 @@
 #include "game/game.h"
+#include "utils/stb_image.h"
 
 void cub_game_init(cubGame* game, int width, int height) {
     // Set up the window
     cub_utils_setup_window(&game->window, width, height, "Cubic Universe");
+    
+    stbi_set_flip_vertically_on_load(true);
 
     // Set up the renderer & load the texture pack
     cub_block_setup_renderer(&game->block_renderer);
@@ -39,7 +42,11 @@ void cub_game_renderer_handler(cubGame* game) {
     // World updates
     glBindVertexArray(game->block_renderer.VAO);
     cub_block_render(&game->block_renderer, 0, CUB_VEC3(0.0f, 0.0f, 0.0f));
-    cub_block_render(&game->block_renderer, 1, CUB_VEC3(2.0f, 0.0f, 0.0f));
+    cub_block_render(&game->block_renderer, 1, CUB_VEC3(1.0f, 0.0f, 0.0f));
+    cub_block_render(&game->block_renderer, 0, CUB_VEC3(0.0f, 0.0f, 1.0f));
+    cub_block_render(&game->block_renderer, 1, CUB_VEC3(1.0f, 0.0f, 1.0f));
+    cub_block_render(&game->block_renderer, 0, CUB_VEC3(1.0f, 1.0f, 1.0f));
+    cub_block_render(&game->block_renderer, 0, CUB_VEC3(2.0f, 0.0f, 0.0f));
 }
 
 void cub_game_start(cubGame* game) {
