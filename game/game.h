@@ -7,6 +7,12 @@
 #include "utils/utils.h"
 #include "utils/window.h"
 
+typedef struct cubGame {
+    GLFWwindow* window;
+    cubBlockRenderer block_renderer;
+    cubCamera camera;
+} cubGame;
+
 void cub_game_init(cubGame* game, int width, int height);
 
 void cub_game_clear_screen_handler(cubGame* game);

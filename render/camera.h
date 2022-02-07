@@ -3,6 +3,16 @@
 
 #include "utils/utils.h"
 
+typedef struct cubCamera {
+    GLint view_uni_loc; // Uniform location of view matrix
+    cubMat4 view_matrix;
+    GLint projection_uni_loc; // Uniform location of projection matrix
+    cubMat4 projection_matrix;
+    float fov; // Field Of View
+    float aspect_ratio; // Aspect ration = width / height
+    float near, far; // Near and Far planes distances
+} cubCamera;
+
 /* Should be called once, at the beginning of the game to setup the camera */
 void cub_render_setup_camera(cubCamera* camera, GLuint shader_program,
                              cubVec3 position, float fov, float aspect_ratio,
