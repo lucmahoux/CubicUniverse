@@ -34,20 +34,15 @@ void cub_game_input_handler(cubGame* game) {
         cub_utils_close_window(game->window);
 
     // Moving commands
-    cubCamera cam = game->camera;
-    const float cameraSpeed = 5000.0f * cam.deltaTime;
+    cubCamera* cam = &game->camera;
+    const float cameraSpeed = 2.5f * cam->deltaTime;
     if(glfwGetKey(game->window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        printf("Coordinates : x = %.6f y = %.6f z = %.6f\n",
-                cam.position.coords[0],cam.position.coords[1],
-                cam.position.coords[2]);
-        cam.position = cub_utils_vec3_add(
-                cam.position,
-                cub_utils_vec3_scalar_new(cameraSpeed, cam.front));
-
-        printf("Coordinates: z = %.6f\n",cam.position.coords[2]);
+        cam->position = CUB_VEC3_ADD(
+                        cam->position,
+                        CUB_VEC3_SCALE(cameraSpeed, cam->front));
     }
-    if(glfwGetKey(game->window, GLFW_KEY_S) == GLFW_PRESS)
+    /*if(glfwGetKey(game->window, GLFW_KEY_S) == GLFW_PRESS)
     {
         printf("Coordinates : x = %.6f y = %.6f z = %.6f\n",
                 cam.position.coords[0],cam.position.coords[1],
@@ -77,7 +72,7 @@ void cub_game_input_handler(cubGame* game) {
                 cub_utils_vec3_scalar_new(cameraSpeed,
                     cub_utils_vec3_normalize(
                         cub_utils_vec3_cross_product(cam.front,cam.up_side))));
-    }
+    }*/
 }
 
 void cub_game_renderer_handler(cubGame* game) {
