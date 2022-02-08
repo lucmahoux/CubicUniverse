@@ -42,37 +42,31 @@ void cub_game_input_handler(cubGame* game) {
                         cam->position,
                         CUB_VEC3_SCALE(cameraSpeed, cam->front));
     }
-    /*if(glfwGetKey(game->window, GLFW_KEY_S) == GLFW_PRESS)
+    if(glfwGetKey(game->window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        printf("Coordinates : x = %.6f y = %.6f z = %.6f\n",
-                cam.position.coords[0],cam.position.coords[1],
-                cam.position.coords[2]);
-        cam.position = cub_utils_vec3_sub(
-                cam.position,
-                cub_utils_vec3_scalar_new(cameraSpeed, cam.front));
+        cam->position = cub_utils_vec3_sub(
+                cam->position,
+                cub_utils_vec3_scalar(cameraSpeed, cam->front));
     }
     if(glfwGetKey(game->window, GLFW_KEY_A) == GLFW_PRESS)
     {
         printf("Coordinates : x = %.6f y = %.6f z = %.6f\n",
-                cam.position.coords[0],cam.position.coords[1],
-                cam.position.coords[2]);
-        cam.position = cub_utils_vec3_sub(
-                cam.position,
-                cub_utils_vec3_scalar_new(cameraSpeed,
+                cam->position.coords[0],cam->position.coords[1],
+                cam->position.coords[2]);
+        cam->position = cub_utils_vec3_sub(
+                cam->position,
+                cub_utils_vec3_scalar(cameraSpeed,
                     cub_utils_vec3_normalize(
-                        cub_utils_vec3_cross_product(cam.front,cam.up_side))));
+                        cub_utils_vec3_cross_product(cam->front,cam->up_side))));
     }
     if(glfwGetKey(game->window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        printf("Coordinates : x = %.6f y = %.6f z = %.6f\n",
-                cam.position.coords[0],cam.position.coords[1],
-                cam.position.coords[2]);
-        cam.position = cub_utils_vec3_add(
-                cam.position,
-                cub_utils_vec3_scalar_new(cameraSpeed,
+        cam->position = cub_utils_vec3_add(
+                cam->position,
+                cub_utils_vec3_scalar(cameraSpeed,
                     cub_utils_vec3_normalize(
-                        cub_utils_vec3_cross_product(cam.front,cam.up_side))));
-    }*/
+                        cub_utils_vec3_cross_product(cam->front,cam->up_side))));
+    }
 }
 
 void cub_game_renderer_handler(cubGame* game) {

@@ -37,35 +37,12 @@ cubVec3 cub_utils_vec3_sub(cubVec3 v1, cubVec3 v2) {
     return v1;
 }
 
-cubVec3 cub_utils_vec3_sub_new(cubVec3 v1, cubVec3 v2)
-{
-    cubVec3 result;
-    result.coords[0] = v1.coords[0]-v2.coords[0];
-    result.coords[1] = v2.coords[1]-v2.coords[1];
-    result.coords[2] = v2.coords[2]-v2.coords[2];
-    return result;
-}
-
-cubVec3 cub_utils_vec3_add_new(cubVec3 v1, cubVec3 v2)
-{
-    return cub_utils_vec3(v1.coords[0]+v2.coords[0],
-                        v1.coords[1]+v2.coords[1],
-                        v1.coords[2]+v2.coords[2]);
-}
 
 cubVec3 cub_utils_vec3_scalar(float scalar, cubVec3 v) {
     v.coords[0] *= scalar;
     v.coords[1] *= scalar;
     v.coords[2] *= scalar;
     return v;
-}
-
-cubVec3 cub_utils_vec3_scalar_new(float scalar, cubVec3 v)
-{
-    return cub_utils_vec3(
-            v.coords[0] * scalar,
-            v.coords[1] * scalar,
-            v.coords[2] * scalar);
 }
 
 float cub_utils_vec3_magnitude(cubVec3* v) {

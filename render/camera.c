@@ -41,7 +41,7 @@ void cub_render_update_camera_view(cubCamera* camera) {
     printf("z_before = %.6f\n", camera->position.coords[2]);
     camera->view_matrix = cub_utils_mat4_view_matrix(
             camera->position,
-            cub_utils_vec3_add_new(camera->position,camera->front),
+            cub_utils_vec3_add(camera->position,camera->front),
             camera->up_side);
     glUniformMatrix4fv(camera->view_uni_loc, 1, GL_FALSE,
                         camera->view_matrix.coeffs);
