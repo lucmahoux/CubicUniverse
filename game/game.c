@@ -29,7 +29,33 @@ void cub_game_clear_screen_handler(cub_unused cubGame* game) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+float radian(float degree)
+{
+    return degree * (3.14159 / 180);
+}
 
+void cub_game_process_mouse_mouvement(cubCamera* cam, float xoffset,
+        float yoffset)
+{
+    float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    cam->yaw += xoffset;
+    cam->pitch += yoffset;
+
+    if(cam->pitch > 89.0f)
+        cam->pitch = 89.0f;
+    if(cam->pitch < -89.0f)
+        cam->pitch = -89.0f;
+
+    cubVec3 direction;
+    direction.coords[0] = cos(radian(cam->yaw)) * cos(radian(cam->pitch));
+    direction.coords[1] = sin(radian(cam->pitch));
+    direction.coords[2] = sin(radian(cam->yaw)) * cos(radian(cam->pitch));
+    cam->front = cub_utils_vec3_normalize(direction);
+
+}
 
 void cub_game_input_handler(cubGame* game) {
     if (glfwGetKey(game->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -74,29 +100,19 @@ void cub_game_input_handler(cubGame* game) {
     double xpos, ypos;
     glfwGetCursorPos(game->window, &xpos, &ypos);
 
-    if(firstMouse)
+    if(cam->firstMouse == 1)
     {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
+        cam->lastX = xpos;
+        cam->lastY = ypos;
+        cam->firstMouse = 0;
     }
 
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;
-    lastX = xpos;
-    lastY = ypos;
+    float xoffset = xpos - cam->lastX;
+    float yoffset = cam->lastY - ypos;
+    cam->lastX = xpos;
+    cam->lastY = ypos;
 
-    float sensitivity = 0.1f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    yaw += xoffset;
-    pitch += yoffset;
-
-    if(pitch > 89.0f)
-        pitch = 89.0f;
-    if(pitch < -89.0f)
-        pitch = -89.0f;
+    cub_game_process_mouse_mouvement(&game->camera, xoffset, yoffset);
 }
 
 void cub_game_renderer_handler(cubGame* game) {
