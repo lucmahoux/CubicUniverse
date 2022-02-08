@@ -35,6 +35,7 @@ void cub_render_update_camera_projection(cubCamera* camera,
 
 void cub_render_update_camera_view(cubCamera* camera) {
     //const float radius = 10.0f;
+
     //float camX = sin(glfwGetTime()) * radius;
     //float camZ = cos(glfwGetTime()) * radius;
     camera->view_matrix = cub_utils_mat4_view_matrix(

@@ -45,6 +45,8 @@ void cub_game_input_handler(cubGame* game) {
         cam.position = cub_utils_vec3_add(
                 cam.position,
                 cub_utils_vec3_scalar_new(cameraSpeed, cam.front));
+
+        printf("Coordinates: z = %.6f\n",cam.position.coords[2]);
     }                                       
     if(glfwGetKey(game->window, GLFW_KEY_S) == GLFW_PRESS)
     {
