@@ -3,6 +3,7 @@
 
 ### OUR THINGS ###
 game/game
+tags.*
 
 ### CMake ###
 CMakeLists.txt.user
