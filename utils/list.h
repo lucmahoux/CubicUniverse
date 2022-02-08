@@ -19,7 +19,13 @@ typedef struct cubList {
 
 cubList* cub_utils_list(size_t memb_size);
 
+void* cub_utils_list_get(cubList* list, size_t i);
+
+void cub_utils_list_set(cubList* list, void* elt, size_t i);
+
 void cub_utils_list_append(cubList* list, void* elt);
+
+void cub_utils_list_insert(cubList* list, void* elt, size_t i);
 
 void cub_utils_list_remove(cubList* list, size_t i);
 

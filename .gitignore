@@ -2,7 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudio,codeblocks,vim,emacs,visualstudiocode,cmake
 
 ### OUR THINGS ###
-graphics/graphics
+game/game
 
 ### CMake ###
 CMakeLists.txt.user

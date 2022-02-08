@@ -19,6 +19,12 @@ cubList* cub_utils_list(size_t memb_size) {
     return list;
 }
 
+void cub_utils_list_set(cubList* list, void* elt, size_t i) {
+    if (i >= list->len)
+        errx(1, "cub_utils_list_set: list index out of range!");
+    memcpy(cub_utils_list_get(list, i), elt, list->memb_size);
+}
+
 void cub_utils_list_append(cubList* list, void* elt) {
     if (list->len == list->capacity) {
         list->capacity *= 2;
@@ -28,6 +34,20 @@ void cub_utils_list_append(cubList* list, void* elt) {
     }
     memcpy(cub_utils_list_get(list, list->len), elt, list->memb_size);
     ++list->len;
+}
+
+void cub_utils_list_insert(cubList* list, void* elt, size_t i) {
+    if (i >= list->len + 1)
+        printf("cub_utils_list_insert: list index out of range\n!");
+    else {
+        cub_utils_list_append(list, cub_utils_list_get(list, list->len - 1));
+        for (size_t k = list->len - 1; k > i; --k)
+            memcpy( cub_utils_list_get(list, k),
+                    cub_utils_list_get(list, k - 1),
+                    list->memb_size );
+        memcpy(cub_utils_list_get(list, i), elt, list->memb_size);
+        ++list->len;
+    }
 }
 
 void cub_utils_list_remove(cubList* list, size_t i) {
