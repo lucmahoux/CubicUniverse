@@ -29,6 +29,8 @@ void cub_game_clear_screen_handler(cub_unused cubGame* game) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+
+
 void cub_game_input_handler(cubGame* game) {
     if (glfwGetKey(game->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         cub_utils_close_window(game->window);
@@ -67,6 +69,34 @@ void cub_game_input_handler(cubGame* game) {
                     cub_utils_vec3_normalize(
                         cub_utils_vec3_cross_product(cam->front,cam->up_side))));
     }
+
+    // Mouse movements
+    double xpos, ypos;
+    glfwGetCursorPos(game->window, &xpos, &ypos);
+
+    if(firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    if(pitch > 89.0f)
+        pitch = 89.0f;
+    if(pitch < -89.0f)
+        pitch = -89.0f;
 }
 
 void cub_game_renderer_handler(cubGame* game) {

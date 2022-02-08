@@ -9,6 +9,7 @@ typedef void (*window_callback) (void*);
 void cub_utils_framebuffer_size_callback(cub_unused GLFWwindow* window,
                                             int width, int height);
 
+
 /* Should be called once to initialise the window */
 void cub_utils_setup_window(GLFWwindow** window, int width, int height,
                             const char* window_name);
