@@ -4,7 +4,6 @@
 void cub_game_init(cubGame* game, int width, int height) {
     // Set up the window
     cub_utils_setup_window(&game->window, width, height, "Cubic Universe");
-    
     stbi_set_flip_vertically_on_load(true);
 
     // Set up the renderer & load the texture pack
@@ -47,7 +46,7 @@ void cub_game_input_handler(cubGame* game) {
                 cub_utils_vec3_scalar_new(cameraSpeed, cam.front));
 
         printf("Coordinates: z = %.6f\n",cam.position.coords[2]);
-    }                                       
+    }
     if(glfwGetKey(game->window, GLFW_KEY_S) == GLFW_PRESS)
     {
         printf("Coordinates : x = %.6f y = %.6f z = %.6f\n",
@@ -56,7 +55,7 @@ void cub_game_input_handler(cubGame* game) {
         cam.position = cub_utils_vec3_sub(
                 cam.position,
                 cub_utils_vec3_scalar_new(cameraSpeed, cam.front));
-    }                                       
+    }
     if(glfwGetKey(game->window, GLFW_KEY_A) == GLFW_PRESS)
     {
         printf("Coordinates : x = %.6f y = %.6f z = %.6f\n",
@@ -67,7 +66,7 @@ void cub_game_input_handler(cubGame* game) {
                 cub_utils_vec3_scalar_new(cameraSpeed,
                     cub_utils_vec3_normalize(
                         cub_utils_vec3_cross_product(cam.front,cam.up_side))));
-    }                                       
+    }
     if(glfwGetKey(game->window, GLFW_KEY_D) == GLFW_PRESS)
     {
         printf("Coordinates : x = %.6f y = %.6f z = %.6f\n",
@@ -78,7 +77,7 @@ void cub_game_input_handler(cubGame* game) {
                 cub_utils_vec3_scalar_new(cameraSpeed,
                     cub_utils_vec3_normalize(
                         cub_utils_vec3_cross_product(cam.front,cam.up_side))));
-    }                                       
+    }
 }
 
 void cub_game_renderer_handler(cubGame* game) {
@@ -91,12 +90,12 @@ void cub_game_renderer_handler(cubGame* game) {
     cub_render_update_camera_view(&game->camera);
     // World updates
     glBindVertexArray(game->block_renderer.VAO);
-    cub_block_render(&game->block_renderer, 0, CUB_VEC3(0.0f, 0.0f, 0.0f));
-    cub_block_render(&game->block_renderer, 1, CUB_VEC3(1.0f, 0.0f, 0.0f));
-    cub_block_render(&game->block_renderer, 0, CUB_VEC3(0.0f, 0.0f, 1.0f));
-    cub_block_render(&game->block_renderer, 1, CUB_VEC3(1.0f, 0.0f, 1.0f));
-    cub_block_render(&game->block_renderer, 0, CUB_VEC3(1.0f, 1.0f, 1.0f));
-    cub_block_render(&game->block_renderer, 0, CUB_VEC3(2.0f, 0.0f, 0.0f));
+    cub_block_render(&game->block_renderer, 1, CUB_VEC3(0.0f, 0.0f, 0.0f));
+    cub_block_render(&game->block_renderer, 2, CUB_VEC3(1.0f, 0.0f, 0.0f));
+    cub_block_render(&game->block_renderer, 1, CUB_VEC3(0.0f, 0.0f, 1.0f));
+    cub_block_render(&game->block_renderer, 2, CUB_VEC3(1.0f, 0.0f, 1.0f));
+    cub_block_render(&game->block_renderer, 1, CUB_VEC3(1.0f, 1.0f, 1.0f));
+    cub_block_render(&game->block_renderer, 1, CUB_VEC3(2.0f, 0.0f, 0.0f));
 }
 
 void cub_game_start(cubGame* game) {

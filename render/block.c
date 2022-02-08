@@ -122,7 +122,7 @@ void cub_block_setup_renderer(cubBlockRenderer* renderer) {
 
 void cub_block_render(cubBlockRenderer* renderer, cub_block_t id,
                         cubVec3 position) {
-    cubBlockData* b_data = &renderer->block_list.blocks[id];
+    cubBlockData* b_data = &renderer->block_list.blocks[id - 1];
 
     switch (b_data->type) {
         case CUBE_SAME_FACES:
