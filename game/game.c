@@ -29,11 +29,7 @@ void cub_game_clear_screen_handler(cub_unused cubGame* game) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-float radian(float degree)
-{
-    return degree * (3.14159 / 180);
-}
-
+// Change values with mouse input
 void cub_game_process_mouse_mouvement(cubCamera* cam, float xoffset,
         float yoffset)
 {
@@ -50,14 +46,15 @@ void cub_game_process_mouse_mouvement(cubCamera* cam, float xoffset,
         cam->pitch = -89.0f;
 
     cubVec3 direction;
-    direction.coords[0] = cos(radian(cam->yaw)) * cos(radian(cam->pitch));
-    direction.coords[1] = sin(radian(cam->pitch));
-    direction.coords[2] = sin(radian(cam->yaw)) * cos(radian(cam->pitch));
+    direction.coords[0] = cos(RAD(cam->yaw)) * cos(RAD(cam->pitch));
+    direction.coords[1] = sin(RAD(cam->pitch));
+    direction.coords[2] = sin(RAD(cam->yaw)) * cos(RAD(cam->pitch));
     cam->front = cub_utils_vec3_normalize(direction);
 
 }
 
 void cub_game_input_handler(cubGame* game) {
+    // Exit program
     if (glfwGetKey(game->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         cub_utils_close_window(game->window);
 
