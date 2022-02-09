@@ -107,12 +107,3 @@ HOW TO PLAY CUBICUNIVERSE
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-
-
