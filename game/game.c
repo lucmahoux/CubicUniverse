@@ -77,7 +77,7 @@ void cub_game_input_handler(cubGame* game) {
     {
         cam->position = CUB_VEC3_SUB(
                 cam->position,
-                CUB_VEC3_SCALE(cameraSpeed,
+               CUB_VEC3_SCALE(cameraSpeed,
                     CUB_VEC3_NORM(CUB_VEC3_CROSS(cam->front,cam->up_side))));
     }
     if(glfwGetKey(game->window, GLFW_KEY_D) == GLFW_PRESS)
