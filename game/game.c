@@ -129,8 +129,8 @@ void cub_game_renderer_handler(cubGame* game) {
     cub_block_render(&game->block_renderer, 2, CUB_VEC3(1.0f, 0.0f, 0.0f));
     cub_block_render(&game->block_renderer, 1, CUB_VEC3(0.0f, 0.0f, 1.0f));
     cub_block_render(&game->block_renderer, 2, CUB_VEC3(1.0f, 0.0f, 1.0f));
-    cub_block_render(&game->block_renderer, 1, CUB_VEC3(1.0f, 1.0f, 1.0f));
-    cub_block_render(&game->block_renderer, 1, CUB_VEC3(2.0f, 0.0f, 0.0f));
+    cub_block_render(&game->block_renderer, 3, CUB_VEC3(1.0f, 1.0f, 1.0f));
+    cub_block_render(&game->block_renderer, 3, CUB_VEC3(2.0f, 0.0f, 0.0f));
 }
 
 void cub_game_start(cubGame* game) {
