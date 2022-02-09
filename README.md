@@ -1,5 +1,4 @@
 <div id="top"></div>
-[![Issues][issues-shield]][issues-url]
 
 
 
@@ -54,7 +53,6 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
 
 
 Super C project by EPITA Students.
@@ -116,6 +114,5 @@ HOW TO PLAY CUBICUNIVERSE
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[issues-shield]: https://img.shields.io/github/issues/github_username/repo_name.svg?style=for-the-badge
-[issues-url]: https://github.com/github_username/repo_name/issues
+
 
