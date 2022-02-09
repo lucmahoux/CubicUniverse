@@ -244,6 +244,9 @@ void cub_block_load_texture_top_bottom_faces(char* buffer, size_t name_len,
     ++tex_id_block;
     strcpy(start, "bottom.png");
     cub_utils_bind_load_texture(tex_id_block, buffer);
+    ++tex_id_block;
+    strcpy(start, "side.png");
+    cub_utils_bind_load_texture(tex_id_block, buffer);
 }
 
 // The buffer must have a sufficient allocated memory to handle the changes made
