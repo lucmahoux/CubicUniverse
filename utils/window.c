@@ -6,6 +6,7 @@ void cub_utils_framebuffer_size_callback(cub_unused GLFWwindow* window,
     glViewport(0, 0, width, height);
 }
 
+
 void cub_utils_setup_window(GLFWwindow** window, int width, int height,
                             const char* window_name) {
     // Initialise GLFW

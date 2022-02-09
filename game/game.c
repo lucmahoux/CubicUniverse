@@ -29,7 +29,32 @@ void cub_game_clear_screen_handler(cub_unused cubGame* game) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+// Change values with mouse input
+void cub_game_process_mouse_mouvement(cubCamera* cam, float xoffset,
+        float yoffset)
+{
+    float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    cam->yaw += xoffset;
+    cam->pitch += yoffset;
+
+    if(cam->pitch > 89.0f)
+        cam->pitch = 89.0f;
+    if(cam->pitch < -89.0f)
+        cam->pitch = -89.0f;
+
+    cubVec3 direction;
+    direction.coords[0] = cos(RAD(cam->yaw)) * cos(RAD(cam->pitch));
+    direction.coords[1] = sin(RAD(cam->pitch));
+    direction.coords[2] = sin(RAD(cam->yaw)) * cos(RAD(cam->pitch));
+    cam->front = cub_utils_vec3_normalize(direction);
+
+}
+
 void cub_game_input_handler(cubGame* game) {
+    // Exit program
     if (glfwGetKey(game->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         cub_utils_close_window(game->window);
 
@@ -52,7 +77,7 @@ void cub_game_input_handler(cubGame* game) {
     {
         cam->position = CUB_VEC3_SUB(
                 cam->position,
-                CUB_VEC3_SCALE(cameraSpeed,
+               CUB_VEC3_SCALE(cameraSpeed,
                     CUB_VEC3_NORM(CUB_VEC3_CROSS(cam->front,cam->up_side))));
     }
     if(glfwGetKey(game->window, GLFW_KEY_D) == GLFW_PRESS)
@@ -62,6 +87,24 @@ void cub_game_input_handler(cubGame* game) {
                 CUB_VEC3_SCALE(cameraSpeed,
                     CUB_VEC3_NORM(CUB_VEC3_CROSS(cam->front,cam->up_side))));
     }
+
+    // Mouse movements
+    double xpos, ypos;
+    glfwGetCursorPos(game->window, &xpos, &ypos);
+
+    if(cam->firstMouse == 1)
+    {
+        cam->lastX = xpos;
+        cam->lastY = ypos;
+        cam->firstMouse = 0;
+    }
+
+    float xoffset = xpos - cam->lastX;
+    float yoffset = cam->lastY - ypos;
+    cam->lastX = xpos;
+    cam->lastY = ypos;
+
+    cub_game_process_mouse_mouvement(&game->camera, xoffset, yoffset);
 }
 
 void cub_game_renderer_handler(cubGame* game) {
@@ -74,7 +117,14 @@ void cub_game_renderer_handler(cubGame* game) {
 
     // World updates
     glBindVertexArray(game->block_renderer.VAO);
-    cub_chunk_render(&game->chunk_test, &game->block_renderer);
+    cub_block_render(&game->block_renderer, 1, CUB_VEC3(0.0f, 0.0f, 0.0f));
+    cub_block_render(&game->block_renderer, 2, CUB_VEC3(1.0f, 0.0f, 0.0f));
+    cub_block_render(&game->block_renderer, 1, CUB_VEC3(0.0f, 0.0f, 1.0f));
+    cub_block_render(&game->block_renderer, 2, CUB_VEC3(1.0f, 0.0f, 1.0f));
+    cub_block_render(&game->block_renderer, 3, CUB_VEC3(1.0f, 1.0f, 1.0f));
+    cub_block_render(&game->block_renderer, 3, CUB_VEC3(2.0f, 0.0f, 0.0f));
+
+    //cub_chunk_render(&game->chunk_test, &game->block_renderer);
 }
 
 void cub_game_start(cubGame* game) {

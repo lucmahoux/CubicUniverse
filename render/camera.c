@@ -20,6 +20,11 @@ void cub_render_setup_camera(cubCamera* camera, GLuint shader_program,
     camera->front = CUB_VEC3(0.0f,0.0f,-1.0f);
     camera->deltaTime = 0.0f;
     camera->lastFrame = 0.0f;
+    camera->pitch = 0.0f;
+    camera->yaw = -90.0f;
+    camera->firstMouse = 1;
+    camera->lastX = 1280 / 2.0f;
+    camera->lastY = 720 / 2.0f;
     cub_render_update_camera_projection(camera, shader_program);
 }
 
