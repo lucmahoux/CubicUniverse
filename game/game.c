@@ -10,10 +10,13 @@ void cub_game_init(cubGame* game, int width, int height) {
     cub_block_setup_renderer(&game->block_renderer);
     for (size_t i = 0; i < game->block_renderer.block_list.nb_blocks; ++i) {
         cubBlockData* block = &game->block_renderer.block_list.blocks[i];
-        printf("Name: %s - ID: %i - Type: %s\n", block->name, block->id,
-                block->type == CUBE_SAME_FACES ? "CUBE_SAME_FACES" :
-                block->type == CUBE_UNIQUE_FACES ? "CUBE_UNIQUE_FACES" :
-                "CUBE_TOP_BOTTOM");
+        printf("Name: %s - ID: %u - RenderType: 0x%x - VAO_id: %u "
+                "- is_solid: %u - has_gravity: %u - has_bs_tex: %u "
+                "- is_bs_creator: %u - has_states: %u - nb_states: %u\n",
+                block->name, block->id, block->render_type, block->VAO_id,
+                block->block_info.is_solid, block->block_info.has_gravity,
+                block->block_info.has_bs_tex, block->block_info.is_bs_creator,
+                block->block_info.has_states, block->block_info.nb_states);
     }
     cub_block_load_texture_pack(&game->block_renderer.block_list);
 
@@ -73,14 +76,62 @@ void cub_game_renderer_handler(cubGame* game) {
     cub_render_update_camera_view(&game->camera);
 
     // World updates
-    glBindVertexArray(game->block_renderer.VAO);
-    cub_chunk_render(&game->chunk_test, &game->block_renderer);
+    glBindVertexArray(game->block_renderer.buffer_objs[CUB_DEFAULT_VAO_ID].VAO);
+    cubBP_elt bp_elt = { .id = 1, .bs_values = NULL };
+    cub_bs_val bs_vals[3] = { 0, 0, 0 };
+    bp_elt.bs_values = bs_vals;
+    cub_block_render(&game->block_renderer, &bp_elt,
+                        CUB_VEC3(0.0f, 0.0f, -2.0f));
+    bp_elt.id = 2;
+    cub_block_render(&game->block_renderer, &bp_elt,
+                        CUB_VEC3(0.0f, 0.0f, 2.0f));
+    bp_elt.id = 3;
+    bp_elt.bs_values[0] = BSV_OAK;
+    cub_block_render(&game->block_renderer, &bp_elt,
+                        CUB_VEC3(0.0f, 2.0f, 0.0f));
+    bp_elt.bs_values[0] = BSV_ACACIA;
+    cub_block_render(&game->block_renderer, &bp_elt,
+                        CUB_VEC3(0.0f, 0.0f, 0.0f));
+    bp_elt.bs_values[0] = BSV_SPRUCE;
+    cub_block_render(&game->block_renderer, &bp_elt,
+                        CUB_VEC3(0.0f, -2.0f, 0.0f));
+    bp_elt.id = 4;
+    bp_elt.bs_values[0] = BSV_OAK;
+    cub_block_render(&game->block_renderer, &bp_elt,
+                        CUB_VEC3(1.0f, 1.0f, 0.0f));
+    bp_elt.bs_values[0] = BSV_ACACIA;
+    cub_block_render(&game->block_renderer, &bp_elt,
+                        CUB_VEC3(0.0f, 1.0f, 1.0f));
+    bp_elt.bs_values[0] = BSV_SPRUCE;
+    cub_block_render(&game->block_renderer, &bp_elt,
+                        CUB_VEC3(1.0f, 0.0f, 1.0f));
+    bp_elt.id = 5;
+    bp_elt.bs_values[0] = BSV_POPPY;
+    cub_block_render(&game->block_renderer, &bp_elt,
+                        CUB_VEC3(0.0f, 3.0f, 0.0f));
+    bp_elt.bs_values[0] = BSV_TULIP_ORANGE;
+    cub_block_render(&game->block_renderer, &bp_elt,
+                        CUB_VEC3(1.0f, 3.0f, 0.0f));
+    bp_elt.bs_values[0] = BSV_LILY_OF_THE_VALLEY;
+    cub_block_render(&game->block_renderer, &bp_elt,
+                        CUB_VEC3(2.0f, 3.0f, 0.0f));
+    bp_elt.bs_values[0] = BSV_OXEYE;
+    cub_block_render(&game->block_renderer, &bp_elt,
+                        CUB_VEC3(3.0f, 3.0f, 0.0f));
+    bp_elt.id = 6;
+    bp_elt.bs_values[0] = BSV_FALSE;
+    cub_block_render(&game->block_renderer, &bp_elt,
+                        CUB_VEC3(4.0f, 3.0f, 0.0f));
+    bp_elt.bs_values[0] = BSV_TRUE;
+    cub_block_render(&game->block_renderer, &bp_elt,
+                        CUB_VEC3(5.0f, 3.0f, 0.0f));
+    //cub_chunk_render(&game->chunk_test, &game->block_renderer);
 }
 
 void cub_game_start(cubGame* game) {
     //game->chunk_test = cub_chunk_create(0, 0);
     //cub_chunk_fill(&game->chunk_test, 1);
-    cub_chunk_load(&game->chunk_test);
+    //cub_chunk_load(&game->chunk_test);
     cub_utils_start_window_loop(game->window,
                                 (window_callback) cub_game_clear_screen_handler,
                                 (window_callback) cub_game_input_handler,

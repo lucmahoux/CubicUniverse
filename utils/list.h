@@ -23,6 +23,8 @@ void* cub_utils_list_get(cubList* list, size_t i);
 
 void cub_utils_list_set(cubList* list, void* elt, size_t i);
 
+void cub_utils_list_check_double_capacity(cubList* list);
+
 void cub_utils_list_append(cubList* list, void* elt);
 
 void cub_utils_list_insert(cubList* list, void* elt, size_t i);

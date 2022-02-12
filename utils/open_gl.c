@@ -12,6 +12,13 @@ GLchar* cub_utils_load_texture(GLint* width, GLint* height,
     return (GLchar*)data;
 }
 
+bool cub_utils_texture_exists(const char* tex_name) {
+    char* fpath = cub_utils_strconcat(TEXTURES_PATH, tex_name, NULL);
+    bool result = cub_utils_file_exists(fpath);
+    free(fpath);
+    return result;
+}
+
 void cub_utils_bind_load_texture(GLuint* texture_id, const char* name) {
     glBindTexture(GL_TEXTURE_2D, *texture_id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

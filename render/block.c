@@ -2,275 +2,241 @@
 
 void cub_block_setup_renderer(cubBlockRenderer* renderer) {
     printf("cub_block_setup_renderer: Starting renderer initialisation...\n");
-    const GLfloat block_vertices[] = {
-        0.0f,   0.0f,   1.0f,   0.0f,   0.0f,   1.0f,   // Face 1 - South
-        1.0f,   0.0f,   1.0f,   1.0f,   0.0f,   1.0f,
-        1.0f,   1.0f,   1.0f,   1.0f,   1.0f,   1.0f,
-        0.0f,   1.0f,   1.0f,   0.0f,   1.0f,   1.0f,
-
-        1.0f,   0.0f,   1.0f,   0.0f,   0.0f,   2.0f,   // Face 2 - East
-        1.0f,   0.0f,   0.0f,   1.0f,   0.0f,   2.0f,
-        1.0f,   1.0f,   0.0f,   1.0f,   1.0f,   2.0f,
-        1.0f,   1.0f,   1.0f,   0.0f,   1.0f,   2.0f,
-
-        1.0f,   0.0f,   0.0f,   0.0f,   0.0f,   3.0f,   // Face 3 - North
-        0.0f,   0.0f,   0.0f,   1.0f,   0.0f,   3.0f,
-        0.0f,   1.0f,   0.0f,   1.0f,   1.0f,   3.0f,
-        1.0f,   1.0f,   0.0f,   0.0f,   1.0f,   3.0f,
-
-        0.0f,   0.0f,   0.0f,   0.0f,   0.0f,   4.0f,   // Face 4 - West
-        0.0f,   0.0f,   1.0f,   1.0f,   0.0f,   4.0f,
-        0.0f,   1.0f,   1.0f,   1.0f,   1.0f,   4.0f,
-        0.0f,   1.0f,   0.0f,   0.0f,   1.0f,   4.0f,
-
-        0.0f,   1.0f,   1.0f,   0.0f,   0.0f,   5.0f,   // Face 5 - Top
-        1.0f,   1.0f,   1.0f,   1.0f,   0.0f,   5.0f,
-        1.0f,   1.0f,   0.0f,   1.0f,   1.0f,   5.0f,
-        0.0f,   1.0f,   0.0f,   0.0f,   1.0f,   5.0f,
-
-        0.0f,   0.0f,   0.0f,   0.0f,   0.0f,   6.0f,   // Face 6 - Bottom
-        1.0f,   0.0f,   0.0f,   1.0f,   0.0f,   6.0f,
-        1.0f,   0.0f,   1.0f,   1.0f,   1.0f,   6.0f,
-        0.0f,   0.0f,   1.0f,   0.0f,   1.0f,   6.0f
-    };
-    const GLuint block_indices[] = {
-        0,  1,  2,  0,  2,  3,  // Face 1
-        4,  5,  6,  4,  6,  7,  // Face 2
-        8,  9,  10, 8,  10, 11, // Face 3
-        12, 13, 14, 12, 14, 15, // Face 4
-        16, 17, 18, 16, 18, 19, // Face 5
-        20, 21, 22, 20, 22, 23  // Face 6
-    };
-
-    // Generate the buffers
-    GLuint buffers[2];
-    GLuint VAO;
-    glGenBuffers(2, buffers);
-    glGenVertexArrays(1, &VAO);
-
-    // Bind the vertex array object then set up the other buffers data
-    glBindVertexArray(VAO);
-    // 1) Vertex Buffer
-    glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(block_vertices),
-                 block_vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                        6 * sizeof(GLfloat), (GLvoid*) 0);
-    glEnableVertexAttribArray(0); // Coords
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
-                        6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(1); // Texture Coords
-    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE,
-                        6 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(2); // Face identifier (NSEWTB)
-    // 2) Element Buffer
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(block_indices),
-                 block_indices, GL_STATIC_DRAW);
-
-    // Unbind everything [!] Order of unbinding matters [!]
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    renderer->VAO = VAO;
-    renderer->VBO = buffers[0];
-    renderer->EBO = buffers[1];
 
     // Load the shader program
     renderer->shader_program = cub_utils_build_shader("block");
 
     // Get uniforms locations (for textures)
-    GLint loc = glGetUniformLocation(renderer->shader_program, "tex_south");
-    if (loc == -1)
-        errx(1, "cub_block_setup_renderer: tex_south uniform is missing!");
-    renderer->tex_locations[0] = loc;
-    loc = glGetUniformLocation(renderer->shader_program, "tex_east");
-    if (loc == -1)
-        errx(1, "cub_block_setup_renderer: tex_east uniform is missing!");
-    renderer->tex_locations[1] = loc;
-    loc = glGetUniformLocation(renderer->shader_program, "tex_north");
-    if (loc == -1)
-        errx(1, "cub_block_setup_renderer: tex_north uniform is missing!");
-    renderer->tex_locations[2] = loc;
-    loc = glGetUniformLocation(renderer->shader_program, "tex_west");
-    if (loc == -1)
-        errx(1, "cub_block_setup_renderer: tex_west uniform is missing!");
-    renderer->tex_locations[3] = loc;
-    loc = glGetUniformLocation(renderer->shader_program, "tex_top");
+    GLint loc = glGetUniformLocation(renderer->shader_program, "tex_top");
     if (loc == -1)
         errx(1, "cub_block_setup_renderer: tex_top uniform is missing!");
-    renderer->tex_locations[4] = loc;
+    renderer->tex_locations[CUB_TOP_ID] = loc;
     loc = glGetUniformLocation(renderer->shader_program, "tex_bottom");
     if (loc == -1)
         errx(1, "cub_block_setup_renderer: tex_bottom uniform is missing!");
-    renderer->tex_locations[5] = loc;
+    renderer->tex_locations[CUB_BOTTOM_ID] = loc;
+    loc = glGetUniformLocation(renderer->shader_program, "tex_front");
+    if (loc == -1)
+        errx(1, "cub_block_setup_renderer: tex_front uniform is missing!");
+    renderer->tex_locations[CUB_FRONT_ID] = loc;
+    loc = glGetUniformLocation(renderer->shader_program, "tex_back");
+    if (loc == -1)
+        errx(1, "cub_block_setup_renderer: tex_back uniform is missing!");
+    renderer->tex_locations[CUB_BACK_ID] = loc;
+    loc = glGetUniformLocation(renderer->shader_program, "tex_left");
+    if (loc == -1)
+        errx(1, "cub_block_setup_renderer: tex_left uniform is missing!");
+    renderer->tex_locations[CUB_LEFT_ID] = loc;
+    loc = glGetUniformLocation(renderer->shader_program, "tex_right");
+    if (loc == -1)
+        errx(1, "cub_block_setup_renderer: tex_right uniform is missing!");
+    renderer->tex_locations[CUB_RIGHT_ID] = loc;
 
     // Get the uniform value of the model matrix
     renderer->model_uni_loc = glGetUniformLocation(renderer->shader_program,
                                                     "model_matrix");
     renderer->model_matrix = cub_utils_mat4(1.0f);
 
-    // Load all the blocks
-    cub_block_load_block_list(&renderer->block_list);
-    printf("cub_block_setup_renderer: Renderer initialised!\n");
+    // Load all the blocks & the rendering buffers
+    cub_BLloader_load(&renderer->block_list, &renderer->nb_buffers,
+                        &renderer->buffer_objs);
 
     // Enable depth testing, otherwise weird rendering of cubes
     glEnable(GL_DEPTH_TEST);
     // Accept the fragment if closer to the camera than the former one
     glDepthFunc(GL_LESS);
+
+    printf("cub_block_setup_renderer: Renderer initialised!\n");
 }
 
-void cub_block_render(cubBlockRenderer* renderer, cub_block_t id,
-                        cubVec3 position) {
-    cubBlockData* b_data = &renderer->block_list.blocks[id - 1];
+void cub_block_update_tex_uniform(GLuint tex_loc, uint8_t tex_id,
+                                    uint8_t gl_tex_nbr) {
+    glActiveTexture(GL_TEXTURE0 + gl_tex_nbr);
+    glBindTexture(GL_TEXTURE_2D, tex_id);
+    glUniform1i(tex_loc, gl_tex_nbr);
+}
 
-    switch (b_data->type) {
-        case CUBE_SAME_FACES:
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, b_data->textures_id[0]);
-            for (uint8_t i = 0; i < 6; ++i)
-                glUniform1i(renderer->tex_locations[i], 0);
-            break;
-        case CUBE_TOP_BOTTOM:
-            glActiveTexture(GL_TEXTURE0); // Top
-            glBindTexture(GL_TEXTURE_2D, b_data->textures_id[0]);
-            glActiveTexture(GL_TEXTURE1); // Bottom
-            glBindTexture(GL_TEXTURE_2D, b_data->textures_id[1]);
-            glActiveTexture(GL_TEXTURE2); // Sides
-            glBindTexture(GL_TEXTURE_2D, b_data->textures_id[2]);
-            for (uint8_t i = 0; i < 4; ++i)
-                glUniform1i(renderer->tex_locations[i], 2);
-            glUniform1i(renderer->tex_locations[4], 0);
-            glUniform1i(renderer->tex_locations[5], 1);
-            break;
-        case CUBE_UNIQUE_FACES:
-            for (uint8_t i = 0; i < 6; ++i) {
-                glActiveTexture(GL_TEXTURE0 + i);
-                glBindTexture(GL_TEXTURE_2D, b_data->textures_id[i]);
-                glUniform1i(renderer->tex_locations[i], i);
-            }
-            break;
+void cub_block_set_tex_default(cubBlockRenderer* renderer, cubBlockData* block,
+                                cubBP_elt* bp_elt) {
+    GLuint tex_ids[6] = { 0, 0, 0, 0, 0, 0 };
+    uint8_t tex_id_block = (block->block_info.has_bs_tex
+                            ? bp_elt->bs_values[CUB_BS_TEX_ID]
+                            : 0) * block->nb_tex_draw;
+    if (block->render_type & RT_TOP)
+        tex_ids[CUB_TOP_ID] = block->textures[tex_id_block++];
+    if (block->render_type & RT_BOTTOM)
+        tex_ids[CUB_BOTTOM_ID] = block->textures[tex_id_block++];
+    if (block->render_type & RT_FRONT)
+        tex_ids[CUB_FRONT_ID] = block->textures[tex_id_block++];
+    if (block->render_type & RT_BACK)
+        tex_ids[CUB_BACK_ID] = block->textures[tex_id_block++];
+    if (block->render_type & RT_LEFT)
+        tex_ids[CUB_LEFT_ID] = block->textures[tex_id_block++];
+    if (block->render_type & RT_RIGHT)
+        tex_ids[CUB_RIGHT_ID] = block->textures[tex_id_block++];
+    if (block->render_type & RT_SIDE) {
+        for (uint8_t i = CUB_SIDE_START_ID; i <= CUB_SIDE_END_ID; ++i)
+            if (!tex_ids[i])
+                tex_ids[i] = block->textures[tex_id_block];
+        ++tex_id_block;
     }
+    // Top & Bottom textures are complementary
+    if (tex_ids[CUB_TOP_ID] && !tex_ids[CUB_BOTTOM_ID])
+        tex_ids[CUB_BOTTOM_ID] = tex_ids[CUB_TOP_ID];
+    if (block->render_type & RT_DEFAULT) {
+        for (uint8_t i = CUB_DEFAULT_START_ID; i <= CUB_DEFAULT_END_ID; ++i)
+            if (!tex_ids[i])
+                tex_ids[i] = block->textures[tex_id_block];
+    }
+    for (uint8_t i = 0; i < 6; ++i)
+        cub_block_update_tex_uniform(renderer->tex_locations[i], tex_ids[i], i);
+}
 
+void cub_block_set_tex_custom(cubBlockRenderer* renderer, cubBlockData* block,
+                                cubBP_elt* bp_elt) {
+    uint8_t offset = (block->block_info.has_bs_tex
+                      ? bp_elt->bs_values[CUB_BS_TEX_ID]
+                      : 0) * block->nb_tex_draw;
+    for (uint8_t i = 0; i < block->nb_tex_draw; ++i)
+        cub_block_update_tex_uniform(renderer->tex_locations[i],
+                                     block->textures[offset + i], i);
+}
+
+void cub_block_render(cubBlockRenderer* renderer, cubBP_elt* bp_elt,
+                        cubVec3 position) {
+    cubBlockData* block = &renderer->block_list.blocks[bp_elt->id];
+    cubRenderBufferObject* r_obj = &renderer->buffer_objs[block->VAO_id];
+    if (block->VAO_id != CUB_DEFAULT_VAO_ID) {
+        glBindVertexArray(r_obj->VAO);
+        cub_block_set_tex_custom(renderer, block, bp_elt);
+    } else
+        cub_block_set_tex_default(renderer, block, bp_elt);
+
+    // TODO: Apply BS transformations (rotations, ...)
     cubMat4 new_model = CUB_MAT4_TRANS(renderer->model_matrix, position);
-    glUniformMatrix4fv(renderer->model_uni_loc, 1, GL_FALSE, new_model.coeffs);
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (GLvoid*) 0);
+     glUniformMatrix4fv(renderer->model_uni_loc, 1, GL_FALSE, new_model.coeffs);
+
+     glDrawElements(GL_TRIANGLES, r_obj->nb_elements,
+                    GL_UNSIGNED_INT, (GLvoid*) 0);
+    if (block->VAO_id != CUB_DEFAULT_VAO_ID) // Rebind the default VAO if needed
+        glBindVertexArray(renderer->buffer_objs[CUB_DEFAULT_VAO_ID].VAO);
 }
 
 void cub_block_free_renderer(cubBlockRenderer* renderer) {
     cub_block_free_all_textures(&renderer->block_list);
     free(renderer->block_list.blocks);
-    glDeleteBuffers(1, &renderer->VBO);
-    glDeleteBuffers(1, &renderer->EBO);
-    glDeleteVertexArrays(1, &renderer->VAO);
+    for (uint8_t i = 0; i < renderer->nb_buffers; ++i) {
+        cubRenderBufferObject* buffer_obj = renderer->buffer_objs + i;
+        glDeleteBuffers(1, &buffer_obj->VBO);
+        glDeleteBuffers(1, &buffer_obj->EBO);
+        glDeleteVertexArrays(1, &buffer_obj->VAO);
+    }
+    free(renderer->buffer_objs);
     glDeleteProgram(renderer->shader_program);
 }
 
-void cub_block_load_block_list(cubBlockList* block_list) {
-    char* fpath = cub_utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
-    printf("cub_block_load_block_list: Trying to load %s...\n", fpath);
-    FILE* fp;
-    if ( (fp = fopen(fpath, "rb")) == NULL ) {
-        errx(1, "cub_block_load_block_list: File not found: %s!", fpath);
+void cub_block_load_texture(char* buffer, const char* prefix, const char* ext,
+                            const char* suffix, GLuint* texture_id) {
+    snprintf(buffer, 2 * CUB_MAX_BLOCK_STRLEN, "%s%s%s.png",
+             prefix, ext, suffix);
+    glGenTextures(1, texture_id);
+    cub_utils_bind_load_texture(texture_id, buffer);
+}
+
+void cub_block_try_load_texture(char* buffer, const char* prefix,
+                                const char* ext, const char* suffix,
+                                GLuint* tex_id, GLuint* def_tex_id) {
+    snprintf(buffer, 2 * CUB_MAX_BLOCK_STRLEN, "%s%s%s.png",
+             prefix, ext, suffix);
+    if (!cub_utils_texture_exists(buffer)) {
+        // If the texture cannot be loaded, set *tex_id to the default value
+        *tex_id = *def_tex_id;
     } else {
-        size_t nb_read;
-        uint32_t nb_blocks;
-        nb_read = fread(&nb_blocks, sizeof(uint32_t), 1, fp);
-        if (nb_read != 1)
-            errx(1, "cub_block_load_block_list: Error - wrong format!");
-        block_list->blocks = malloc(nb_blocks * sizeof(cubBlockData));
-        if (!block_list->blocks)
-            errx(1, "cub_block_load_block_list: Malloc failed!");
-        block_list->nb_blocks = nb_blocks;
-        size_t name_len = CUB_MAX_BLOCK_STRLEN;
-        size_t id_len = sizeof(cub_block_t);
-        size_t type_len = sizeof(cubBlockTextureType);
-        for (uint32_t i = 0; i < nb_blocks; ++i) {
-            cubBlockData* current = &block_list->blocks[i];
-            // Load block name
-            nb_read = fread(&current->name, sizeof(char), name_len, fp);
-            if (nb_read != name_len)
-                errx(1, "cub_block_load_block_list: Incorrect 'name' format!");
-
-            // Load block id
-            nb_read = fread(&current->id, id_len, 1, fp);
-            if (nb_read != 1)
-                errx(1, "cub_block_load_block_list: Incorrect 'id' format!");
-
-            // Load block type
-            nb_read = fread(&current->type, type_len, 1, fp);
-            if (nb_read != 1)
-                errx(1, "cub_block_load_block_list: Incorrect 'type' format!");
-
-            // Set up memory allocations for textures identifiers
-            switch (current->type) {
-                case CUBE_SAME_FACES:
-                    current->textures_id = malloc(sizeof(GLuint));
-                    if (!current->textures_id)
-                        errx(1, "cub_block_load_block_list: Malloc failed!");
-                    break;
-                case CUBE_TOP_BOTTOM:
-                    current->textures_id = malloc(3 * sizeof(GLuint));
-                    if (!current->textures_id)
-                        errx(1, "cub_block_load_block_list: Malloc failed!");
-                    break;
-                case CUBE_UNIQUE_FACES:
-                    current->textures_id = malloc(6 * sizeof(GLuint));
-                    if (!current->textures_id)
-                        errx(1, "cub_block_load_block_list: Malloc failed!");
-                    break;
-                default:
-                    errx(1, "cub_block_load_block_list: Unknown block type!");
-            }
-        }
-        printf("cub_block_load_block_list: Block list loaded successfully!\n");
+        glGenTextures(1, tex_id);
+        cub_utils_bind_load_texture(tex_id, buffer);
     }
-    free(fpath);
-    fclose(fp);
 }
 
-void cub_block_load_texture_same_faces(char* buffer, size_t name_len,
-                                        GLuint* tex_id_block) {
-    char* start = buffer + name_len - 1;
-    strcpy(start, ".png");
-    cub_utils_bind_load_texture(tex_id_block, buffer);
+void cub_block_tex_load_from_render_type(char* buffer, const char* prefix,
+                                         const char* suffix,
+                                         cubRenderType render_type,
+                                         GLuint* tex_id) {
+    if (render_type & RT_TOP)
+        cub_block_load_texture(buffer, prefix, "_top", suffix, tex_id++);
+    if (render_type & RT_BOTTOM)
+        cub_block_load_texture(buffer, prefix, "_bottom", suffix, tex_id++);
+    if (render_type & RT_FRONT)
+        cub_block_load_texture(buffer, prefix, "_front", suffix, tex_id++);
+    if (render_type & RT_BACK)
+        cub_block_load_texture(buffer, prefix, "_back", suffix, tex_id++);
+    if (render_type & RT_LEFT)
+        cub_block_load_texture(buffer, prefix, "_left", suffix, tex_id++);
+    if (render_type & RT_RIGHT)
+        cub_block_load_texture(buffer, prefix, "_right", suffix, tex_id++);
+    if (render_type & RT_SIDE)
+        cub_block_load_texture(buffer, prefix, "_side", suffix, tex_id++);
+    if (render_type & RT_DEFAULT)
+        cub_block_load_texture(buffer, prefix, "", suffix, tex_id++);
 }
 
-void cub_block_load_texture_top_bottom_faces(char* buffer, size_t name_len,
-                                             GLuint* tex_id_block) {
-    char* start = buffer + name_len;
-    strcpy(start, "top.png");
-    cub_utils_bind_load_texture(tex_id_block, buffer);
-    ++tex_id_block;
-    strcpy(start, "bottom.png");
-    cub_utils_bind_load_texture(tex_id_block, buffer);
-    ++tex_id_block;
-    strcpy(start, "side.png");
-    cub_utils_bind_load_texture(tex_id_block, buffer);
+void cub_block_load_texture_BS_modificator(cubBlockData* block) {
+    char buffer[CUB_MAX_BLOCK_STRLEN * 2];
+    char suffix[CUB_MAX_BLOCK_STRLEN];
+    if (!block->bs_name_parser)
+        errx(1, "cub_block_load_texture_BS_modificator: No parser found...");
+    cubBlockStateValue bs_value = 0;
+    while (block->bs_name_parser(bs_value, suffix) != NULL) {
+        GLuint* tex_id = &block->textures[bs_value * block->nb_tex_draw];
+        GLuint* def_tex_id = block->textures;
+        if (block->render_type & RT_TOP)
+            cub_block_try_load_texture(buffer, block->name, "_top",
+                                        suffix, tex_id++, def_tex_id++);
+        if (block->render_type & RT_BOTTOM)
+            cub_block_try_load_texture(buffer, block->name, "_bottom",
+                                        suffix, tex_id++, def_tex_id++);
+        if (block->render_type & RT_FRONT)
+            cub_block_try_load_texture(buffer, block->name, "_front",
+                                        suffix, tex_id++, def_tex_id++);
+        if (block->render_type & RT_BACK)
+            cub_block_try_load_texture(buffer, block->name, "_back",
+                                        suffix, tex_id++, def_tex_id++);
+        if (block->render_type & RT_LEFT)
+            cub_block_try_load_texture(buffer, block->name, "_left",
+                                        suffix, tex_id++, def_tex_id++);
+        if (block->render_type & RT_RIGHT)
+            cub_block_try_load_texture(buffer, block->name, "_right",
+                                        suffix, tex_id++, def_tex_id++);
+        if (block->render_type & RT_SIDE)
+            cub_block_try_load_texture(buffer, block->name, "_side",
+                                        suffix, tex_id++, def_tex_id++);
+        if (block->render_type & RT_DEFAULT)
+            cub_block_try_load_texture(buffer, block->name, "",
+                                        suffix, tex_id++, def_tex_id++);
+        ++bs_value;
+    }
 }
 
-// The buffer must have a sufficient allocated memory to handle the changes made
-void cub_block_load_texture_unique_faces(char* buffer, size_t name_len,
-                                         GLuint* tex_id_block) {
-    char* start = buffer + name_len;
-    strcpy(start, "south.png");
-    cub_utils_bind_load_texture(tex_id_block, buffer);
-    ++tex_id_block;
-    strcpy(start, "east.png");
-    cub_utils_bind_load_texture(tex_id_block, buffer);
-    ++tex_id_block;
-    strcpy(start, "north.png");
-    cub_utils_bind_load_texture(tex_id_block, buffer);
-    ++tex_id_block;
-    strcpy(start, "west.png");
-    cub_utils_bind_load_texture(tex_id_block, buffer);
-    ++tex_id_block;
-    strcpy(start, "top.png");
-    cub_utils_bind_load_texture(tex_id_block, buffer);
-    ++tex_id_block;
-    strcpy(start, "bottom.png");
-    cub_utils_bind_load_texture(tex_id_block, buffer);
-    ++tex_id_block;
+void cub_block_load_texture_BS_creator(cubBlockData* block) {
+    char buffer[CUB_MAX_BLOCK_STRLEN * 2];
+    char prefix[CUB_MAX_BLOCK_STRLEN];
+    cubBlockState bs_used = BS_TEX(block);
+    if (!block->bs_name_parser)
+        errx(1, "cub_block_load_texture_BS_creator: No parser found...");
+    char* name = cub_BS_is_total_creator(bs_used) ? NULL : block->name;
+    char* start;
+    cubBlockStateValue bs_value = 0;
+    while ( (start = block->bs_name_parser(bs_value, prefix)) != NULL ) {
+        GLuint* tex_id = &block->textures[bs_value * block->nb_tex_draw];
+        if (name) {
+            *start = '_';
+            strcpy(start + 1, name);
+        }
+        printf("prefix: %s\n", prefix);
+        cub_block_tex_load_from_render_type(buffer, prefix, "",
+                                            block->render_type,
+                                            tex_id);
+        ++bs_value;
+    }
 }
 
 void cub_block_load_texture_pack(cubBlockList* block_list) {
@@ -278,25 +244,16 @@ void cub_block_load_texture_pack(cubBlockList* block_list) {
     char buffer[CUB_MAX_BLOCK_STRLEN * 2];
     for (size_t i = 0; i < block_list->nb_blocks; ++i) {
         cubBlockData* current = &block_list->blocks[i];
-        size_t name_len = strlen(current->name) + 1;
-        strcpy(buffer, current->name);
-        buffer[name_len - 1] = '_';
-        switch (current->type) {
-            case CUBE_SAME_FACES:
-                glGenTextures(1, current->textures_id);
-                cub_block_load_texture_same_faces(buffer, name_len,
-                                                  current->textures_id);
-                break;
-            case CUBE_TOP_BOTTOM:
-                glGenTextures(3, current->textures_id);
-                cub_block_load_texture_top_bottom_faces(buffer, name_len,
-                                                        current->textures_id);
-                break;
-            case CUBE_UNIQUE_FACES:
-                glGenTextures(6, current->textures_id);
-                cub_block_load_texture_unique_faces(buffer, name_len,
-                                                    current->textures_id);
-                break;
+        if (current->block_info.has_bs_tex) {
+            if (current->block_info.is_bs_creator) // BS texture creator
+                cub_block_load_texture_BS_creator(current);
+            else // BS texture modificator
+                cub_block_load_texture_BS_modificator(current);
+        } else {
+            // No blockstates which add additionnal textures
+            cub_block_tex_load_from_render_type(buffer, current->name, "",
+                                                current->render_type,
+                                                current->textures);
         }
     }
     printf("cub_block_load_texture_pack: texture pack loaded!\n");
@@ -306,59 +263,11 @@ void cub_block_free_all_textures(cubBlockList* block_list) {
     printf("cub_block_free_all_textures: Starting to free textures...\n");
     for (size_t i = 0; i < block_list->nb_blocks; ++i) {
         cubBlockData* current = &block_list->blocks[i];
-        switch (current->type) {
-            case CUBE_SAME_FACES:
-                glDeleteTextures(1, current->textures_id);
-                break;
-            case CUBE_TOP_BOTTOM:
-                glDeleteTextures(3, current->textures_id);
-                break;
-            case CUBE_UNIQUE_FACES:
-                glDeleteTextures(6, current->textures_id);
-                break;
-        }
-        free(current->textures_id);
+        uint16_t nb_modes = current->block_info.has_bs_tex
+                            ? cub_BS_TEX_get_nb_modes(BS_TEX(current))
+                            : 1;
+        glDeleteTextures(current->nb_tex_draw * nb_modes, current->textures);
+        free(current->textures);
     }
     printf("cub_block_free_all_textures: Textures freed!\n");
-}
-
-void cub_block_new_block(const char* name, cub_block_t id,
-                            cubBlockTextureType type) {
-    char* fpath = cub_utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
-    FILE* fp;
-    if ( (fp = fopen(fpath, "r+b")) != NULL ) {
-        uint32_t block_counter = 0;
-        size_t nb_written;
-        if (fread(&block_counter, sizeof(uint32_t), 1, fp) != 1) { // New file
-            rewind(fp);
-            nb_written = fwrite(&block_counter, sizeof(uint32_t), 1, fp);
-            if (nb_written != 1)
-                errx(1, "cub_block_new_block: fwrite(), writing block counter");
-        }
-        fseek(fp, 0, SEEK_END);
-        char buffer[CUB_MAX_BLOCK_STRLEN];
-        size_t i = 0;
-        for (; name[i] && i < CUB_MAX_BLOCK_STRLEN; ++i)
-            buffer[i] = name[i];
-        for(; i < CUB_MAX_BLOCK_STRLEN; ++i)
-            buffer[i] = '\0';
-        nb_written = fwrite(buffer, sizeof(char), CUB_MAX_BLOCK_STRLEN, fp);
-        if (nb_written != CUB_MAX_BLOCK_STRLEN)
-            errx(1, "cub_block_new_block: fwrite(), writing block name failed");
-        nb_written = fwrite(&id, sizeof(cub_block_t), 1, fp);
-        if (nb_written != 1)
-            errx(1, "cub_block_new_block: fwrite(), writing block id failed");
-        nb_written = fwrite(&type, sizeof(cubBlockTextureType), 1, fp);
-        if (nb_written != 1)
-            errx(1, "cub_block_new_block: fwrite(), writing block type failed");
-        // Update the block counter
-        ++block_counter;
-        fseek(fp, 0, SEEK_SET);
-        nb_written = fwrite(&block_counter, sizeof(uint32_t), 1, fp);
-        if (nb_written != 1)
-            errx(1, "cub_block_new_block: fwrite(), writing block counter");
-    } else errx(1, "cub_block_new_block: failed to open %s!\
-                    Please create it so that it can be populated!", fpath);
-    free(fpath);
-    fclose(fp);
 }

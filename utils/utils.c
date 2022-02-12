@@ -21,3 +21,19 @@ char* cub_utils_strconcat(const char* s1, const char* s2, size_t* len) {
     if (len) *len = s1_len + s2_len;
     return result;
 }
+
+void cub_utils_fread(void* dest, size_t memb_size, size_t memb_nbr,
+                     FILE* fp, const char* fname, const char* field_name) {
+    if (fread(dest, memb_size, memb_nbr, fp) != memb_nbr)
+        errx(1, "%s: Wrong format on field '%s'!", fname, field_name);
+}
+
+void cub_utils_fwrite(void* src, size_t memb_size, size_t memb_nbr,
+                      FILE* fp, const char* fname, const char* field_name) {
+    if (fwrite(src, memb_size, memb_nbr, fp) != memb_nbr)
+        errx(1, "%s: fwrite() failed on field '%s'!", fname, field_name);
+}
+
+bool cub_utils_file_exists(const char* fname) {
+    return access(fname, F_OK) == 0;
+}

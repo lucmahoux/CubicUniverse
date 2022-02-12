@@ -19,7 +19,7 @@ LIBUTILS_SRC = utils.c matrix.c vector.c list.c shader.c open_gl.c window.c
 LIBUTILS_SRC := $(addprefix $(LIBUTILS_DIR)/,$(LIBUTILS_SRC))
 
 LIBRENDER_DIR = ../render
-LIBRENDER_SRC = block.c camera.c chunk.c
+LIBRENDER_SRC = block.c camera.c chunk.c blockstates.c block_list_loader.c
 LIBRENDER_SRC := $(addprefix $(LIBRENDER_DIR)/,$(LIBRENDER_SRC))
 
 LIBINPUT_DIR = ../input

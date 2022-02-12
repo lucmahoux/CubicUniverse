@@ -34,10 +34,16 @@ void cub_render_update_camera_projection(cubCamera* camera,
 }
 
 void cub_render_update_camera_view(cubCamera* camera) {
-    camera->view_matrix = cub_utils_mat4_view_matrix(
+    /*camera->view_matrix = cub_utils_mat4_view_matrix(
             camera->position,
             cub_utils_vec3_add(camera->position,camera->front),
-            camera->up_side);
+            camera->up_side);*/
+    float camX = sin(glfwGetTime()) * 10.0f;
+    float camZ = cos(glfwGetTime()) * 10.0f;
+    camera->view_matrix = cub_utils_mat4_view_matrix(
+            CUB_VEC3(camX, 0.0f, camZ),
+            CUB_VEC3(0.0f, 0.0f, 0.0f),
+            CUB_VEC3(0.0f, 2.0f, 0.0f));
     glUniformMatrix4fv(camera->view_uni_loc, 1, GL_FALSE,
                         camera->view_matrix.coeffs);
 }

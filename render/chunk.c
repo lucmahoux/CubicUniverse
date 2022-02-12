@@ -197,8 +197,8 @@ void cub_chunk_render(cubChunk* chunk, cubBlockRenderer* block_renderer) {
                     uint8_t* bp_id = &subchunk->blocks[x + (z << 4) + (y << 8)];
                     if (!*bp_id) // Air => no rendering required
                         continue;
-                    cub_block_render(block_renderer,
-                            CUB_CHUNK_PALETTE(subchunk)[*bp_id - 1].block_id,
+                    cub_block_render(block_renderer, NULL,
+                            //CUB_CHUNK_PALETTE(subchunk)[*bp_id - 1].block_id,
                             CUB_VEC3(1.0f * (chunk->chunkX << 4) + 1.0f * x,
                                      1.0f * (subchunk->y_pos << 4) + 1.0f * y,
                                      1.0f * (chunk->chunkZ << 4) + 1.0f * z));

@@ -25,13 +25,17 @@ void cub_utils_list_set(cubList* list, void* elt, size_t i) {
     memcpy(cub_utils_list_get(list, i), elt, list->memb_size);
 }
 
-void cub_utils_list_append(cubList* list, void* elt) {
-    if (list->len == list->capacity) {
+void cub_utils_list_check_double_capacity(cubList* list) {
+    if (list->len >= list->capacity) {
         list->capacity *= 2;
         list->data = realloc(list->data, list->memb_size * list->capacity);
         if (!list->data)
             errx(1, "cub_utis_list_append: realloc failed!");
     }
+}
+
+void cub_utils_list_append(cubList* list, void* elt) {
+    cub_utils_list_check_double_capacity(list);
     memcpy(cub_utils_list_get(list, list->len), elt, list->memb_size);
     ++list->len;
 }
