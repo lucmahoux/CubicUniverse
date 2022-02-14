@@ -1,6 +1,6 @@
 #include "render/skybox.h"
 
-void cub_skybox_load_cubemap()
+GLuint cub_skybox_load_cubemap()
 {
     GLuint textureID;
     glGenTextures(1, &textureID);
@@ -48,38 +48,6 @@ void cub_skybox_load_cubemap()
 
 void cub_skybox_setup_renderer(cubSkyboxRenderer* renderer) {
     printf("cub_skybox_setup_renderer: Starting renderer initialisation...\n");
-    const GLfloat block_vertices[] = {
-        0.0f,   0.0f,   1.0f,   0.0f,   0.0f,   1.0f,   // Face 1 - South
-        1.0f,   0.0f,   1.0f,   1.0f,   0.0f,   1.0f,
-        1.0f,   1.0f,   1.0f,   1.0f,   1.0f,   1.0f,
-        0.0f,   1.0f,   1.0f,   0.0f,   1.0f,   1.0f,
-
-        1.0f,   0.0f,   1.0f,   0.0f,   0.0f,   2.0f,   // Face 2 - East
-        1.0f,   0.0f,   0.0f,   1.0f,   0.0f,   2.0f,
-        1.0f,   1.0f,   0.0f,   1.0f,   1.0f,   2.0f,
-        1.0f,   1.0f,   1.0f,   0.0f,   1.0f,   2.0f,
-
-        1.0f,   0.0f,   0.0f,   0.0f,   0.0f,   3.0f,   // Face 3 - North
-        0.0f,   0.0f,   0.0f,   1.0f,   0.0f,   3.0f,
-        0.0f,   1.0f,   0.0f,   1.0f,   1.0f,   3.0f,
-        1.0f,   1.0f,   0.0f,   0.0f,   1.0f,   3.0f,
-
-        0.0f,   0.0f,   0.0f,   0.0f,   0.0f,   4.0f,   // Face 4 - West
-        0.0f,   0.0f,   1.0f,   1.0f,   0.0f,   4.0f,
-        0.0f,   1.0f,   1.0f,   1.0f,   1.0f,   4.0f,
-        0.0f,   1.0f,   0.0f,   0.0f,   1.0f,   4.0f,
-
-        0.0f,   1.0f,   1.0f,   0.0f,   0.0f,   5.0f,   // Face 5 - Top
-        1.0f,   1.0f,   1.0f,   1.0f,   0.0f,   5.0f,
-        1.0f,   1.0f,   0.0f,   1.0f,   1.0f,   5.0f,
-        0.0f,   1.0f,   0.0f,   0.0f,   1.0f,   5.0f,
-
-        0.0f,   0.0f,   0.0f,   0.0f,   0.0f,   6.0f,   // Face 6 - Bottom
-        1.0f,   0.0f,   0.0f,   1.0f,   0.0f,   6.0f,
-        1.0f,   0.0f,   1.0f,   1.0f,   1.0f,   6.0f,
-        0.0f,   0.0f,   1.0f,   0.0f,   1.0f,   6.0f
-    };
-    
     const GLfloat skybox_vertices[] = {
         // positions          
         -1.0f,  1.0f, -1.0f,
@@ -127,12 +95,11 @@ void cub_skybox_setup_renderer(cubSkyboxRenderer* renderer) {
 
     // Generate the buffers
     GLuint buffers[2];
-    GLuint VAO;
     glGenBuffers(2, buffers);
-    glGenVertexArrays(1, &VAO);
+    glGenVertexArrays(1, &renderer->VAO);
 
     // Bind the vertex array object then set up the other buffers data
-    glBindVertexArray(VAO);
+    glBindVertexArray(renderer->VAO);
     // 1) Vertex Buffer
     glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(skybox_vertices),
@@ -142,25 +109,24 @@ void cub_skybox_setup_renderer(cubSkyboxRenderer* renderer) {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
             (void*)0);
 
-    GLuint cubemapTexture = cub_skybox_load_cubemap();
+    renderer->cubemapTexture = cub_skybox_load_cubemap();
 
+    renderer->VBO = buffers[0];
     renderer->shader_program = cub_utils_build_shader("skybox");
-
 }
 
 void cub_skybox_render(cubSkyboxRenderer* renderer)
 {
-    glDeptechFunc(GL_LEQUAL);
-    renderer->shader_program.use();
-    view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
-    skyboxShader.setMat4("view", view);
-    skyboxShader.setMat4("projection", projection);
+    glDepthFunc(GL_LEQUAL);
+    //renderer->shader_program.use();
+    //view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+    //renderer->shader_program.setMat4("view", view);
+    //renderer->shader_program.setMat4("projection", projection);
     // skybox cube
-    glBindVertexArray(skyboxVAO);
+    glBindVertexArray(renderer->VAO);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, renderer->cubemapTexture);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
     glDepthFunc(GL_LESS); // set depth function back to default
-
 }
