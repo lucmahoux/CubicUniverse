@@ -3,21 +3,17 @@
 
 #include "render/block.h"
 #include "utils/utils.h"
+#include "utils/hashmap.h"
 #include "utils/list.h"
 
 #define CUB_CHUNK_PALETTE(SC_ptr) ((cubPaletteTuple*)SC_ptr->palette->data)
 #define CUB_MAX_SUBCHUNKS 16
 
-typedef struct cubPaletteTuple {
-    cub_block_t block_id; // Block ID for palette element
-    uint16_t nb_blocks; // Number of blocks with 'block_id' as ID in subchunk
-} cubPaletteTuple;
-
 typedef struct cubSubChunk {
     // Y position of the subchunk relative to the bottom of the chunk it belongs
     uint8_t y_pos;
-    // List of block ids which identify the type of blocks in the subchunk
-    cubList* palette;
+    // Hashmap linking each palette_id to a BP_elt
+    cubHashMap* palette;
     // List of indices in 'palette' to determine the type of block
     uint8_t* blocks;
 } cubSubChunk;

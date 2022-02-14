@@ -204,8 +204,11 @@ void cub_BLloader_add_block(const char* name, cubRenderType render_type,
                         fp, fname, "nb_blocks");
         fseek(fp, 0, SEEK_END);
         char buffer[CUB_MAX_BLOCK_STRLEN];
-        for (uint8_t i = 0; i < CUB_MAX_BLOCK_STRLEN; ++i)
+        uint8_t i = 0;
+        for (; name[i] && i < CUB_MAX_BLOCK_STRLEN; ++i)
             buffer[i] = name[i];
+        for (; i < CUB_MAX_BLOCK_STRLEN; ++i)
+            buffer[i] = '\0';
         cub_utils_fwrite(buffer, sizeof(char), CUB_MAX_BLOCK_STRLEN,
                          fp, fname, "block_name");
         // Block ID is the previous number of blocks in the list

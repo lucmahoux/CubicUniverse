@@ -23,6 +23,8 @@ typedef enum cubBlockFaceIndex {
 typedef struct cubBlockPaletteElement {
     cub_block_t id;
     cub_bs_val* bs_values;
+    // Nbr of blocks referencing this palette element in the subchunk
+    uint16_t nb_blocks;
 } cubBP_elt;
 
 typedef struct cubBlockRenderer {

@@ -9,33 +9,30 @@ void cub_chunk_load(cubChunk* chunk) {
     if ( (fp = fopen(path, "rb")) == NULL ) {
         errx(1, "cub_chunk_load: File not found: %s!", path);
     } else {
-        size_t nb_read;
-        nb_read = fread(&chunk->nb_subchunks, sizeof(uint8_t), 1, fp);
-        if (nb_read != 1)
-            errx(1, "cub_chunk_load: Wrong format 'nb_subchunks'!");
+        const char[] fname = "cub_chunk_load";
+        cub_utils_fread(&chunk->nb_subchunks, sizeof(uint8_t), 1,
+                        fp, fname, "nb_subchunks");
         uint8_t nb_subchunks = chunk->nb_subchunks;
         // Initialise the subchunks array
         for (uint8_t i = 0; i < CUB_MAX_SUBCHUNKS; ++i)
             chunk->subchunks[i].y_pos = CUB_MAX_SUBCHUNKS;
         while (nb_subchunks--) {
             // Load subChunk
-            uint8_t y_pos;;
+            uint8_t y_pos;
             nb_read = fread(&y_pos, sizeof(uint8_t), 1, fp);
             if (nb_read != 1 || y_pos >= CUB_MAX_SUBCHUNKS)
                 errx(1, "cub_chunk_load: Wrong format 'Y_pos subchunk'!");
             cubSubChunk* subchunk = &chunk->subchunks[y_pos];
             subchunk->y_pos = y_pos;
             // Palette loading
-            uint8_t palette_len;
-            nb_read = fread(&palette_len, sizeof(uint8_t), 1, fp);
-            if (nb_read != 1)
-                errx(1, "cub_chunk_load: Wrong format 'palette_len'!");
+            uint16_t palette_len;
+            cub_utils_fread(&palette_len, sizeof(uint16_t), 1,
+                            fp, fname, "palette_len");
             subchunk->palette = cub_utils_list(sizeof(cubPaletteTuple));
             for (uint16_t i = 0; i < palette_len; ++i) {
                 cubPaletteTuple tuple;
-                nb_read = fread(&tuple.block_id, sizeof(cub_block_t), 1, fp);
-                if (nb_read != 1)
-                    errx(1, "cub_chunk_load: Wrong format 'palette_id'!");
+                cub_utils_fread(&tuple.block_id, sizeof(cub_block_t), 1,
+                                fp, fname, "palette_block_id");
                 tuple.nb_blocks = 0;
                 cub_utils_list_append(subchunk->palette, &tuple);
             }
