@@ -46,3 +46,14 @@ void cub_render_update_camera_view(cubCamera* camera) {
     glUniformMatrix4fv(camera->view_uni_loc, 1, GL_FALSE,
                         camera->view_matrix.coeffs);
 }
+
+void cub_camera_remove_translation(cubCamera* camera)
+{
+    camera->view_matrix.coeffs[3] = 0;
+    camera->view_matrix.coeffs[7] = 0;
+    camera->view_matrix.coeffs[11] = 0;
+    camera->view_matrix.coeffs[12] = 0;
+    camera->view_matrix.coeffs[13] = 0;
+    camera->view_matrix.coeffs[14] = 0;
+    camera->view_matrix.coeffs[15] = 0;
+}

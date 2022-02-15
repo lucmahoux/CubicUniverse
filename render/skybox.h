@@ -17,6 +17,6 @@ GLuint cub_skybox_load_cubemap();
 
 void cub_skybox_setup_renderer(cubSkyboxRenderer* renderer);
 
-void cub_skybox_render(cubSkyboxRenderer* renderer);
+void cub_skybox_free_renderer(cubSkyboxRenderer* renderer);
 
 #endif

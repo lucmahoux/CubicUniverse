@@ -11,17 +11,17 @@ GLuint cub_skybox_load_cubemap()
     {
         char* face;
         if(i == 0)
-            face = "right.jpg";
+            face = "../assets/skybox/right.jpg";
         else if(i == 1)
-            face = "left.jpg";
+            face = "../assets/skybox/left.jpg";
         else if(i == 2)
-            face = "top.jpg";
+            face = "../assets/skybox/top.jpg";
         else if(i == 3)
-            face = "bottom.jpg";
+            face = "../assets/skybox/bottom.jpg";
         else if(i == 4)
-            face = "front.jpg";
+            face = "../assets/skybox/front.jpg";
         else
-            face = "back.jpg";
+            face = "../assets/skybox/back.jpg";
         unsigned char *data = stbi_load(face, &width, &height,
                 &nrChannels, 0);
         if (data)
@@ -33,6 +33,7 @@ GLuint cub_skybox_load_cubemap()
         }
         else
         {
+            errx(1, "Skybox image not found avec %d",i);
             stbi_image_free(data);
         }
     }
@@ -113,20 +114,14 @@ void cub_skybox_setup_renderer(cubSkyboxRenderer* renderer) {
 
     renderer->VBO = buffers[0];
     renderer->shader_program = cub_utils_build_shader("skybox");
+
+    glUniform1i(glGetUniformLocation(renderer->shader_program, "skybox"), 0);
 }
 
-void cub_skybox_render(cubSkyboxRenderer* renderer)
+void cub_skybox_free_renderer(cubSkyboxRenderer* renderer)
 {
-    glDepthFunc(GL_LEQUAL);
-    //renderer->shader_program.use();
-    //view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
-    //renderer->shader_program.setMat4("view", view);
-    //renderer->shader_program.setMat4("projection", projection);
-    // skybox cube
-    glBindVertexArray(renderer->VAO);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, renderer->cubemapTexture);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
-    glDepthFunc(GL_LESS); // set depth function back to default
+    glDeleteBuffers(1, &renderer->VBO);
+    glDeleteVertexArrays(1, &renderer->VAO);
+    glDeleteProgram(renderer->shader_program);
+
 }

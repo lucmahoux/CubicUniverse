@@ -16,6 +16,8 @@ void cub_game_init(cubGame* game, int width, int height) {
                 "CUBE_TOP_BOTTOM");
     }
     cub_block_load_texture_pack(&game->block_renderer.block_list);
+    
+    cub_skybox_setup_renderer(&game->skybox_renderer);
 
     // Set up the camera
     float aspect_ratio = 1.0f * width / height;
@@ -107,6 +109,22 @@ void cub_game_input_handler(cubGame* game) {
     cub_game_process_mouse_mouvement(&game->camera, xoffset, yoffset);
 }
 
+void cub_game_skybox_render(cubGame* game)
+{
+    glDepthFunc(GL_LEQUAL);
+    glUseProgram(game->skybox_renderer.shader_program);
+    cub_camera_remove_translation(&game->camera);
+    game->camera.view_uni_loc = glGetUniformLocation(game->skybox_renderer.shader_program, "view");
+    game->camera.projection_uni_loc = glGetUniformLocation(game->skybox_renderer.shader_program, "projection");
+
+    glBindVertexArray(game->skybox_renderer.VAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, game->skybox_renderer.cubemapTexture);
+    glDrawArrays(GL_TRIANGLES,0 , 36);
+    glBindVertexArray(0);
+    glDepthFunc(GL_LESS);
+}
+
 void cub_game_renderer_handler(cubGame* game) {
     glUseProgram(game->block_renderer.shader_program);
     // Camera updates
@@ -125,6 +143,8 @@ void cub_game_renderer_handler(cubGame* game) {
     cub_block_render(&game->block_renderer, 3, CUB_VEC3(2.0f, 0.0f, 0.0f));
 
     //cub_chunk_render(&game->chunk_test, &game->block_renderer);
+    
+    cub_game_skybox_render(game);
 }
 
 void cub_game_start(cubGame* game) {
@@ -143,4 +163,5 @@ void cub_game_stop(cubGame* game) {
     // TODO: Save things on disk
     // cub_chunk_save(&game->chunk_test);
     cub_block_free_renderer(&game->block_renderer);
+    cub_skybox_free_renderer(&game->skybox_renderer);
 }
