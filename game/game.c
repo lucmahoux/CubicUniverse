@@ -111,12 +111,14 @@ void cub_game_input_handler(cubGame* game) {
 
 void cub_game_skybox_render(cubGame* game)
 {
+    // Prepare skybox rendering
     glDepthFunc(GL_LEQUAL);
     glUseProgram(game->skybox_renderer.shader_program);
     cub_camera_remove_translation(&game->camera);
     game->camera.view_uni_loc = glGetUniformLocation(game->skybox_renderer.shader_program, "view");
     game->camera.projection_uni_loc = glGetUniformLocation(game->skybox_renderer.shader_program, "projection");
-
+    
+    // Render skybox
     glBindVertexArray(game->skybox_renderer.VAO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, game->skybox_renderer.cubemapTexture);
