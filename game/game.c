@@ -145,14 +145,14 @@ void cub_game_renderer_handler(cubGame* game) {
     // World updates
 
     glBindVertexArray(game->block_renderer.VAO);
-    cub_block_render(&game->block_renderer, 1, CUB_VEC3(0.0f, 0.0f, 0.0f));
+  /*  cub_block_render(&game->block_renderer, 1, CUB_VEC3(0.0f, 0.0f, 0.0f));
     cub_block_render(&game->block_renderer, 2, CUB_VEC3(1.0f, 0.0f, 0.0f));
     cub_block_render(&game->block_renderer, 1, CUB_VEC3(0.0f, 0.0f, 1.0f));
     cub_block_render(&game->block_renderer, 2, CUB_VEC3(1.0f, 0.0f, 1.0f));
     cub_block_render(&game->block_renderer, 3, CUB_VEC3(1.0f, 1.0f, 1.0f));
     cub_block_render(&game->block_renderer, 3, CUB_VEC3(2.0f, 0.0f, 0.0f));
-
-    //cub_chunk_render(&game->chunk_test, &game->block_renderer);
+*/
+    cub_chunk_render(&game->chunk_test, &game->block_renderer);
     
     cub_game_skybox_render(game);
 }
