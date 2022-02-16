@@ -4,6 +4,7 @@
 #include "render/block.h"
 #include "render/camera.h"
 #include "render/chunk.h"
+#include "render/skybox.h"
 #include "utils/open_gl.h"
 #include "utils/utils.h"
 #include "utils/window.h"
@@ -11,6 +12,7 @@
 typedef struct cubGame {
     GLFWwindow* window;
     cubBlockRenderer block_renderer;
+    cubSkyboxRenderer skybox_renderer;
     cubCamera camera;
     cubChunk chunk_test;
 } cubGame;
