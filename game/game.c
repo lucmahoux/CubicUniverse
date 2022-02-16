@@ -137,12 +137,13 @@ void cub_game_skybox_render(cubGame* game)
 
 void cub_game_renderer_handler(cubGame* game) {
 
+    
+    glUseProgram(game->block_renderer.shader_program);
     // Camera updates
     cub_render_update_camera(&game->camera);
 
     // World updates
 
-    glUseProgram(game->block_renderer.shader_program);
     glBindVertexArray(game->block_renderer.VAO);
     cub_block_render(&game->block_renderer, 1, CUB_VEC3(0.0f, 0.0f, 0.0f));
     cub_block_render(&game->block_renderer, 2, CUB_VEC3(1.0f, 0.0f, 0.0f));
