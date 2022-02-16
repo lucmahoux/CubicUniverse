@@ -39,4 +39,6 @@ void cub_render_update_camera_projection(cubCamera* camera,
 
 void cub_camera_remove_translation(cubCamera* camera);
 
+void cub_render_update_camera(cubCamera* camera);
+
 #endif

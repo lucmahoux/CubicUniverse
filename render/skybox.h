@@ -8,9 +8,11 @@
 
 typedef struct cubSkyboxRenderer {
     GLuint VAO;
-    GLuint VBO, EBO;
+    GLuint VBO;
     GLuint shader_program;
     GLuint cubemapTexture;
+    GLuint projection_uni_loc;
+    GLuint view_uni_loc;
 } cubSkyboxRenderer;
 
 GLuint cub_skybox_load_cubemap();

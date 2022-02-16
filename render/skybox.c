@@ -5,6 +5,7 @@ GLuint cub_skybox_load_cubemap()
     GLuint textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+    stbi_set_flip_vertically_on_load(0);
 
     int width, height, nrChannels;
     for (unsigned int i = 0; i < 6; i++)
@@ -37,6 +38,7 @@ GLuint cub_skybox_load_cubemap()
             stbi_image_free(data);
         }
     }
+    stbi_set_flip_vertically_on_load(1);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -95,8 +97,8 @@ void cub_skybox_setup_renderer(cubSkyboxRenderer* renderer) {
     };
 
     // Generate the buffers
-    GLuint buffers[2];
-    glGenBuffers(2, buffers);
+    GLuint buffers[1];
+    glGenBuffers(1, buffers);
     glGenVertexArrays(1, &renderer->VAO);
 
     // Bind the vertex array object then set up the other buffers data
@@ -114,8 +116,15 @@ void cub_skybox_setup_renderer(cubSkyboxRenderer* renderer) {
 
     renderer->VBO = buffers[0];
     renderer->shader_program = cub_utils_build_shader("skybox");
-
+    
+    glUseProgram(renderer->shader_program);
+    
+    renderer->view_uni_loc = glGetUniformLocation(renderer->shader_program, "view");
+    renderer->projection_uni_loc = glGetUniformLocation(renderer->shader_program, "projection");
     glUniform1i(glGetUniformLocation(renderer->shader_program, "skybox"), 0);
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void cub_skybox_free_renderer(cubSkyboxRenderer* renderer)

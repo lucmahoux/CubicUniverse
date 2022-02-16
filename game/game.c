@@ -90,6 +90,9 @@ void cub_game_input_handler(cubGame* game) {
                     CUB_VEC3_NORM(CUB_VEC3_CROSS(cam->front,cam->up_side))));
     }
 
+    printf("x : %f, y : %f, z : %f\n", cam->position.coords[0],
+            cam->position.coords[1], cam->position.coords[2]);
+
     // Mouse movements
     double xpos, ypos;
     glfwGetCursorPos(game->window, &xpos, &ypos);
@@ -112,12 +115,17 @@ void cub_game_input_handler(cubGame* game) {
 void cub_game_skybox_render(cubGame* game)
 {
     // Prepare skybox rendering
+    //glDepthMask(GL_FALSE);
     glDepthFunc(GL_LEQUAL);
     glUseProgram(game->skybox_renderer.shader_program);
-    cub_camera_remove_translation(&game->camera);
-    game->camera.view_uni_loc = glGetUniformLocation(game->skybox_renderer.shader_program, "view");
-    game->camera.projection_uni_loc = glGetUniformLocation(game->skybox_renderer.shader_program, "projection");
-    
+    //cub_camera_remove_translation(&game->camera);
+    cubMat4 view = CUB_MAT4_TRANS(game->camera.view_matrix,
+            CUB_VEC3(0.0,0.0,0.0));
+    glUniformMatrix4fv(game->skybox_renderer.view_uni_loc, 1, GL_FALSE,
+           view.coeffs);
+    glUniformMatrix4fv(game->skybox_renderer.projection_uni_loc, 1, GL_FALSE,
+           game->camera.projection_matrix.coeffs);
+
     // Render skybox
     glBindVertexArray(game->skybox_renderer.VAO);
     glActiveTexture(GL_TEXTURE0);
@@ -128,14 +136,13 @@ void cub_game_skybox_render(cubGame* game)
 }
 
 void cub_game_renderer_handler(cubGame* game) {
-    glUseProgram(game->block_renderer.shader_program);
+
     // Camera updates
-    float currentFrame = glfwGetTime();
-    game->camera.deltaTime = currentFrame - game->camera.lastFrame;
-    game->camera.lastFrame = currentFrame;
-    cub_render_update_camera_view(&game->camera);
+    cub_render_update_camera(&game->camera);
 
     // World updates
+
+    glUseProgram(game->block_renderer.shader_program);
     glBindVertexArray(game->block_renderer.VAO);
     cub_block_render(&game->block_renderer, 1, CUB_VEC3(0.0f, 0.0f, 0.0f));
     cub_block_render(&game->block_renderer, 2, CUB_VEC3(1.0f, 0.0f, 0.0f));

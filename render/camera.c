@@ -57,3 +57,16 @@ void cub_camera_remove_translation(cubCamera* camera)
     camera->view_matrix.coeffs[14] = 0;
     camera->view_matrix.coeffs[15] = 0;
 }
+
+void cub_render_update_camera_time(cubCamera* camera)
+{
+    float currentFrame = glfwGetTime();
+    camera->deltaTime = currentFrame - camera->lastFrame;
+    camera->lastFrame = currentFrame;
+}
+
+void cub_render_update_camera(cubCamera* camera)
+{
+    cub_render_update_camera_time(camera);
+    cub_render_update_camera_view(camera);
+}
