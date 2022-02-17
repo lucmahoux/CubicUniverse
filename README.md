@@ -95,8 +95,7 @@ List prerequisites here
    ```sh
    git clone https://github.com/lucmahoux/CubicUniverse.git
    ```
-3. Build the project
-    To build the project, you simply have to go to the root of the project and run :
+3. To build the project, you simply have to go to the root of the project and run :
    ```sh
    make game_run
    ```
