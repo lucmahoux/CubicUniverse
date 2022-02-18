@@ -16,6 +16,11 @@ typedef struct cubCamera {
     cubVec3 front;
     float deltaTime;
     float lastFrame;
+    float yaw;
+    float pitch;
+    float lastX;
+    float lastY;
+    int firstMouse;
 } cubCamera;
 
 /* Should be called once, at the beginning of the game to setup the camera */
@@ -31,5 +36,9 @@ void cub_render_update_camera_view(cubCamera* camera);
  * resized by the user */
 void cub_render_update_camera_projection(cubCamera* camera,
                                          GLuint shader_program);
+
+void cub_camera_remove_translation(cubCamera* camera);
+
+void cub_render_update_camera(cubCamera* camera);
 
 #endif

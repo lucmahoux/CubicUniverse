@@ -19,6 +19,8 @@ void cub_game_init(cubGame* game, int width, int height) {
                 block->block_info.has_states, block->block_info.nb_states);
     }
     cub_block_load_texture_pack(&game->block_renderer.block_list);
+    
+    cub_skybox_setup_renderer(&game->skybox_renderer);
 
     // Set up the camera
     float aspect_ratio = 1.0f * width / height;
@@ -32,7 +34,32 @@ void cub_game_clear_screen_handler(cub_unused cubGame* game) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+// Change values with mouse input
+void cub_game_process_mouse_mouvement(cubCamera* cam, float xoffset,
+        float yoffset)
+{
+    float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    cam->yaw += xoffset;
+    cam->pitch += yoffset;
+
+    if(cam->pitch > 89.0f)
+        cam->pitch = 89.0f;
+    if(cam->pitch < -89.0f)
+        cam->pitch = -89.0f;
+
+    cubVec3 direction;
+    direction.coords[0] = cos(RAD(cam->yaw)) * cos(RAD(cam->pitch));
+    direction.coords[1] = sin(RAD(cam->pitch));
+    direction.coords[2] = sin(RAD(cam->yaw)) * cos(RAD(cam->pitch));
+    cam->front = cub_utils_vec3_normalize(direction);
+
+}
+
 void cub_game_input_handler(cubGame* game) {
+    // Exit program
     if (glfwGetKey(game->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         cub_utils_close_window(game->window);
 
@@ -55,7 +82,7 @@ void cub_game_input_handler(cubGame* game) {
     {
         cam->position = CUB_VEC3_SUB(
                 cam->position,
-                CUB_VEC3_SCALE(cameraSpeed,
+               CUB_VEC3_SCALE(cameraSpeed,
                     CUB_VEC3_NORM(CUB_VEC3_CROSS(cam->front,cam->up_side))));
     }
     if(glfwGetKey(game->window, GLFW_KEY_D) == GLFW_PRESS)
@@ -65,15 +92,53 @@ void cub_game_input_handler(cubGame* game) {
                 CUB_VEC3_SCALE(cameraSpeed,
                     CUB_VEC3_NORM(CUB_VEC3_CROSS(cam->front,cam->up_side))));
     }
+
+    // Mouse movements
+    double xpos, ypos;
+    glfwGetCursorPos(game->window, &xpos, &ypos);
+
+    if(cam->firstMouse == 1)
+    {
+        cam->lastX = xpos;
+        cam->lastY = ypos;
+        cam->firstMouse = 0;
+    }
+
+    float xoffset = xpos - cam->lastX;
+    float yoffset = cam->lastY - ypos;
+    cam->lastX = xpos;
+    cam->lastY = ypos;
+
+    cub_game_process_mouse_mouvement(&game->camera, xoffset, yoffset);
+}
+
+void cub_game_skybox_render(cubGame* game)
+{
+    // Prepare skybox rendering
+    //glDepthMask(GL_FALSE);
+    glDepthFunc(GL_LEQUAL);
+    glUseProgram(game->skybox_renderer.shader_program);
+    //cub_camera_remove_translation(&game->camera);
+    cubMat4 view = CUB_MAT4_TRANS(game->camera.view_matrix,
+            CUB_VEC3(0.0,0.0,0.0));
+    glUniformMatrix4fv(game->skybox_renderer.view_uni_loc, 1, GL_FALSE,
+           view.coeffs);
+    glUniformMatrix4fv(game->skybox_renderer.projection_uni_loc, 1, GL_FALSE,
+           game->camera.projection_matrix.coeffs);
+
+    // Render skybox
+    glBindVertexArray(game->skybox_renderer.VAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, game->skybox_renderer.cubemapTexture);
+    glDrawArrays(GL_TRIANGLES,0 , 36);
+    glBindVertexArray(0);
+    glDepthFunc(GL_LESS);
 }
 
 void cub_game_renderer_handler(cubGame* game) {
     glUseProgram(game->block_renderer.shader_program);
     // Camera updates
-    float currentFrame = glfwGetTime();
-    game->camera.deltaTime = currentFrame - game->camera.lastFrame;
-    game->camera.lastFrame = currentFrame;
-    cub_render_update_camera_view(&game->camera);
+    cub_render_update_camera(&game->camera);
 
     // World updates
     glBindVertexArray(game->block_renderer.buffer_objs[CUB_DEFAULT_VAO_ID].VAO);
@@ -125,7 +190,9 @@ void cub_game_renderer_handler(cubGame* game) {
     bs.states[0] = BSV_TRUE;
     cub_block_render(&game->block_renderer, &bs,
                         CUB_VEC3(5.0f, 3.0f, 0.0f));*/
+
     cub_chunk_render(&game->chunk_test, &game->block_renderer);
+    cub_game_skybox_render(game);
 }
 
 void cub_game_start(cubGame* game) {
@@ -149,4 +216,5 @@ void cub_game_stop(cubGame* game) {
     // TODO: Save things on disk
     cub_chunk_save(&game->chunk_test, &game->block_renderer);
     cub_block_free_renderer(&game->block_renderer);
+    cub_skybox_free_renderer(&game->skybox_renderer);
 }

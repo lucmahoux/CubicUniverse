@@ -25,7 +25,7 @@ LIBUTILS_SRC := $(addprefix $(LIBUTILS_DIR)/,$(LIBUTILS_SRC))
 
 LIBRENDER_DIR = ../render
 LIBRENDER_SRC = block.c camera.c blockstates.c block_list_loader.c chunk.c \
-				chunk_loader.c block_utils.c
+				chunk_loader.c block_utils.c skybox.c
 LIBRENDER_SRC := $(addprefix $(LIBRENDER_DIR)/,$(LIBRENDER_SRC))
 
 LIBINPUT_DIR = ../input
