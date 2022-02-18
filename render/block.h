@@ -1,46 +1,16 @@
 #ifndef CUB_RENDER_BLOCK_H
 #define CUB_RENDER_BLOCK_H
 
-#include "render/blockstates.h"
+#include "render/block_utils.h"
 #include "render/block_list_loader.h"
-#include "utils/utils.h"
-#include "utils/open_gl.h"
+#include "render/blockstates.h"
 #include "utils/shader.h"
 
-typedef enum cubBlockFaceIndex {
-    CUB_DEFAULT_START_ID,
-    CUB_TOP_ID              =       CUB_DEFAULT_START_ID,
-    CUB_BOTTOM_ID,
-    CUB_SIDE_START_ID,
-    CUB_FRONT_ID            =       CUB_SIDE_START_ID,
-    CUB_BACK_ID,
-    CUB_LEFT_ID,
-    CUB_RIGHT_ID,
-    CUB_SIDE_END_ID         =       CUB_RIGHT_ID,
-    CUB_DEFAULT_END_ID      =       CUB_SIDE_END_ID
-} cubBlockFaceIndex;
-
-typedef struct cubBlockPaletteElement {
-    cub_block_t id;
-    cub_bs_val* bs_values;
-    // Nbr of blocks referencing this palette element in the subchunk
-    uint16_t nb_blocks;
-} cubBP_elt;
-
-typedef struct cubBlockRenderer {
-    // All the buffers used to render the blocks
-    cubRenderBufferObject* buffer_objs;
-    uint8_t nb_buffers;
-    GLuint shader_program;
-    // Use the cubBlockFaceIndex enum to access the texture associated to
-    // a certain face of the cube - works only for the default VAO.
-    GLint tex_locations[6];
-    GLint model_uni_loc; // Uniform location of model_matrix
-    cubMat4 model_matrix;
-    cubBlockList block_list;
-} cubBlockRenderer;
-
 // -------- Rendering functions --------
+
+/* Returns the cubBlockData related to the given block 'id' */
+cubBlockData* cub_block_get_data(cubBlockRenderer* renderer, cub_block_t id);
+
 /* Should be called only once to set up the block renderer */
 void cub_block_setup_renderer(cubBlockRenderer* renderer);
 
@@ -53,20 +23,20 @@ void cub_block_update_tex_uniform(GLuint tex_loc, uint8_t tex_id,
  * That means that tex_[top|bottom|front|back|left|right] uniforms are set
  * based on the cubRenderType of the given block */
 void cub_block_set_tex_default(cubBlockRenderer* renderer, cubBlockData* block,
-                                cubBP_elt* bp_elt);
+                                cubBlockState* bs);
 
 /* Called when the block to render does NOT use the default VAO.
  * Textures uniforms are simple assigned in a linear manner to the
  * textures list of 'block' with respect to the order:
  * TOP -> BOTTOM -> FRONT -> BACK -> LEFT -> RIGHT */
 void cub_block_set_tex_custom(cubBlockRenderer* renderer, cubBlockData* block,
-                                cubBP_elt* bp_elt);
+                                cubBlockState* bs);
 
 /* When calling this, it is assumed that the correct shader program
  * has been bound before the call 
  * Calls either cub_block_set_tex_default() if the bp_elt uses the default VAO,
  * or cub_block_set_custom() */
-void cub_block_render(cubBlockRenderer* renderer, cubBP_elt* bp_elt,
+void cub_block_render(cubBlockRenderer* renderer, cubBlockState* bs,
                         cubVec3 position);
 
 /* Should be called only at the end of the game */

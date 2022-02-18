@@ -57,10 +57,10 @@ void cub_block_update_tex_uniform(GLuint tex_loc, uint8_t tex_id,
 }
 
 void cub_block_set_tex_default(cubBlockRenderer* renderer, cubBlockData* block,
-                                cubBP_elt* bp_elt) {
+                                cubBlockState* bs) {
     GLuint tex_ids[6] = { 0, 0, 0, 0, 0, 0 };
     uint8_t tex_id_block = (block->block_info.has_bs_tex
-                            ? bp_elt->bs_values[CUB_BS_TEX_ID]
+                            ? bs->states[CUB_BS_TEX_ID]
                             : 0) * block->nb_tex_draw;
     if (block->render_type & RT_TOP)
         tex_ids[CUB_TOP_ID] = block->textures[tex_id_block++];
@@ -93,24 +93,24 @@ void cub_block_set_tex_default(cubBlockRenderer* renderer, cubBlockData* block,
 }
 
 void cub_block_set_tex_custom(cubBlockRenderer* renderer, cubBlockData* block,
-                                cubBP_elt* bp_elt) {
+                                cubBlockState* bs) {
     uint8_t offset = (block->block_info.has_bs_tex
-                      ? bp_elt->bs_values[CUB_BS_TEX_ID]
+                      ? bs->states[CUB_BS_TEX_ID]
                       : 0) * block->nb_tex_draw;
     for (uint8_t i = 0; i < block->nb_tex_draw; ++i)
         cub_block_update_tex_uniform(renderer->tex_locations[i],
                                      block->textures[offset + i], i);
 }
 
-void cub_block_render(cubBlockRenderer* renderer, cubBP_elt* bp_elt,
+void cub_block_render(cubBlockRenderer* renderer, cubBlockState* bs,
                         cubVec3 position) {
-    cubBlockData* block = &renderer->block_list.blocks[bp_elt->id];
+    cubBlockData* block = CUB_BLOCK_DATA(renderer, bs->id);
     cubRenderBufferObject* r_obj = &renderer->buffer_objs[block->VAO_id];
     if (block->VAO_id != CUB_DEFAULT_VAO_ID) {
         glBindVertexArray(r_obj->VAO);
-        cub_block_set_tex_custom(renderer, block, bp_elt);
+        cub_block_set_tex_custom(renderer, block, bs);
     } else
-        cub_block_set_tex_default(renderer, block, bp_elt);
+        cub_block_set_tex_default(renderer, block, bs);
 
     // TODO: Apply BS transformations (rotations, ...)
     cubMat4 new_model = CUB_MAT4_TRANS(renderer->model_matrix, position);
@@ -219,10 +219,10 @@ void cub_block_load_texture_BS_modificator(cubBlockData* block) {
 void cub_block_load_texture_BS_creator(cubBlockData* block) {
     char buffer[CUB_MAX_BLOCK_STRLEN * 2];
     char prefix[CUB_MAX_BLOCK_STRLEN];
-    cubBlockState bs_used = BS_TEX(block);
+    cubBlockStateKey bsk_used = CUB_BSK_TEX(block);
     if (!block->bs_name_parser)
         errx(1, "cub_block_load_texture_BS_creator: No parser found...");
-    char* name = cub_BS_is_total_creator(bs_used) ? NULL : block->name;
+    char* name = cub_BS_is_total_creator(bsk_used) ? NULL : block->name;
     char* start;
     cubBlockStateValue bs_value = 0;
     while ( (start = block->bs_name_parser(bs_value, prefix)) != NULL ) {
@@ -264,7 +264,7 @@ void cub_block_free_all_textures(cubBlockList* block_list) {
     for (size_t i = 0; i < block_list->nb_blocks; ++i) {
         cubBlockData* current = &block_list->blocks[i];
         uint16_t nb_modes = current->block_info.has_bs_tex
-                            ? cub_BS_TEX_get_nb_modes(BS_TEX(current))
+                            ? cub_BS_TEX_get_nb_modes(CUB_BSK_TEX(current))
                             : 1;
         glDeleteTextures(current->nb_tex_draw * nb_modes, current->textures);
         free(current->textures);

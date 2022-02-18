@@ -13,6 +13,7 @@ typedef struct cubBucket {
 typedef struct cubHashMap {
     cubList** hash_table;
     size_t len;
+    size_t nb_keys;
     size_t hash_nbr;
 } cubHashMap;
 
@@ -37,6 +38,14 @@ void cub_utils_hashmap_set(cubHashMap* HM, size_t key, void* value);
 
 /* Removes the key from the hashmap if it exists */
 void cub_utils_hashmap_remove(cubHashMap* HM, size_t key);
+
+/* Populates the array 'keys' which must have at least 'HM->nb_keys' elements,
+ * with all the keys contained in the hashmap */
+void cub_utils_hashmap_get_keys(cubHashMap* HM, size_t* keys);
+
+/* Same as cub_utils_hashmap_get_keys() but instead of size_t keys, it fills
+ * the 'keys' array with uint32_t keys */
+void cub_utils_hashmap_get_keys_uint(cubHashMap* HM, uint32_t* keys);
 
 /* Called when freeing the hashmap is required */
 void cub_utils_hashmap_free(cubHashMap* HM);

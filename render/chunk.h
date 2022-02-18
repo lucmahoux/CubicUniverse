@@ -2,59 +2,36 @@
 #define CUB_RENDER_CHUNK_H
 
 #include "render/block.h"
-#include "utils/utils.h"
-#include "utils/hashmap.h"
-#include "utils/list.h"
-
-#define CUB_CHUNK_PALETTE(SC_ptr) ((cubPaletteTuple*)SC_ptr->palette->data)
-#define CUB_MAX_SUBCHUNKS 16
-
-typedef struct cubSubChunk {
-    // Y position of the subchunk relative to the bottom of the chunk it belongs
-    uint8_t y_pos;
-    // Hashmap linking each palette_id to a BP_elt
-    cubHashMap* palette;
-    // List of indices in 'palette' to determine the type of block
-    uint8_t* blocks;
-} cubSubChunk;
-
-typedef struct cubChunk {
-    // X and Z coordinates of the chunk in the chunk coords system
-    uint32_t chunkX, chunkZ;
-    uint8_t nb_subchunks;
-    // List of the subchunks in this chunk
-    cubSubChunk subchunks[CUB_MAX_SUBCHUNKS];
-} cubChunk;
-
-/* Load the chunk and allocate the memory for the lists, ... */
-void cub_chunk_load(cubChunk* chunk);
-
-/* Save the chunk and FREE all its allocated memory*/
-void cub_chunk_save(cubChunk* chunk);
+#include "render/block_utils.h"
+#include "render/chunk_loader.h"
+#include "render/chunk_utils.h"
 
 /* Return the block ID at position (x, y, z) in CHUNK coordinates */
-cub_block_t cub_chunk_get_block_at(cubChunk* chunk, uint8_t x,
-                                    uint8_t y, uint8_t z);
+void cub_chunk_get_block_at(cubChunk* chunk, uint8_t x,
+                            uint8_t y, uint8_t z, cubBlockState* block);
 
 /* Called to initialise *subchunk and its fields (malloc, ...) */
 void cub_subchunk_initialise(cubSubChunk* subchunk, uint8_t y_pos);
 
-/* Tries to add 'block_id' to the palette of subchunk.
- * Returns the block_palette_id of the palette element related to 'block_id'
- * if found (or added), and returns 0 (= air) on failure when the palette
- * list is full (Maximum Length = 255) */
-uint8_t cub_subchunk_palette_add(cubSubChunk* subchunk, cub_block_t block_id);
+/* Tries to add 'bs' to the palette (it must not be an heap allocation).
+ * If it already exists, adds 1 to the block counter, otherwise create the
+ * 'bs' via a heap allocation & add it to the palette.
+ * Returns the bs UID in the palette. */
+cub_palette_id cub_subchunk_palette_add(cubBlockRenderer* renderer,
+                                        cubSubChunk* sc, cubBlockState* bs);
 
 /* Set the block_id of the block at position (x, y, z) in CHUNK coordinates */
-void cub_chunk_set_block(cubChunk* chunk, uint8_t x, uint8_t y,
-                         uint8_t z, cub_block_t id);
+void cub_chunk_set_block(cubBlockRenderer* renderer,
+                        cubChunk* chunk, uint8_t x, uint8_t y, uint8_t z,
+                        cubBlockState* id);
 
-void cub_chunk_render(cubChunk* chunk, cubBlockRenderer* block_renderer);
+void cub_chunk_render(cubChunk* chunk, cubBlockRenderer* renderer);
 
 /* Creates an empty chunk with no subchunks */
 cubChunk cub_chunk_create(uint32_t chunkX, uint32_t chunkZ);
 
 /* Used for tests, fills a chunk with the given block id */
-void cub_chunk_fill(cubChunk* chunk, cub_block_t id);
+void cub_chunk_fill(cubBlockRenderer* renderer,
+                    cubChunk* chunk, cubBlockState* bs);
 
 #endif

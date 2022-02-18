@@ -114,8 +114,8 @@ char* cub_BSCRE_double_plant_type(cubBlockStateValue value, char* buffer) {
     return buffer + offset;
 }
 
-cubBS_parser cub_BS_is_creator(cubBlockState bs) {
-    switch (bs) {
+cubBS_parser cub_BS_is_creator(cubBlockStateKey bsk) {
+    switch (bsk) {
         case BS_DOUBLE_PLANT_TYPE:
             return cub_BSCRE_double_plant_type;
         case BS_FLOWER_TYPE:
@@ -127,16 +127,18 @@ cubBS_parser cub_BS_is_creator(cubBlockState bs) {
         default:
             return NULL;
     }
+    return NULL;
 }
 
-bool cub_BS_is_total_creator(cubBlockState bs) {
-    switch (bs) {
+bool cub_BS_is_total_creator(cubBlockStateKey bsk) {
+    switch (bsk) {
         case BS_DOUBLE_PLANT_TYPE:
         case BS_FLOWER_TYPE:
             return true;
         default:
             return false;
     }
+    return false;
 }
 
 char* cub_BSMOD_LIT_suffix(cubBlockStateValue value, char* buffer) {
@@ -167,8 +169,8 @@ char* cub_BSMOD_AGE_suffix(cubBlockStateValue value, char* buffer) {
     return buffer;
 }
 
-cubBS_parser cub_BS_is_modificator(cubBlockState bs) {
-    switch (bs) {
+cubBS_parser cub_BS_is_modificator(cubBlockStateKey bsk) {
+    switch (bsk) {
         case BS_LIT:
             return cub_BSMOD_LIT_suffix;
         case BS_AGE:
@@ -176,10 +178,11 @@ cubBS_parser cub_BS_is_modificator(cubBlockState bs) {
         default:
             return NULL;
     }
+    return NULL;
 }
 
-uint16_t cub_BS_TEX_get_nb_modes(cubBlockState bs) {
-    switch (bs) {
+uint16_t cub_BS_TEX_get_nb_modes(cubBlockStateKey bsk) {
+    switch (bsk) {
         case BS_LIT:
             return 2;
         case BS_AGE:
@@ -194,4 +197,5 @@ uint16_t cub_BS_TEX_get_nb_modes(cubBlockState bs) {
         default:
             return 0;
     }
+    return 0;
 }

@@ -39,6 +39,7 @@ cubHashMap* cub_utils_hashmap(size_t len, size_t hash_nbr) {
     for (size_t i = 0; i < len; ++i)
         HM->hash_table[i] = NULL;
     HM->len = len;
+    HM->nb_keys = 0;
     HM->hash_nbr = hash_nbr == 0 ? get_next_prime_nbr(len) : hash_nbr;
     return HM;
 }
@@ -76,6 +77,7 @@ void cub_utils_hashmap_set(cubHashMap* HM, size_t key, void* value) {
                                       CUB_HASHMAP_DEFAULT_LIST_CAPACITY);
         cubBucket elt = { .key = key, .value = value };
         cub_utils_list_append(*bucket_list, &elt);
+        ++HM->nb_keys;
     } else {
         size_t pos;
         cubBucket* bucket = binary_search_bucket((*bucket_list)->data,
@@ -86,6 +88,7 @@ void cub_utils_hashmap_set(cubHashMap* HM, size_t key, void* value) {
         } else {
             cubBucket elt = { .key = key, .value = value };
             cub_utils_list_insert(*bucket_list, &elt, pos);
+            ++HM->nb_keys;
         }
     }
 }
@@ -98,8 +101,34 @@ void cub_utils_hashmap_remove(cubHashMap* HM, size_t key) {
     cubBucket* bucket = binary_search_bucket(bucket_list->data,
                                              bucket_list->len,
                                              key, &pos);
-    if (bucket && bucket->key == key)
+    if (bucket && bucket->key == key) {
         cub_utils_list_remove_ordered(bucket_list, pos);
+        --HM->nb_keys;
+    }
+}
+
+void cub_utils_hashmap_get_keys(cubHashMap* HM, size_t* keys) {
+    size_t i = 0;
+    for (size_t k = 0; k < HM->len; ++k) {
+        if (HM->hash_table[k]) {
+            cubList* bucket_list = HM->hash_table[k];
+            for (size_t l = 0; l < bucket_list->len; ++l)
+                keys[i++] = ((cubBucket*)
+                            cub_utils_list_get(bucket_list, l))->key;
+        }
+    }
+}
+
+void cub_utils_hashmap_get_keys_uint(cubHashMap* HM, uint32_t* keys) {
+    size_t i = 0;
+    for (size_t k = 0; k < HM->len; ++k) {
+        if (HM->hash_table[k]) {
+            cubList* bucket_list = HM->hash_table[k];
+            for (size_t l = 0; l < bucket_list->len; ++l)
+                keys[i++] = (uint32_t)((cubBucket*)
+                            cub_utils_list_get(bucket_list, l))->key;
+        }
+    }
 }
 
 void cub_utils_hashmap_free(cubHashMap* HM) {

@@ -1,70 +1,8 @@
 #ifndef CUB_RENDER_BLOCK_LIST_LOADER
 #define CUB_RENDER_BLOCK_LIST_LOADER
 
+#include "render/block_utils.h"
 #include "render/blockstates.h"
-#include "utils/utils.h"
-#include "utils/open_gl.h"
-
-#define BLOCK_LIST_FILE "block-list.cubic"
-#define CUB_MAX_BLOCK_STRLEN 32
-/* If the blockstate texturer exists, then its ID in the 'bs_keys' of a
- * cubBlockData must be 0! */
-#define CUB_BS_TEX_ID 0
-#define BS_TEX(block_ptr) block_ptr->bs_keys[CUB_BS_TEX_ID]
-#define CUB_DEFAULT_VAO_ID 0
-#define cub_bs_key uint8_t
-#define cub_bs_val uint8_t
-
-// Define how the textures file names must be formed.
-// It is also used to bind the correct textures when using the default VAO
-typedef enum cubRenderType {
-    RT_NONE             =   0x00,   // no texture (air)
-    RT_TOP              =   0x01,   // _top suffix
-    RT_BOTTOM           =   0x02,   // _bottom suffix
-    RT_FRONT            =   0x04,   // _front suffix
-    RT_BACK             =   0x08,   // _back suffix
-    RT_LEFT             =   0x10,   // _left suffix
-    RT_RIGHT            =   0x20,   // _right suffix
-    RT_SIDE             =   0x40,   // _side suffix
-    RT_DEFAULT          =   0x80    // no suffix
-} cubRenderType;
-
-typedef struct cubBlockInfo {
-    // Does the player collide with the block?
-    uint8_t is_solid : 1;
-    // Can it stand in the air without support?
-    uint8_t has_gravity : 1;
-    // Does it have a blockstate modifying its textures ("bs texturer")?
-    uint8_t has_bs_tex : 1;
-    // Only if has_bs_tex is TRUE, Is this BS a block CREATOR (!= MODIFICATOR)?
-    uint8_t is_bs_creator : 1;
-    // Does it have BSs? (including the bs_name_mod which must be the first)
-    uint8_t has_states : 1;
-    // If has_states is TRUE, how many are there?
-    uint8_t nb_states : 3;
-} cubBlockInfo;
-
-typedef struct cubBlockData {
-    cubRenderType render_type;
-    char name[CUB_MAX_BLOCK_STRLEN];
-    cub_block_t id;
-    cubBlockInfo block_info;
-    uint8_t nb_tex_draw; // Nbr of different textures to load on draw call
-    uint8_t VAO_id; // ID of the VAO used to render the block
-    // Set to NULL if the block does not have a BS name modifier.
-    // Otherwise, point to the function used to parse its values.
-    cubBS_parser bs_name_parser;
-    GLuint* textures;
-    cub_bs_key* bs_keys;
-    cub_bs_val* bs_default_values;
-} cubBlockData;
-
-typedef struct cubBlockList {
-    // Array of all blocks
-    cubBlockData* blocks;
-    // Total number of blocks
-    size_t nb_blocks;
-} cubBlockList;
 
 /* Determine the number of .png textures to load for one draw call
  * This number is equivalent to the field cubBlockData.nb_tex_draw */

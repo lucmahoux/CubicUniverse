@@ -24,7 +24,8 @@ LIBUTILS_SRC = utils.c matrix.c vector.c list.c hashmap.c \
 LIBUTILS_SRC := $(addprefix $(LIBUTILS_DIR)/,$(LIBUTILS_SRC))
 
 LIBRENDER_DIR = ../render
-LIBRENDER_SRC = block.c camera.c blockstates.c block_list_loader.c
+LIBRENDER_SRC = block.c camera.c blockstates.c block_list_loader.c chunk.c \
+				chunk_loader.c block_utils.c
 LIBRENDER_SRC := $(addprefix $(LIBRENDER_DIR)/,$(LIBRENDER_SRC))
 
 LIBINPUT_DIR = ../input
@@ -47,7 +48,7 @@ SUB_RULES = all clean
 
 .PHONY = all $(EXECS)
 
-all: $(EXECS)
+all: clean $(EXECS)
 
 define explicit_template =
 $(1): phony_explicit
@@ -74,6 +75,6 @@ clean: $(addsuffix _clean,$(EXECS))
 	@echo "Finished running $<"
 	@echo ""
 
-run: $(addsuffix _run,$(EXECS))
+run: clean $(addsuffix _run,$(EXECS))
 
 phony_explicit:

@@ -15,7 +15,7 @@ uint8_t cub_BLloader_count_draw_tex(cubRenderType type) {
 
 void cub_BLloader_allocate_tex_mem(cubBlockData* block) {
     uint16_t nb_modes = block->block_info.has_bs_tex
-                ? cub_BS_TEX_get_nb_modes(BS_TEX(block))
+                ? cub_BS_TEX_get_nb_modes(CUB_BSK_TEX(block))
                 : 1;
     block->textures = malloc(nb_modes * block->nb_tex_draw * sizeof(GLuint));
     if (!block->textures)
@@ -119,8 +119,8 @@ void cub_BLloader_load_blocks(cubBlockList* block_list, FILE* fp) {
             }
             if (current->block_info.has_bs_tex) {
                 current->bs_name_parser = current->block_info.is_bs_creator
-                                ? cub_BS_is_creator(BS_TEX(current))
-                                : cub_BS_is_modificator(BS_TEX(current));
+                                ? cub_BS_is_creator(CUB_BSK_TEX(current))
+                                : cub_BS_is_modificator(CUB_BSK_TEX(current));
             } else current->bs_name_parser = NULL;
         } else {
             current->bs_keys = NULL;

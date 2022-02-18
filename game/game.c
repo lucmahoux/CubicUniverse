@@ -77,61 +77,66 @@ void cub_game_renderer_handler(cubGame* game) {
 
     // World updates
     glBindVertexArray(game->block_renderer.buffer_objs[CUB_DEFAULT_VAO_ID].VAO);
-    cubBP_elt bp_elt = { .id = 1, .bs_values = NULL };
+    /*cubBlockState bs = { .id = 1, .states = NULL };
     cub_bs_val bs_vals[3] = { 0, 0, 0 };
-    bp_elt.bs_values = bs_vals;
-    cub_block_render(&game->block_renderer, &bp_elt,
+    bs.states = bs_vals;
+    cub_block_render(&game->block_renderer, &bs,
                         CUB_VEC3(0.0f, 0.0f, -2.0f));
-    bp_elt.id = 2;
-    cub_block_render(&game->block_renderer, &bp_elt,
+    bs.id = 2;
+    cub_block_render(&game->block_renderer, &bs,
                         CUB_VEC3(0.0f, 0.0f, 2.0f));
-    bp_elt.id = 3;
-    bp_elt.bs_values[0] = BSV_OAK;
-    cub_block_render(&game->block_renderer, &bp_elt,
+    bs.id = 3;
+    bs.states[0] = BSV_OAK;
+    cub_block_render(&game->block_renderer, &bs,
                         CUB_VEC3(0.0f, 2.0f, 0.0f));
-    bp_elt.bs_values[0] = BSV_ACACIA;
-    cub_block_render(&game->block_renderer, &bp_elt,
+    bs.states[0] = BSV_ACACIA;
+    cub_block_render(&game->block_renderer, &bs,
                         CUB_VEC3(0.0f, 0.0f, 0.0f));
-    bp_elt.bs_values[0] = BSV_SPRUCE;
-    cub_block_render(&game->block_renderer, &bp_elt,
+    bs.states[0] = BSV_SPRUCE;
+    cub_block_render(&game->block_renderer, &bs,
                         CUB_VEC3(0.0f, -2.0f, 0.0f));
-    bp_elt.id = 4;
-    bp_elt.bs_values[0] = BSV_OAK;
-    cub_block_render(&game->block_renderer, &bp_elt,
+    bs.id = 4;
+    bs.states[0] = BSV_OAK;
+    cub_block_render(&game->block_renderer, &bs,
                         CUB_VEC3(1.0f, 1.0f, 0.0f));
-    bp_elt.bs_values[0] = BSV_ACACIA;
-    cub_block_render(&game->block_renderer, &bp_elt,
+    bs.states[0] = BSV_ACACIA;
+    cub_block_render(&game->block_renderer, &bs,
                         CUB_VEC3(0.0f, 1.0f, 1.0f));
-    bp_elt.bs_values[0] = BSV_SPRUCE;
-    cub_block_render(&game->block_renderer, &bp_elt,
+    bs.states[0] = BSV_SPRUCE;
+    cub_block_render(&game->block_renderer, &bs,
                         CUB_VEC3(1.0f, 0.0f, 1.0f));
-    bp_elt.id = 5;
-    bp_elt.bs_values[0] = BSV_POPPY;
-    cub_block_render(&game->block_renderer, &bp_elt,
+    bs.id = 5;
+    bs.states[0] = BSV_POPPY;
+    cub_block_render(&game->block_renderer, &bs,
                         CUB_VEC3(0.0f, 3.0f, 0.0f));
-    bp_elt.bs_values[0] = BSV_TULIP_ORANGE;
-    cub_block_render(&game->block_renderer, &bp_elt,
+    bs.states[0] = BSV_TULIP_ORANGE;
+    cub_block_render(&game->block_renderer, &bs,
                         CUB_VEC3(1.0f, 3.0f, 0.0f));
-    bp_elt.bs_values[0] = BSV_LILY_OF_THE_VALLEY;
-    cub_block_render(&game->block_renderer, &bp_elt,
+    bs.states[0] = BSV_LILY_OF_THE_VALLEY;
+    cub_block_render(&game->block_renderer, &bs,
                         CUB_VEC3(2.0f, 3.0f, 0.0f));
-    bp_elt.bs_values[0] = BSV_OXEYE;
-    cub_block_render(&game->block_renderer, &bp_elt,
+    bs.states[0] = BSV_OXEYE;
+    cub_block_render(&game->block_renderer, &bs,
                         CUB_VEC3(3.0f, 3.0f, 0.0f));
-    bp_elt.id = 6;
-    bp_elt.bs_values[0] = BSV_FALSE;
-    cub_block_render(&game->block_renderer, &bp_elt,
+    bs.id = 6;
+    bs.states[0] = BSV_FALSE;
+    cub_block_render(&game->block_renderer, &bs,
                         CUB_VEC3(4.0f, 3.0f, 0.0f));
-    bp_elt.bs_values[0] = BSV_TRUE;
-    cub_block_render(&game->block_renderer, &bp_elt,
-                        CUB_VEC3(5.0f, 3.0f, 0.0f));
-    //cub_chunk_render(&game->chunk_test, &game->block_renderer);
+    bs.states[0] = BSV_TRUE;
+    cub_block_render(&game->block_renderer, &bs,
+                        CUB_VEC3(5.0f, 3.0f, 0.0f));*/
+    cub_chunk_render(&game->chunk_test, &game->block_renderer);
 }
 
 void cub_game_start(cubGame* game) {
-    //game->chunk_test = cub_chunk_create(0, 0);
-    //cub_chunk_fill(&game->chunk_test, 1);
-    //cub_chunk_load(&game->chunk_test);
+    /*game->chunk_test = cub_chunk_create(0, 0);
+    cubBlockState bs;
+    bs.id = 5;
+    cub_bs_val states[3];
+    bs.states = states;
+    states[0] = BSV_POPPY;
+    cub_chunk_fill(&game->block_renderer, &game->chunk_test, &bs);*/
+    cub_chunk_load(&game->chunk_test, &game->block_renderer);
     cub_utils_start_window_loop(game->window,
                                 (window_callback) cub_game_clear_screen_handler,
                                 (window_callback) cub_game_input_handler,
@@ -142,6 +147,6 @@ void cub_game_start(cubGame* game) {
 
 void cub_game_stop(cubGame* game) {
     // TODO: Save things on disk
-    // cub_chunk_save(&game->chunk_test);
+    cub_chunk_save(&game->chunk_test, &game->block_renderer);
     cub_block_free_renderer(&game->block_renderer);
 }
