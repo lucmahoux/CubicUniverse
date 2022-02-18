@@ -54,8 +54,8 @@
 ## About The Project
 
 
-
-Super C project by EPITA Students.
+CubicUniverse is a project for the fourth semester of our curriculum at EPITA.
+Its main purpose is to be a clone of the iconic game Minecraft.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -73,16 +73,20 @@ Super C project by EPITA Students.
 <!-- GETTING STARTED -->
 ## Getting Started
 
-CHANGE HERE
-
 ### Prerequisites
 
 List prerequisites here
 
-* BLABLABLA
+* In order to be able to compile the project, you must install the following dependencies:
   ```sh
-  sudo apt -get install BLABLABLA
+  sudo apt-get install libglfw3
+  sudo apt-get install libglfw3-dev
+  sudo apt-get install libglew-dev
+  sudo apt-get install freeglut3
+  sudo apt-get install freeglut3-dev
   ```
+  Moreover, regarding the unit-tests part of the project, you must install Criterion.
+  You can get it from the github repository [Criterion](https://github.com/Snaipe/Criterion).
 
 ### Installation
 
@@ -91,10 +95,15 @@ List prerequisites here
    ```sh
    git clone https://github.com/lucmahoux/CubicUniverse.git
    ```
-3. Install dependencies
+3. To build the project, you simply have to go to the root of the project and run :
    ```sh
-   sudo apt-get install BLABLABLA
+   make game_run
    ```
+   if you want to build & run the project.
+    ```sh
+    make tests_run
+    ```
+    if you want to build & run the test-suite.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -103,7 +112,7 @@ List prerequisites here
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-HOW TO PLAY CUBICUNIVERSE
+HOW TO PLAY CUBICUNIVERSE - Run it & gaze at the beauty of a skybox & some blocks :)
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>

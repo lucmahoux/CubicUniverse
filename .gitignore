@@ -3,6 +3,7 @@
 
 ### OUR THINGS ###
 game/game
+tests/tests
 tags.*
 
 ### CMake ###

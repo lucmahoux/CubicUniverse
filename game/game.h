@@ -4,6 +4,7 @@
 #include "render/block.h"
 #include "render/camera.h"
 #include "render/chunk.h"
+#include "render/chunk_loader.h"
 #include "render/skybox.h"
 #include "utils/open_gl.h"
 #include "utils/utils.h"

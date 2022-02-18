@@ -10,10 +10,13 @@ void cub_game_init(cubGame* game, int width, int height) {
     cub_block_setup_renderer(&game->block_renderer);
     for (size_t i = 0; i < game->block_renderer.block_list.nb_blocks; ++i) {
         cubBlockData* block = &game->block_renderer.block_list.blocks[i];
-        printf("Name: %s - ID: %i - Type: %s\n", block->name, block->id,
-                block->type == CUBE_SAME_FACES ? "CUBE_SAME_FACES" :
-                block->type == CUBE_UNIQUE_FACES ? "CUBE_UNIQUE_FACES" :
-                "CUBE_TOP_BOTTOM");
+        printf("Name: %s - ID: %u - RenderType: 0x%x - VAO_id: %u "
+                "- is_solid: %u - has_gravity: %u - has_bs_tex: %u "
+                "- is_bs_creator: %u - has_states: %u - nb_states: %u\n",
+                block->name, block->id, block->render_type, block->VAO_id,
+                block->block_info.is_solid, block->block_info.has_gravity,
+                block->block_info.has_bs_tex, block->block_info.is_bs_creator,
+                block->block_info.has_states, block->block_info.nb_states);
     }
     cub_block_load_texture_pack(&game->block_renderer.block_list);
     
@@ -90,9 +93,6 @@ void cub_game_input_handler(cubGame* game) {
                     CUB_VEC3_NORM(CUB_VEC3_CROSS(cam->front,cam->up_side))));
     }
 
-    printf("x : %f, y : %f, z : %f\n", cam->position.coords[0],
-            cam->position.coords[1], cam->position.coords[2]);
-
     // Mouse movements
     double xpos, ypos;
     glfwGetCursorPos(game->window, &xpos, &ypos);
@@ -136,31 +136,74 @@ void cub_game_skybox_render(cubGame* game)
 }
 
 void cub_game_renderer_handler(cubGame* game) {
-
-    
     glUseProgram(game->block_renderer.shader_program);
     // Camera updates
     cub_render_update_camera(&game->camera);
 
     // World updates
+    glBindVertexArray(game->block_renderer.buffer_objs[CUB_DEFAULT_VAO_ID].VAO);
+    /*cubBlockState bs = { .id = 1, .states = NULL };
+    cub_bs_val bs_vals[3] = { 0, 0, 0 };
+    bs.states = bs_vals;
+    cub_block_render(&game->block_renderer, &bs,
+                        CUB_VEC3(0.0f, 0.0f, -2.0f));
+    bs.id = 2;
+    cub_block_render(&game->block_renderer, &bs,
+                        CUB_VEC3(0.0f, 0.0f, 2.0f));
+    bs.id = 3;
+    bs.states[0] = BSV_OAK;
+    cub_block_render(&game->block_renderer, &bs,
+                        CUB_VEC3(0.0f, 2.0f, 0.0f));
+    bs.states[0] = BSV_ACACIA;
+    cub_block_render(&game->block_renderer, &bs,
+                        CUB_VEC3(0.0f, 0.0f, 0.0f));
+    bs.states[0] = BSV_SPRUCE;
+    cub_block_render(&game->block_renderer, &bs,
+                        CUB_VEC3(0.0f, -2.0f, 0.0f));
+    bs.id = 4;
+    bs.states[0] = BSV_OAK;
+    cub_block_render(&game->block_renderer, &bs,
+                        CUB_VEC3(1.0f, 1.0f, 0.0f));
+    bs.states[0] = BSV_ACACIA;
+    cub_block_render(&game->block_renderer, &bs,
+                        CUB_VEC3(0.0f, 1.0f, 1.0f));
+    bs.states[0] = BSV_SPRUCE;
+    cub_block_render(&game->block_renderer, &bs,
+                        CUB_VEC3(1.0f, 0.0f, 1.0f));
+    bs.id = 5;
+    bs.states[0] = BSV_POPPY;
+    cub_block_render(&game->block_renderer, &bs,
+                        CUB_VEC3(0.0f, 3.0f, 0.0f));
+    bs.states[0] = BSV_TULIP_ORANGE;
+    cub_block_render(&game->block_renderer, &bs,
+                        CUB_VEC3(1.0f, 3.0f, 0.0f));
+    bs.states[0] = BSV_LILY_OF_THE_VALLEY;
+    cub_block_render(&game->block_renderer, &bs,
+                        CUB_VEC3(2.0f, 3.0f, 0.0f));
+    bs.states[0] = BSV_OXEYE;
+    cub_block_render(&game->block_renderer, &bs,
+                        CUB_VEC3(3.0f, 3.0f, 0.0f));
+    bs.id = 6;
+    bs.states[0] = BSV_FALSE;
+    cub_block_render(&game->block_renderer, &bs,
+                        CUB_VEC3(4.0f, 3.0f, 0.0f));
+    bs.states[0] = BSV_TRUE;
+    cub_block_render(&game->block_renderer, &bs,
+                        CUB_VEC3(5.0f, 3.0f, 0.0f));*/
 
-    glBindVertexArray(game->block_renderer.VAO);
-  /*  cub_block_render(&game->block_renderer, 1, CUB_VEC3(0.0f, 0.0f, 0.0f));
-    cub_block_render(&game->block_renderer, 2, CUB_VEC3(1.0f, 0.0f, 0.0f));
-    cub_block_render(&game->block_renderer, 1, CUB_VEC3(0.0f, 0.0f, 1.0f));
-    cub_block_render(&game->block_renderer, 2, CUB_VEC3(1.0f, 0.0f, 1.0f));
-    cub_block_render(&game->block_renderer, 3, CUB_VEC3(1.0f, 1.0f, 1.0f));
-    cub_block_render(&game->block_renderer, 3, CUB_VEC3(2.0f, 0.0f, 0.0f));
-*/
     cub_chunk_render(&game->chunk_test, &game->block_renderer);
-    
     cub_game_skybox_render(game);
 }
 
 void cub_game_start(cubGame* game) {
-    //game->chunk_test = cub_chunk_create(0, 0);
-    //cub_chunk_fill(&game->chunk_test, 1);
-    cub_chunk_load(&game->chunk_test);
+    /*game->chunk_test = cub_chunk_create(0, 0);
+    cubBlockState bs;
+    bs.id = 5;
+    cub_bs_val states[3];
+    bs.states = states;
+    states[0] = BSV_POPPY;
+    cub_chunk_fill(&game->block_renderer, &game->chunk_test, &bs);*/
+    cub_chunk_load(&game->chunk_test, &game->block_renderer);
     cub_utils_start_window_loop(game->window,
                                 (window_callback) cub_game_clear_screen_handler,
                                 (window_callback) cub_game_input_handler,
@@ -171,7 +214,7 @@ void cub_game_start(cubGame* game) {
 
 void cub_game_stop(cubGame* game) {
     // TODO: Save things on disk
-    // cub_chunk_save(&game->chunk_test);
+    cub_chunk_save(&game->chunk_test, &game->block_renderer);
     cub_block_free_renderer(&game->block_renderer);
     cub_skybox_free_renderer(&game->skybox_renderer);
 }
