@@ -26,7 +26,7 @@ void cub_BLloader_allocate_tex_mem(cubBlockData* block) {
 
 void cub_BLloader_create_VAO(GLfloat* VBO, GLuint* EBO,
                              GLsizei VBO_len, GLsizei EBO_len,
-                             cubRenderBufferObject* render_obj) {
+                             renderBufferObject* render_obj) {
     // Generate the buffers
     glGenBuffers(1, &render_obj->VBO);
     glGenBuffers(1, &render_obj->EBO);
@@ -62,7 +62,7 @@ void cub_BLloader_create_VAO(GLfloat* VBO, GLuint* EBO,
 }
 
 void cub_BLloader_load_header(cubBlockList* block_list, uint8_t* nb_buffers,
-                                cubRenderBufferObject** render_objs, FILE* fp) {
+                                renderBufferObject** render_objs, FILE* fp) {
     const char fname[] = "cub_BLloader_load";
     // Get the number of rendering buffers & the number of blocks
     utils_fread(nb_buffers, sizeof(uint8_t), 1,
@@ -70,7 +70,7 @@ void cub_BLloader_load_header(cubBlockList* block_list, uint8_t* nb_buffers,
     utils_fread(&block_list->nb_blocks, sizeof(cub_block_t), 1,
                     fp, fname, "nb_blocks");
     // Allocate the arrays of buffer & cubBlockData accordingly
-    *render_objs = malloc(*nb_buffers * sizeof(cubRenderBufferObject));
+    *render_objs = malloc(*nb_buffers * sizeof(renderBufferObject));
     block_list->blocks = malloc(block_list->nb_blocks * sizeof(cubBlockData));
     if (!*render_objs || !block_list->blocks)
         errx(1, "cub_BLloader_load_header: Malloc failed!");
@@ -133,7 +133,7 @@ void cub_BLloader_load_blocks(cubBlockList* block_list, FILE* fp) {
 }
 
 void cub_BLloader_load(cubBlockList* block_list, uint8_t* nb_buffers,
-                        cubRenderBufferObject** render_objs) {
+                        renderBufferObject** render_objs) {
     char* fpath = utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
     printf("cub_block_load_block_list: Trying to load %s...\n", fpath);
     FILE* fp;

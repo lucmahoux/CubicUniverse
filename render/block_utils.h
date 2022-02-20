@@ -129,7 +129,7 @@ typedef struct cubBlockPaletteElement {
 
 typedef struct cubBlockRenderer {
     // All the buffers used to render the blocks
-    cubRenderBufferObject* buffer_objs;
+    renderBufferObject* buffer_objs;
     uint8_t nb_buffers;
     GLuint shader_program;
     // Use the cubBlockFaceIndex enum to access the texture associated to

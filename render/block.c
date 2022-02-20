@@ -105,7 +105,7 @@ void cub_block_set_tex_custom(cubBlockRenderer* renderer, cubBlockData* block,
 void cub_block_render(cubBlockRenderer* renderer, cubBlockState* bs,
                         vec3 position) {
     cubBlockData* block = CUB_BLOCK_DATA(renderer, bs->id);
-    cubRenderBufferObject* r_obj = &renderer->buffer_objs[block->VAO_id];
+    renderBufferObject* r_obj = &renderer->buffer_objs[block->VAO_id];
     if (block->VAO_id != CUB_DEFAULT_VAO_ID) {
         glBindVertexArray(r_obj->VAO);
         cub_block_set_tex_custom(renderer, block, bs);
@@ -126,7 +126,7 @@ void cub_block_free_renderer(cubBlockRenderer* renderer) {
     cub_block_free_all_textures(&renderer->block_list);
     free(renderer->block_list.blocks);
     for (uint8_t i = 0; i < renderer->nb_buffers; ++i) {
-        cubRenderBufferObject* buffer_obj = renderer->buffer_objs + i;
+        renderBufferObject* buffer_obj = renderer->buffer_objs + i;
         glDeleteBuffers(1, &buffer_obj->VBO);
         glDeleteBuffers(1, &buffer_obj->EBO);
         glDeleteVertexArrays(1, &buffer_obj->VAO);
@@ -140,7 +140,7 @@ void cub_block_load_texture(char* buffer, const char* prefix, const char* ext,
     snprintf(buffer, 2 * CUB_MAX_BLOCK_STRLEN, "%s%s%s.png",
              prefix, ext, suffix);
     glGenTextures(1, texture_id);
-    cub_utils_bind_load_texture(texture_id, buffer);
+    bind_load_texture(texture_id, buffer);
 }
 
 void cub_block_try_load_texture(char* buffer, const char* prefix,
@@ -148,12 +148,12 @@ void cub_block_try_load_texture(char* buffer, const char* prefix,
                                 GLuint* tex_id, GLuint* def_tex_id) {
     snprintf(buffer, 2 * CUB_MAX_BLOCK_STRLEN, "%s%s%s.png",
              prefix, ext, suffix);
-    if (!cub_utils_texture_exists(buffer)) {
+    if (!texture_exists(buffer)) {
         // If the texture cannot be loaded, set *tex_id to the default value
         *tex_id = *def_tex_id;
     } else {
         glGenTextures(1, tex_id);
-        cub_utils_bind_load_texture(tex_id, buffer);
+        bind_load_texture(tex_id, buffer);
     }
 }
 

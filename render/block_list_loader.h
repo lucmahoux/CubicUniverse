@@ -19,13 +19,13 @@ void cub_BLloader_allocate_tex_mem(cubBlockData* block);
 /* Initialize the cubRenderBufferObject render_obj with the VBO & EBO buffers */
 void cub_BLloader_create_VAO(GLfloat* VBO, GLuint* EBO,
                              GLsizei VBO_len, GLsizei EBO_len,
-                             cubRenderBufferObject* render_obj);
+                             renderBufferObject* render_obj);
 
 /* Load the header of the block list file & set the 'nb_buffers' & 'render_objs'
  * values accordingly.
  * The memory for the array block_list->blocks is also allocated */
 void cub_BLloader_load_header(cubBlockList* block_list, uint8_t* nb_buffers,
-                              cubRenderBufferObject** render_objs, FILE* fp);
+                              renderBufferObject** render_objs, FILE* fp);
 
 /* Load the body (= the list of blocks) of the block list file */
 void cub_BLloader_load_blocks(cubBlockList* block_list, FILE* fp);
@@ -33,7 +33,7 @@ void cub_BLloader_load_blocks(cubBlockList* block_list, FILE* fp);
 /* Load the block_list & initialize it. It sets the pointer 'nb_buffers' to
  * the number of generated render_objs. */
 void cub_BLloader_load(cubBlockList* block_list, uint8_t* nb_buffers,
-                        cubRenderBufferObject** render_objs);
+                        renderBufferObject** render_objs);
 
 #ifdef CUB_DEV_STAGE
 // [!] ALL the buffers MUST be added FIRST -
