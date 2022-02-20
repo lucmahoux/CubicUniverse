@@ -8,13 +8,13 @@ void cub_chunk_get_block_at(cubChunk* chunk, uint8_t x,
     else {
         uint16_t p_id = sc->blocks[x + (z << 4) + (y << 8)];
         if (!p_id) block->id = CUB_AIR_ID;
-        else *block = ((cubBP_elt*)cub_utils_hashmap_get(sc->palette, p_id))
+        else *block = ((cubBP_elt*)hashmap_get(sc->palette, p_id))
                         ->block;
     }
 }
 
 void cub_subchunk_initialise(cubSubChunk* sc, uint8_t y_pos) {
-    sc->palette = cub_utils_hashmap(CUB_PALETTE_DEFAULT_LEN,
+    sc->palette = hashmap_new(CUB_PALETTE_DEFAULT_LEN,
                                     CUB_PALETTE_DEFAULT_HASH_NBR);
     sc->y_pos = y_pos;
     sc->blocks = malloc(4096 * sizeof(cub_palette_id));
@@ -30,7 +30,7 @@ cub_palette_id cub_subchunk_palette_add(cubBlockRenderer* renderer,
     if (bp_elt) { // BlockState already exists in palette
         ++bp_elt->nb_blocks;
     } else { // Create a new BP_elt -> default nb_blocks is already 1
-        cub_utils_hashmap_set(sc->palette, bp_uid,
+        hashmap_set(sc->palette, bp_uid,
             cub_block_BP_elt(CUB_BLOCK_DATA(renderer, bs->id),
                 bs->id, bs->states));
     }

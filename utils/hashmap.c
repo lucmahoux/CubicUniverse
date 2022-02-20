@@ -27,14 +27,14 @@ cubBucket* binary_search_bucket(cubBucket* buckets, size_t len,
     return left < len ? (buckets + left) : NULL;
 }
 
-cubHashMap* cub_utils_hashmap(size_t len, size_t hash_nbr) {
-    cubHashMap* HM = malloc(sizeof(cubHashMap));
+hashMap* hashmap_new(size_t len, size_t hash_nbr) {
+    hashMap* HM = malloc(sizeof(hashMap));
     if (!HM)
-        errx(1, "cub_utils_hashmap: Malloc failed!");
+        errx(1, "hashmap_new: Malloc failed!");
     HM->hash_table = malloc(len * sizeof(cubList*));
     if (!HM->hash_table) {
         free(HM);
-        errx(1, "cub_utils_hashmap: Malloc failed!");
+        errx(1, "hashmap_new: Malloc failed!");
     }
     for (size_t i = 0; i < len; ++i)
         HM->hash_table[i] = NULL;
@@ -44,12 +44,12 @@ cubHashMap* cub_utils_hashmap(size_t len, size_t hash_nbr) {
     return HM;
 }
 
-size_t cub_utils_hash_function(cubHashMap* HM, size_t key) {
+size_t hash_function(hashMap* HM, size_t key) {
     return (key % HM->hash_nbr) % HM->len;
 }
 
-void* cub_utils_hashmap_get(cubHashMap* HM, size_t key) {
-    cubList* bucket_list = HM->hash_table[cub_utils_hash_function(HM, key)];
+void* hashmap_get(hashMap* HM, size_t key) {
+    cubList* bucket_list = HM->hash_table[hash_function(HM, key)];
     if (!bucket_list)
         return NULL;
     size_t pos;
@@ -59,8 +59,8 @@ void* cub_utils_hashmap_get(cubHashMap* HM, size_t key) {
     return (!bucket || bucket->key != key) ? NULL : bucket->value;
 }
 
-bool cub_utils_hashmap_in(cubHashMap* HM, size_t key) {
-    cubList* bucket_list = HM->hash_table[cub_utils_hash_function(HM, key)];
+bool hashmap_in(hashMap* HM, size_t key) {
+    cubList* bucket_list = HM->hash_table[hash_function(HM, key)];
     if (!bucket_list)
         return false;
     size_t pos;
@@ -70,11 +70,11 @@ bool cub_utils_hashmap_in(cubHashMap* HM, size_t key) {
     return bucket && bucket->key == key;
 }
 
-void cub_utils_hashmap_set(cubHashMap* HM, size_t key, void* value) {
-    cubList** bucket_list = &HM->hash_table[cub_utils_hash_function(HM, key)];
+void hashmap_set(hashMap* HM, size_t key, void* value) {
+    cubList** bucket_list = &HM->hash_table[hash_function(HM, key)];
     if (!*bucket_list) {
         *bucket_list = cub_utils_list(sizeof(cubBucket), CUB_REALLOC_PLUS_ONE,
-                                      CUB_HASHMAP_DEFAULT_LIST_CAPACITY);
+                                      HASHMAP_DEFAULT_LIST_CAPACITY);
         cubBucket elt = { .key = key, .value = value };
         cub_utils_list_append(*bucket_list, &elt);
         ++HM->nb_keys;
@@ -93,8 +93,8 @@ void cub_utils_hashmap_set(cubHashMap* HM, size_t key, void* value) {
     }
 }
 
-void cub_utils_hashmap_remove(cubHashMap* HM, size_t key) {
-    cubList* bucket_list = HM->hash_table[cub_utils_hash_function(HM, key)];
+void hashmap_remove(hashMap* HM, size_t key) {
+    cubList* bucket_list = HM->hash_table[hash_function(HM, key)];
     if (!bucket_list)
         return;
     size_t pos;
@@ -107,7 +107,7 @@ void cub_utils_hashmap_remove(cubHashMap* HM, size_t key) {
     }
 }
 
-void cub_utils_hashmap_get_keys(cubHashMap* HM, size_t* keys) {
+void hashmap_get_keys(hashMap* HM, size_t* keys) {
     size_t i = 0;
     for (size_t k = 0; k < HM->len; ++k) {
         if (HM->hash_table[k]) {
@@ -119,7 +119,7 @@ void cub_utils_hashmap_get_keys(cubHashMap* HM, size_t* keys) {
     }
 }
 
-void cub_utils_hashmap_get_keys_uint(cubHashMap* HM, uint32_t* keys) {
+void hashmap_get_keys_uint(hashMap* HM, uint32_t* keys) {
     size_t i = 0;
     for (size_t k = 0; k < HM->len; ++k) {
         if (HM->hash_table[k]) {
@@ -131,7 +131,7 @@ void cub_utils_hashmap_get_keys_uint(cubHashMap* HM, uint32_t* keys) {
     }
 }
 
-void cub_utils_hashmap_free(cubHashMap* HM) {
+void hashmap_free(hashMap* HM) {
     for (size_t i = 0; i < HM->len; ++i)
         if (HM->hash_table[i])
             cub_utils_list_free(HM->hash_table[i]);

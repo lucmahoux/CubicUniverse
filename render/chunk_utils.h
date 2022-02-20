@@ -13,7 +13,7 @@ typedef struct cubSubChunk {
     // Y position of the subchunk relative to the bottom of the chunk it belongs
     uint8_t y_pos;
     // Hashmap linking each palette_id to a BP_elt
-    cubHashMap* palette;
+    hashMap* palette;
     // List of indices in 'palette' to determine the type of block
     cub_palette_id* blocks;
 } cubSubChunk;
@@ -28,7 +28,7 @@ typedef struct cubChunk {
 
 // ---------- Useful Macros ---------- //
 #define CUB_GET_BP_ELT(subchunk, bp_uid) ((cubBP_elt*)\
-        cub_utils_hashmap_get(subchunk->palette, (size_t)bp_uid))
+        hashmap_get(subchunk->palette, (size_t)bp_uid))
 #define CUB_SUBCHUNK_BP_UID(sc, x, y, z) (sc->blocks + x + (z << 4) + (y << 8))
 
 #endif

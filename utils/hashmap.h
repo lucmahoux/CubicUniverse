@@ -3,51 +3,51 @@
 
 #include <stdbool.h>
 #include "utils/list.h"
-#define CUB_HASHMAP_DEFAULT_LIST_CAPACITY 2
+#define HASHMAP_DEFAULT_LIST_CAPACITY 2
 
 typedef struct cubBucket {
     size_t key;
     void* value;
 } cubBucket;
 
-typedef struct cubHashMap {
+typedef struct hashMap {
     cubList** hash_table;
     size_t len;
     size_t nb_keys;
     size_t hash_nbr;
-} cubHashMap;
+} hashMap;
 
 /* Initialises a hashmap of length 'len'.
  * If 'hash_nbr' is 0, the next prime number following 'len' is chosen
  * as the 'hash_nbr'.
  * Otherwise, it is set to the specified value. */
-cubHashMap* cub_utils_hashmap(size_t len, size_t hash_nbr);
+hashMap* hashmap_new(size_t len, size_t hash_nbr);
 
 /* Function used to hash the keys */
-size_t cub_utils_hash_function(cubHashMap* HM, size_t key);
+size_t hash_function(hashMap* HM, size_t key);
 
 /* Return the value associated to a key if it exists or NULL otherwise */
-void* cub_utils_hashmap_get(cubHashMap* HM, size_t key);
+void* hashmap_get(hashMap* HM, size_t key);
 
 /* Returns TRUE if the 'key' is in the hashmap */
-bool cub_utils_hashmap_in(cubHashMap* HM, size_t key);
+bool hashmap_in(hashMap* HM, size_t key);
 
 /* Add a new key-value pair to the hashmap if the key does not exist.
  * Otherwise, it replaces the value by 'value'. */
-void cub_utils_hashmap_set(cubHashMap* HM, size_t key, void* value);
+void hashmap_set(hashMap* HM, size_t key, void* value);
 
 /* Removes the key from the hashmap if it exists */
-void cub_utils_hashmap_remove(cubHashMap* HM, size_t key);
+void hashmap_remove(hashMap* HM, size_t key);
 
 /* Populates the array 'keys' which must have at least 'HM->nb_keys' elements,
  * with all the keys contained in the hashmap */
-void cub_utils_hashmap_get_keys(cubHashMap* HM, size_t* keys);
+void hashmap_get_keys(hashMap* HM, size_t* keys);
 
 /* Same as cub_utils_hashmap_get_keys() but instead of size_t keys, it fills
  * the 'keys' array with uint32_t keys */
-void cub_utils_hashmap_get_keys_uint(cubHashMap* HM, uint32_t* keys);
+void hashmap_get_keys_uint(hashMap* HM, uint32_t* keys);
 
 /* Called when freeing the hashmap is required */
-void cub_utils_hashmap_free(cubHashMap* HM);
+void hashmap_free(hashMap* HM);
 
 #endif

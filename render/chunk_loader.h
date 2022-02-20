@@ -16,7 +16,7 @@ void cub_chunk_load_palette(cubSubChunk* sc, cubBlockRenderer* renderer,
 /* Load the chunk and allocate its memory */
 void cub_chunk_load(cubChunk* chunk, cubBlockRenderer* renderer);
 
-void cub_chunk_save_blocks(cubHashMap* new_ids, uint16_t palette_len,
+void cub_chunk_save_blocks(hashMap* new_ids, uint16_t palette_len,
                         cub_palette_id* blocks, FILE* fp);
 
 void cub_chunk_save_palette(cubSubChunk* sc, cubBlockRenderer* renderer,
