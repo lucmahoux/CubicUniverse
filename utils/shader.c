@@ -1,6 +1,6 @@
 #include "utils/shader.h"
 
-void cub_utils_get_shader_source(char* file, ShaderSource* shader) {
+void get_shader_source(char* file, ShaderSource* shader) {
     printf("Searching for shader: %s\n", file);
     FILE* fp;
     if ( (fp = fopen(file, "r")) == NULL ) {
@@ -9,7 +9,7 @@ void cub_utils_get_shader_source(char* file, ShaderSource* shader) {
     } else {
         char* source = malloc(BUFFER_SIZE + 1);
         if (!source)
-            errx(1, "cub_utils_get_shader_source: malloc failed!\n");
+            errx(1, "get_shader_source: malloc failed!\n");
         size_t nb_read, total_bytes = 0;
         char buffer[BUFFER_SIZE];
         while ((nb_read = fread(buffer, sizeof(char), BUFFER_SIZE, fp)) != 0) {
@@ -18,7 +18,7 @@ void cub_utils_get_shader_source(char* file, ShaderSource* shader) {
             if (nb_read >= BUFFER_SIZE) {
                 source = realloc(source, total_bytes + BUFFER_SIZE + 1);
                 if (!source)
-                    errx(1, "cub_utils_get_shader_source: realloc failed!\n");
+                    errx(1, "get_shader_source: realloc failed!\n");
             }
         }
         *(char*)(source + total_bytes) = '\0';
@@ -28,10 +28,10 @@ void cub_utils_get_shader_source(char* file, ShaderSource* shader) {
     }
 }
 
-ShaderSource* cub_utils_get_shaders(char* path, size_t path_len, uint8_t* len) {
+ShaderSource* get_shaders(char* path, size_t path_len, uint8_t* len) {
     ShaderSource* shader_sources = malloc(3 * sizeof(ShaderSource));
     if (!shader_sources)
-        errx(1, "cub_utils_get_shaders: malloc failed!");
+        errx(1, "get_shaders: malloc failed!");
 
     char file[path_len + 10];
     char* type = &file[path_len + 1];
@@ -41,21 +41,21 @@ ShaderSource* cub_utils_get_shaders(char* path, size_t path_len, uint8_t* len) {
     // Vertex Shader
     *type = 'V';
     shader_sources[0].shader_type = VERTEX_SHADER;
-    cub_utils_get_shader_source(file, &shader_sources[0]);
+    get_shader_source(file, &shader_sources[0]);
     // Geometry Shader
     *type = 'G';
     shader_sources[1].shader_type = GEOMETRY_SHADER;
-    cub_utils_get_shader_source(file, &shader_sources[1]);
+    get_shader_source(file, &shader_sources[1]);
     // Fragment Shader
     *type = 'F';
     shader_sources[2].shader_type = FRAGMENT_SHADER;
-    cub_utils_get_shader_source(file, &shader_sources[2]);
+    get_shader_source(file, &shader_sources[2]);
 
     *len = 3;
     return shader_sources;
 }
 
-void cub_utils_create_compile_shader(ShaderSource* shader, const char* name) {
+void create_compile_shader(ShaderSource* shader, const char* name) {
     // Create the shader
     switch (shader->shader_type) {
         case VERTEX_SHADER:
@@ -68,7 +68,7 @@ void cub_utils_create_compile_shader(ShaderSource* shader, const char* name) {
             shader->id = glCreateShader(GL_FRAGMENT_SHADER);
             break;
         default:
-            errx(1, "cub_utils_create_compile_shader: unknown shader type!");
+            errx(1, "create_compile_shader: unknown shader type!");
     }
 
     // Compile it & check for errors
@@ -88,11 +88,11 @@ void cub_utils_create_compile_shader(ShaderSource* shader, const char* name) {
     }
 }
 
-GLuint cub_utils_build_shader(const char* shader_name) {
+GLuint build_shader(const char* shader_name) {
     size_t path_len;
-    char* path = cub_utils_strconcat(SHADERS_PATH, shader_name, &path_len);
+    char* path = utils_strconcat(SHADERS_PATH, shader_name, &path_len);
     uint8_t len;
-    ShaderSource* shader_srcs = cub_utils_get_shaders(path, path_len, &len);
+    ShaderSource* shader_srcs = get_shaders(path, path_len, &len);
     free(path);
 
     GLuint shaderProgram = glCreateProgram();
@@ -100,13 +100,13 @@ GLuint cub_utils_build_shader(const char* shader_name) {
     for (uint8_t i = 0; i < len; ++i) {
         ShaderSource* shader = &shader_srcs[i];
         if (shader->shader_type != NONE) {
-            cub_utils_create_compile_shader(shader, shader_name);
+            create_compile_shader(shader, shader_name);
             glAttachShader(shaderProgram, shader->id);
             ++nb_shaders;
         }
     }
     if (nb_shaders == 0)
-        errx(1, "cub_utils_build_shader: no shader type was found!");
+        errx(1, "build_shader: no shader type was found!");
 
     glLinkProgram(shaderProgram);
     GLint success;

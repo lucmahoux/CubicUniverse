@@ -4,7 +4,7 @@ void cub_block_setup_renderer(cubBlockRenderer* renderer) {
     printf("cub_block_setup_renderer: Starting renderer initialisation...\n");
 
     // Load the shader program
-    renderer->shader_program = cub_utils_build_shader("block");
+    renderer->shader_program = build_shader("block");
 
     // Get uniforms locations (for textures)
     GLint loc = glGetUniformLocation(renderer->shader_program, "tex_top");

@@ -115,7 +115,7 @@ void cub_skybox_setup_renderer(cubSkyboxRenderer* renderer) {
     renderer->cubemapTexture = cub_skybox_load_cubemap();
 
     renderer->VBO = buffers[0];
-    renderer->shader_program = cub_utils_build_shader("skybox");
+    renderer->shader_program = build_shader("skybox");
     
     glUseProgram(renderer->shader_program);
     

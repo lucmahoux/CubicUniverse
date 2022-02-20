@@ -65,9 +65,9 @@ void cub_BLloader_load_header(cubBlockList* block_list, uint8_t* nb_buffers,
                                 cubRenderBufferObject** render_objs, FILE* fp) {
     const char fname[] = "cub_BLloader_load";
     // Get the number of rendering buffers & the number of blocks
-    cub_utils_fread(nb_buffers, sizeof(uint8_t), 1,
+    utils_fread(nb_buffers, sizeof(uint8_t), 1,
                     fp, fname, "nb_buffers");
-    cub_utils_fread(&block_list->nb_blocks, sizeof(cub_block_t), 1,
+    utils_fread(&block_list->nb_blocks, sizeof(cub_block_t), 1,
                     fp, fname, "nb_blocks");
     // Allocate the arrays of buffer & cubBlockData accordingly
     *render_objs = malloc(*nb_buffers * sizeof(cubRenderBufferObject));
@@ -76,13 +76,13 @@ void cub_BLloader_load_header(cubBlockList* block_list, uint8_t* nb_buffers,
         errx(1, "cub_BLloader_load_header: Malloc failed!");
     for (uint16_t i = 0; i < *nb_buffers; ++i) {
         GLsizei VBO_len;
-        cub_utils_fread(&VBO_len, sizeof(GLsizei), 1, fp, fname, "VBO_len");
+        utils_fread(&VBO_len, sizeof(GLsizei), 1, fp, fname, "VBO_len");
         GLfloat VBO[VBO_len];
-        cub_utils_fread(&VBO, sizeof(GLfloat), VBO_len, fp, fname, "VBO");
+        utils_fread(&VBO, sizeof(GLfloat), VBO_len, fp, fname, "VBO");
         GLsizei EBO_len;
-        cub_utils_fread(&EBO_len, sizeof(GLsizei), 1, fp, fname, "EBO_len");
+        utils_fread(&EBO_len, sizeof(GLsizei), 1, fp, fname, "EBO_len");
         GLuint EBO[EBO_len];
-        cub_utils_fread(&EBO, sizeof(GLuint), EBO_len, fp, fname, "EBO");
+        utils_fread(&EBO, sizeof(GLuint), EBO_len, fp, fname, "EBO");
         cub_BLloader_create_VAO(VBO, EBO, VBO_len, EBO_len, *render_objs + i);
     }
 }
@@ -91,17 +91,17 @@ void cub_BLloader_load_blocks(cubBlockList* block_list, FILE* fp) {
     const char fname[] = "cub_BLloader_load_blocks";
     for (uint32_t i = 0; i < block_list->nb_blocks; ++i) {
         cubBlockData* current = &block_list->blocks[i];
-        cub_utils_fread(&current->name, sizeof(char), CUB_MAX_BLOCK_STRLEN,
+        utils_fread(&current->name, sizeof(char), CUB_MAX_BLOCK_STRLEN,
                         fp, fname, "name"); // Name
-        cub_utils_fread(&current->id, sizeof(cub_block_t), 1,
+        utils_fread(&current->id, sizeof(cub_block_t), 1,
                         fp, fname, "id"); // ID
-        cub_utils_fread(&current->render_type, sizeof(cubRenderType), 1,
+        utils_fread(&current->render_type, sizeof(cubRenderType), 1,
                         fp, fname, "render_type"); // Render type
         current->nb_tex_draw =
                         cub_BLloader_count_draw_tex(current->render_type);
-        cub_utils_fread(&current->VAO_id, sizeof(uint8_t), 1,
+        utils_fread(&current->VAO_id, sizeof(uint8_t), 1,
                         fp, fname, "VAO_ID"); // VAO ID
-        cub_utils_fread(&current->block_info, sizeof(cubBlockInfo), 1,
+        utils_fread(&current->block_info, sizeof(cubBlockInfo), 1,
                         fp, fname, "block_info"); // Block info
         // Set up blockstates (if any)
         if (current->block_info.has_states) {
@@ -111,9 +111,9 @@ void cub_BLloader_load_blocks(cubBlockList* block_list, FILE* fp) {
             if (!current->bs_keys || !current->bs_default_values)
                 errx(1, "Malloc failed!");
             for (uint8_t k = 0; k < nb_bs; ++k) {
-                cub_utils_fread(&current->bs_keys[k], sizeof(cub_bs_key), 1,
+                utils_fread(&current->bs_keys[k], sizeof(cub_bs_key), 1,
                                 fp, fname, "blockstate_key");
-                cub_utils_fread(&current->bs_default_values[k],
+                utils_fread(&current->bs_default_values[k],
                                 sizeof(cub_bs_val), 1, fp, fname,
                                     "blockstate_default_value");
             }
@@ -134,7 +134,7 @@ void cub_BLloader_load_blocks(cubBlockList* block_list, FILE* fp) {
 
 void cub_BLloader_load(cubBlockList* block_list, uint8_t* nb_buffers,
                         cubRenderBufferObject** render_objs) {
-    char* fpath = cub_utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
+    char* fpath = utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
     printf("cub_block_load_block_list: Trying to load %s...\n", fpath);
     FILE* fp;
     if ( (fp = fopen(fpath, "rb")) == NULL ) {
@@ -149,7 +149,7 @@ void cub_BLloader_load(cubBlockList* block_list, uint8_t* nb_buffers,
 }
 
 void cub_BLloader_create_block_list_file() {
-    char* fpath = cub_utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
+    char* fpath = utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
     FILE* fp = fopen(fpath, "w");
     if (fp) fclose(fp);
     free(fpath);
@@ -157,7 +157,7 @@ void cub_BLloader_create_block_list_file() {
 
 void cub_BLloader_add_buffer(GLfloat* VBO, GLsizei VBO_len,
                              GLuint* EBO, GLsizei EBO_len) {
-    char* fpath = cub_utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
+    char* fpath = utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
     FILE* fp;
     if ( (fp = fopen(fpath, "r+b")) != NULL ) {
         const char fname[] = "cub_BLloader_add_buffer";
@@ -165,24 +165,24 @@ void cub_BLloader_add_buffer(GLfloat* VBO, GLsizei VBO_len,
         if (fread(&nb_buffers, sizeof(uint8_t), 1, fp) != 1) {
             // New file
             rewind(fp);
-            cub_utils_fwrite(&nb_buffers, sizeof(uint8_t), 1,
+            utils_fwrite(&nb_buffers, sizeof(uint8_t), 1,
                              fp, fname, "nb_buffers");
             cub_block_t nb_blocks = 0;
-            cub_utils_fwrite(&nb_blocks, sizeof(cub_block_t), 1,
+            utils_fwrite(&nb_blocks, sizeof(cub_block_t), 1,
                              fp, fname, "nb_blocks");
         }
         fseek(fp, 0, SEEK_END); // Go to the end of the file
-        cub_utils_fwrite(&VBO_len, sizeof(GLsizei), 1,
+        utils_fwrite(&VBO_len, sizeof(GLsizei), 1,
                          fp, fname, "VBO_len");
-        cub_utils_fwrite(VBO, sizeof(GLfloat), VBO_len,
+        utils_fwrite(VBO, sizeof(GLfloat), VBO_len,
                          fp, fname, "VBO");
-        cub_utils_fwrite(&EBO_len, sizeof(GLsizei), 1,
+        utils_fwrite(&EBO_len, sizeof(GLsizei), 1,
                          fp, fname, "EBO_len");
-        cub_utils_fwrite(EBO, sizeof(GLuint), EBO_len,
+        utils_fwrite(EBO, sizeof(GLuint), EBO_len,
                          fp, fname, "EBO");
         fseek(fp, 0, SEEK_SET); // Go to the start of the file
         ++nb_buffers; // Update the buffer counter
-        cub_utils_fwrite(&nb_buffers, sizeof(uint8_t), 1,
+        utils_fwrite(&nb_buffers, sizeof(uint8_t), 1,
                          fp, fname, "nb_buffers");
         fclose(fp);
     } else errx(1, "cub_BLloader_add_buffer: failed to open %s!\
@@ -194,13 +194,13 @@ void cub_BLloader_add_block(const char* name, cubRenderType render_type,
                             uint8_t VAO_id, cubBlockInfo block_info,
                             cub_bs_key* bs_keys,
                             cub_bs_val* bs_default_values) {
-    char* fpath = cub_utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
+    char* fpath = utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
     FILE* fp;
     if ( (fp = fopen(fpath, "r+b")) != NULL ) {
         const char fname[] = "cub_BLloader_add_block";
         fseek(fp, sizeof(uint8_t), SEEK_SET);
         cub_block_t nb_blocks;
-        cub_utils_fread(&nb_blocks, sizeof(cub_block_t), 1,
+        utils_fread(&nb_blocks, sizeof(cub_block_t), 1,
                         fp, fname, "nb_blocks");
         fseek(fp, 0, SEEK_END);
         char buffer[CUB_MAX_BLOCK_STRLEN];
@@ -209,26 +209,26 @@ void cub_BLloader_add_block(const char* name, cubRenderType render_type,
             buffer[i] = name[i];
         for (; i < CUB_MAX_BLOCK_STRLEN; ++i)
             buffer[i] = '\0';
-        cub_utils_fwrite(buffer, sizeof(char), CUB_MAX_BLOCK_STRLEN,
+        utils_fwrite(buffer, sizeof(char), CUB_MAX_BLOCK_STRLEN,
                          fp, fname, "block_name");
         // Block ID is the previous number of blocks in the list
-        cub_utils_fwrite(&nb_blocks, sizeof(cub_block_t), 1,
+        utils_fwrite(&nb_blocks, sizeof(cub_block_t), 1,
                          fp, fname, "block_id");
-        cub_utils_fwrite(&render_type, sizeof(cubRenderType), 1,
+        utils_fwrite(&render_type, sizeof(cubRenderType), 1,
                          fp, fname, "block_render_type");
-        cub_utils_fwrite(&VAO_id, sizeof(uint8_t), 1,
+        utils_fwrite(&VAO_id, sizeof(uint8_t), 1,
                          fp, fname, "block_VAO_id");
-        cub_utils_fwrite(&block_info, sizeof(cubBlockInfo), 1,
+        utils_fwrite(&block_info, sizeof(cubBlockInfo), 1,
                          fp, fname, "block_info");
         for (uint8_t i = 0; i < block_info.nb_states; ++i) {
-            cub_utils_fwrite(bs_keys + i, sizeof(cub_bs_key), 1,
+            utils_fwrite(bs_keys + i, sizeof(cub_bs_key), 1,
                              fp, fname, "blockstate_key");
-            cub_utils_fwrite(bs_default_values + i, sizeof(cub_bs_val), 1,
+            utils_fwrite(bs_default_values + i, sizeof(cub_bs_val), 1,
                              fp, fname, "blockstate_value");
         }
         fseek(fp, sizeof(uint8_t), SEEK_SET);
         ++nb_blocks; // Update the block counter
-        cub_utils_fwrite(&nb_blocks, sizeof(cub_block_t), 1,
+        utils_fwrite(&nb_blocks, sizeof(cub_block_t), 1,
                          fp, fname, "nb_blocks");
         fclose(fp);
     } else errx(1, "cub_BLloader_add_block: failed to open %s!\

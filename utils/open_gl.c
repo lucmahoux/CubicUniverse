@@ -4,7 +4,7 @@
 
 GLchar* cub_utils_load_texture(GLint* width, GLint* height,
                                 GLint* nb_channels, const char* img_name) {
-    char* fpath = cub_utils_strconcat(TEXTURES_PATH, img_name, NULL);
+    char* fpath = utils_strconcat(TEXTURES_PATH, img_name, NULL);
     uint8_t* data = stbi_load(fpath, width, height, nb_channels, 0);
     if (!data)
         errx(1, "cub_graphics_load_img: failed to load: %s", fpath);
@@ -13,8 +13,8 @@ GLchar* cub_utils_load_texture(GLint* width, GLint* height,
 }
 
 bool cub_utils_texture_exists(const char* tex_name) {
-    char* fpath = cub_utils_strconcat(TEXTURES_PATH, tex_name, NULL);
-    bool result = cub_utils_file_exists(fpath);
+    char* fpath = utils_strconcat(TEXTURES_PATH, tex_name, NULL);
+    bool result = utils_file_exists(fpath);
     free(fpath);
     return result;
 }

@@ -31,7 +31,7 @@ void cub_chunk_load_blocks(cubSubChunk* sc, cub_palette_id* new_ids,
     if (palette_len <= 255) {
         uint8_t old_ids_buffer[1024];
         for (uint8_t i = 0; i < 4; ++i) {
-            cub_utils_fread(old_ids_buffer, sizeof(uint8_t), 1024,
+            utils_fread(old_ids_buffer, sizeof(uint8_t), 1024,
                             fp, fname, "batch_of_blocks");
             cub_palette_id dest;
             for (uint16_t j = 0; j < 1024; ++j) {
@@ -45,7 +45,7 @@ void cub_chunk_load_blocks(cubSubChunk* sc, cub_palette_id* new_ids,
     } else {
         uint16_t old_ids_buffer[512];
         for (uint8_t i = 0; i < 8; ++i) {
-            cub_utils_fread(old_ids_buffer, sizeof(uint16_t), 512,
+            utils_fread(old_ids_buffer, sizeof(uint16_t), 512,
                             fp, fname, "batch_of_blocks");
             cub_palette_id dest;
             for (uint16_t j = 0; j < 512; ++j) {
@@ -63,7 +63,7 @@ void cub_chunk_load_palette(cubSubChunk* sc, cubBlockRenderer* renderer,
                             FILE* fp) {
     const char fname[] = "cub_chunk_load_palette";
     uint16_t palette_len;
-    cub_utils_fread(&palette_len, sizeof(uint16_t), 1,
+    utils_fread(&palette_len, sizeof(uint16_t), 1,
                     fp, fname, "palette_len");
     if (palette_len > CUB_PALETTE_DEFAULT_LEN)
         sc->palette = cub_utils_hashmap(palette_len, 0);
@@ -79,7 +79,7 @@ void cub_chunk_load_palette(cubSubChunk* sc, cubBlockRenderer* renderer,
         cubBP_elt* elt = malloc(sizeof(cubBP_elt));
         if (!elt)
             errx(1, "cub_chunk_load_palette: Malloc failed!");
-        cub_utils_fread(&elt->block.id, sizeof(cub_block_t), 1,
+        utils_fread(&elt->block.id, sizeof(cub_block_t), 1,
                         fp, fname, "palette_block_id");
         elt->nb_blocks = 0;
         uint8_t nb_states = CUB_BLOCK_DATA(renderer, elt->block.id)
@@ -89,7 +89,7 @@ void cub_chunk_load_palette(cubSubChunk* sc, cubBlockRenderer* renderer,
                 nb_states);
         if (!elt->block.states)
             errx(1, "cub_chunk_load_palette: Malloc failed!");
-        cub_utils_fread(elt->block.states, sizeof(cub_bs_val), nb_states,
+        utils_fread(elt->block.states, sizeof(cub_bs_val), nb_states,
                         fp, fname, "palette_states");
         // Get the uid of the blockstate
         new_ids[i] = cub_chunk_blockstate_uid(renderer, &elt->block);
@@ -110,7 +110,7 @@ void cub_chunk_load(cubChunk* chunk, cubBlockRenderer* renderer) {
         errx(1, "cub_chunk_load: File not found: %s!", path);
     } else {
         const char fname[] = "cub_chunk_load";
-        cub_utils_fread(&chunk->nb_subchunks, sizeof(uint8_t), 1,
+        utils_fread(&chunk->nb_subchunks, sizeof(uint8_t), 1,
                         fp, fname, "nb_subchunks");
         uint8_t nb_subchunks = chunk->nb_subchunks;
         // Initialise the subchunks array
@@ -137,13 +137,13 @@ void cub_chunk_save_blocks(cubHashMap* new_ids, uint16_t palette_len,
     if (palette_len <= 255) {
         for (uint16_t i = 0; i < 4096; ++i) {
             uint8_t src = (size_t)cub_utils_hashmap_get(new_ids, blocks[i]);
-            cub_utils_fwrite(&src, sizeof(uint8_t), 1,
+            utils_fwrite(&src, sizeof(uint8_t), 1,
                              fp, fname, "batch_of_blocks");
         }
     } else {
         for (uint16_t i = 0; i < 4096; ++i) {
             uint16_t src = (size_t)cub_utils_hashmap_get(new_ids, blocks[i]);
-            cub_utils_fwrite(&src, sizeof(uint16_t), 1,
+            utils_fwrite(&src, sizeof(uint16_t), 1,
                              fp, fname, "batch_of_blocks");
         }
     }
@@ -155,7 +155,7 @@ void cub_chunk_save_palette(cubSubChunk* sc, cubBlockRenderer* renderer,
                             FILE* fp) {
     const char fname[] = "cub_chunk_save_palette";
     uint16_t palette_len = sc->palette->nb_keys;
-    cub_utils_fwrite(&palette_len, sizeof(uint16_t), 1,
+    utils_fwrite(&palette_len, sizeof(uint16_t), 1,
                      fp, fname, "palette_len");
     cub_palette_id* old_ids = malloc(palette_len * sizeof(cub_palette_id));
     if (!old_ids)
@@ -166,11 +166,11 @@ void cub_chunk_save_palette(cubSubChunk* sc, cubBlockRenderer* renderer,
         // Save palette element
         cub_utils_hashmap_set(new_ids, old_ids[i - 1], (void*) i);
         cubBP_elt* p_elt = cub_utils_hashmap_get(sc->palette, old_ids[i - 1]);
-        cub_utils_fwrite(&p_elt->block.id, sizeof(cub_block_t), 1,
+        utils_fwrite(&p_elt->block.id, sizeof(cub_block_t), 1,
                          fp, fname, "palette_block_id");
         uint8_t nb_states = CUB_BLOCK_DATA(renderer, p_elt->block.id)
                             ->block_info.nb_states;
-        cub_utils_fwrite(p_elt->block.states, sizeof(cub_bs_val), nb_states,
+        utils_fwrite(p_elt->block.states, sizeof(cub_bs_val), nb_states,
                          fp, fname, "palette_states");
         // Free palette element
         free(p_elt->block.states);
@@ -197,13 +197,13 @@ void cub_chunk_save(cubChunk* chunk, cubBlockRenderer* renderer) {
         errx(1, "cub_chunk_save: Error while trying to save the chunk!");
     } else {
         const char fname[] = "cub_chunk_save";
-        cub_utils_fwrite(&chunk->nb_subchunks, sizeof(uint8_t), 1,
+        utils_fwrite(&chunk->nb_subchunks, sizeof(uint8_t), 1,
                          fp, fname, "nb_subchunks");
         for (uint8_t i = 0; i < CUB_MAX_SUBCHUNKS; ++i) {
             if (chunk->subchunks[i].y_pos >= CUB_MAX_SUBCHUNKS)
                 continue;
             cubSubChunk* sc = chunk->subchunks + i;
-            cub_utils_fwrite(&sc->y_pos, sizeof(uint8_t), 1,
+            utils_fwrite(&sc->y_pos, sizeof(uint8_t), 1,
                              fp, fname, "Y_pos subchunk");
             cub_chunk_save_palette(&chunk->subchunks[i], renderer, fp);
         }

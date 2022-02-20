@@ -22,18 +22,18 @@ typedef struct ShaderSource {
  * If not shader->shader_type is set to NONE.
  * Otherwise, only shader->source is set to an allocated memory area
  * representing the source code of the shader. */
-void cub_utils_get_shader_source(char* file, ShaderSource* shader);
+void get_shader_source(char* file, ShaderSource* shader);
 
 /* Retrieve all possible shader types with their associated source code.
  *  - const char* name: the shader identifier
  *  - uint8_t* len: the number of shaders in ShaderSource* returned array */
-ShaderSource* cub_utils_get_shaders(char* path, size_t path_len, uint8_t* len);
+ShaderSource* get_shaders(char* path, size_t path_len, uint8_t* len);
 
 /* Create the correct shader type & compile it while checking for errors */
-void cub_utils_create_compile_shader(ShaderSource* shader, const char* name);
+void create_compile_shader(ShaderSource* shader, const char* name);
 
 /* Link & compile all the shaders identified by 'const char* name'
  * and return the shader program ID */
-GLuint cub_utils_build_shader(const char* shader_name);
+GLuint build_shader(const char* shader_name);
 
 #endif
