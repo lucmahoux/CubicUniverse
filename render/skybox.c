@@ -1,6 +1,6 @@
 #include "render/skybox.h"
 
-GLuint cub_skybox_load_cubemap()
+GLuint skybox_load_cubemap()
 {
     GLuint textureID;
     glGenTextures(1, &textureID);
@@ -49,8 +49,8 @@ GLuint cub_skybox_load_cubemap()
 }
 
 
-void cub_skybox_setup_renderer(cubSkyboxRenderer* renderer) {
-    printf("cub_skybox_setup_renderer: Starting renderer initialisation...\n");
+void skybox_setup_renderer(skyboxRenderer* renderer) {
+    printf("skybox_setup_renderer: Starting renderer initialisation...\n");
     const GLfloat skybox_vertices[] = {
         // positions          
         -1.0f,  1.0f, -1.0f,
@@ -112,7 +112,7 @@ void cub_skybox_setup_renderer(cubSkyboxRenderer* renderer) {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
             (void*)0);
 
-    renderer->cubemapTexture = cub_skybox_load_cubemap();
+    renderer->cubemapTexture = skybox_load_cubemap();
 
     renderer->VBO = buffers[0];
     renderer->shader_program = build_shader("skybox");
@@ -127,7 +127,7 @@ void cub_skybox_setup_renderer(cubSkyboxRenderer* renderer) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void cub_skybox_free_renderer(cubSkyboxRenderer* renderer)
+void skybox_free_renderer(skyboxRenderer* renderer)
 {
     glDeleteBuffers(1, &renderer->VBO);
     glDeleteVertexArrays(1, &renderer->VAO);

@@ -13,7 +13,7 @@
 typedef struct game {
     GLFWwindow* window;
     blockRenderer block_renderer;
-    cubSkyboxRenderer skybox_renderer;
+    skyboxRenderer skybox_renderer;
     camera camera;
     chunk chunk_test;
 } game;

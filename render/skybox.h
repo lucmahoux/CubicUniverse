@@ -6,19 +6,19 @@
 #include "utils/shader.h"
 #include "utils/stb_image.h"
 
-typedef struct cubSkyboxRenderer {
+typedef struct skyboxRenderer {
     GLuint VAO;
     GLuint VBO;
     GLuint shader_program;
     GLuint cubemapTexture;
     GLuint projection_uni_loc;
     GLuint view_uni_loc;
-} cubSkyboxRenderer;
+} skyboxRenderer;
 
-GLuint cub_skybox_load_cubemap();
+GLuint skybox_load_cubemap();
 
-void cub_skybox_setup_renderer(cubSkyboxRenderer* renderer);
+void skybox_setup_renderer(skyboxRenderer* renderer);
 
-void cub_skybox_free_renderer(cubSkyboxRenderer* renderer);
+void skybox_free_renderer(skyboxRenderer* renderer);
 
 #endif

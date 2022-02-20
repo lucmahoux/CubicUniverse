@@ -20,7 +20,7 @@ void game_init(game* game, int width, int height) {
     }
     block_load_texture_pack(&game->block_renderer.block_list);
     
-    cub_skybox_setup_renderer(&game->skybox_renderer);
+    skybox_setup_renderer(&game->skybox_renderer);
 
     // Set up the camera
     float aspect_ratio = 1.0f * width / height;
@@ -216,5 +216,5 @@ void game_stop(game* game) {
     // TODO: Save things on disk
     chunk_save(&game->chunk_test, &game->block_renderer);
     block_free_renderer(&game->block_renderer);
-    cub_skybox_free_renderer(&game->skybox_renderer);
+    skybox_free_renderer(&game->skybox_renderer);
 }
