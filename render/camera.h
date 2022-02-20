@@ -3,7 +3,7 @@
 
 #include "utils/utils.h"
 
-typedef struct cubCamera {
+typedef struct camera {
     GLint view_uni_loc; // Uniform location of view matrix
     mat4 view_matrix;
     GLint projection_uni_loc; // Uniform location of projection matrix
@@ -21,24 +21,24 @@ typedef struct cubCamera {
     float lastX;
     float lastY;
     int firstMouse;
-} cubCamera;
+} camera;
 
 /* Should be called once, at the beginning of the game to setup the camera */
-void cub_render_setup_camera(cubCamera* camera, GLuint shader_program,
+void camera_setup(camera* camera, GLuint shader_program,
                             vec3 position, float fov, float aspect_ratio,
                              float near, float far);
 
 /* Update the view matrix of the camera when the player 'moves' his head.
  * It is assumed that the relevant shader_program is being used upon calling */
-void cub_render_update_camera_view(cubCamera* camera);
+void camera_update_view(camera* camera);
 
 /* Update the projection matrix in the shader program when the window is
  * resized by the user */
-void cub_render_update_camera_projection(cubCamera* camera,
+void camera_update_projection(camera* camera,
                                          GLuint shader_program);
 
-void cub_camera_remove_translation(cubCamera* camera);
+void camera_remove_translation(camera* camera);
 
-void cub_render_update_camera(cubCamera* camera);
+void camera_update(camera* camera);
 
 #endif

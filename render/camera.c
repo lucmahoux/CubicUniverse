@@ -1,6 +1,6 @@
 #include "render/camera.h"
 
-void cub_render_setup_camera(cubCamera* camera, GLuint shader_program,
+void camera_setup(camera* camera, GLuint shader_program,
                              vec3 position, float fov, float aspect_ratio,
                              float near, float far) {
     camera->view_uni_loc = glGetUniformLocation(shader_program, "view_matrix");
@@ -25,10 +25,10 @@ void cub_render_setup_camera(cubCamera* camera, GLuint shader_program,
     camera->firstMouse = 1;
     camera->lastX = 1280 / 2.0f;
     camera->lastY = 720 / 2.0f;
-    cub_render_update_camera_projection(camera, shader_program);
+    camera_update_projection(camera, shader_program);
 }
 
-void cub_render_update_camera_projection(cubCamera* camera,
+void camera_update_projection(camera* camera,
                                          GLuint shader_program) {
     glUseProgram(shader_program);
     camera->projection_matrix = mat4_perspective(
@@ -38,7 +38,7 @@ void cub_render_update_camera_projection(cubCamera* camera,
                         camera->projection_matrix.coeffs);
 }
 
-void cub_render_update_camera_view(cubCamera* camera) {
+void camera_update_view(camera* camera) {
     camera->view_matrix = mat4_view_matrix(
             camera->position,
             vec3_add(camera->position,camera->front),
@@ -47,7 +47,7 @@ void cub_render_update_camera_view(cubCamera* camera) {
                         camera->view_matrix.coeffs);
 }
 
-void cub_camera_remove_translation(cubCamera* camera)
+void camera_remove_translation(camera* camera)
 {
     camera->view_matrix.coeffs[3] = 0;
     camera->view_matrix.coeffs[7] = 0;
@@ -58,15 +58,15 @@ void cub_camera_remove_translation(cubCamera* camera)
     camera->view_matrix.coeffs[15] = 0;
 }
 
-void cub_render_update_camera_time(cubCamera* camera)
+void camera_update_time(camera* camera)
 {
     float currentFrame = glfwGetTime();
     camera->deltaTime = currentFrame - camera->lastFrame;
     camera->lastFrame = currentFrame;
 }
 
-void cub_render_update_camera(cubCamera* camera)
+void camera_update(camera* camera)
 {
-    cub_render_update_camera_time(camera);
-    cub_render_update_camera_view(camera);
+    camera_update_time(camera);
+    camera_update_view(camera);
 }

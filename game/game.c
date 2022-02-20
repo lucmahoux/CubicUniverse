@@ -24,7 +24,7 @@ void cub_game_init(cubGame* game, int width, int height) {
 
     // Set up the camera
     float aspect_ratio = 1.0f * width / height;
-    cub_render_setup_camera(&game->camera, game->block_renderer.shader_program,
+    camera_setup(&game->camera, game->block_renderer.shader_program,
                             VEC3(0.0f, 0.0f, 10.0f),
                             45.0f, aspect_ratio, 0.1f, 100.0f);
 }
@@ -35,7 +35,7 @@ void cub_game_clear_screen_handler(cub_unused cubGame* game) {
 }
 
 // Change values with mouse input
-void cub_game_process_mouse_mouvement(cubCamera* cam, float xoffset,
+void cub_game_process_mouse_mouvement(camera* cam, float xoffset,
         float yoffset)
 {
     float sensitivity = 0.1f;
@@ -64,7 +64,7 @@ void cub_game_input_handler(cubGame* game) {
         close_window(game->window);
 
     // Moving commands
-    cubCamera* cam = &game->camera;
+    camera* cam = &game->camera;
     const float cameraSpeed = 2.5f * cam->deltaTime;
     if(glfwGetKey(game->window, GLFW_KEY_W) == GLFW_PRESS)
     {
@@ -138,7 +138,7 @@ void cub_game_skybox_render(cubGame* game)
 void cub_game_renderer_handler(cubGame* game) {
     glUseProgram(game->block_renderer.shader_program);
     // Camera updates
-    cub_render_update_camera(&game->camera);
+    camera_update(&game->camera);
 
     // World updates
     glBindVertexArray(game->block_renderer.buffer_objs[DEFAULT_VAO_ID].VAO);

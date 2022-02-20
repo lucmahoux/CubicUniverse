@@ -14,7 +14,7 @@ typedef struct cubGame {
     GLFWwindow* window;
     blockRenderer block_renderer;
     cubSkyboxRenderer skybox_renderer;
-    cubCamera camera;
+    camera camera;
     cubChunk chunk_test;
 } cubGame;
 
