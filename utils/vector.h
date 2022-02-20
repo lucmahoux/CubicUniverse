@@ -8,44 +8,44 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define CUB_VEC3(x, y, z) cub_utils_vec3(x, y, z)
-#define CUB_VEC3_CROSS(u, v) cub_utils_vec3_cross_product(u, v)
-#define CUB_VEC3_DOT(ptr_u, ptr_v) cub_utils_vec3_dot_product(ptr_u, ptr_v)
-#define CUB_VEC3_ADD(u, v) cub_utils_vec3_add(u, v)
-#define CUB_VEC3_SUB(u, v) cub_utils_vec3_sub(u, v)
-#define CUB_VEC3_SCALE(k, u) cub_utils_vec3_scalar(k, u)
-#define CUB_VEC3_MAG(ptr_u) cub_utils_vec3_magnitude(ptr_u)
-#define CUB_VEC3_NORM(u) cub_utils_vec3_normalize(u)
-#define CUB_QUAT_NORM(q) cub_utils_quaternion_normalize(q)
-#define CUB_QUAT_CONJ(q) cub_utils_quaternion_conjugate(q)
-#define CUB_QUAT_PROD(q1, q2) cub_utils_quaternion_product(q1, q2)
-#define CUB_VEC3_ROT(u, axis, theta) cub_utils_vec3_rotate(u, axis, theta)
+#define VEC3(x, y, z) vec3_new(x, y, z)
+#define VEC3_CROSS(u, v) vec3_cross_product(u, v)
+#define VEC3_DOT(ptr_u, ptr_v) vec3_dot_product(ptr_u, ptr_v)
+#define VEC3_ADD(u, v) vec3_add(u, v)
+#define VEC3_SUB(u, v) vec3_sub(u, v)
+#define VEC3_SCALE(k, u) vec3_scalar(k, u)
+#define VEC3_MAG(ptr_u) vec3_magnitude(ptr_u)
+#define VEC3_NORM(u) vec3_normalize(u)
+#define QUAT_NORM(q) quaternion_normalize(q)
+#define QUAT_CONJ(q) quaternion_conjugate(q)
+#define QUAT_PROD(q1, q2) quaternion_product(q1, q2)
+#define VEC3_ROT(u, axis, theta) vec3_rotate(u, axis, theta)
 
-typedef struct cubVec3 {
+typedef struct vec3 {
     float coords[3];
-} cubVec3;
+} vec3;
 
 // Vector - Scalar representation of quaternions
-typedef struct cubQuaternion {
-    cubVec3 vect;
+typedef struct quaternion {
+    vec3 vect;
     float w;
-} cubQuaternion;
+} quaternion;
 
 /* Return an initialised 3D vector (x, y, z) */
-cubVec3 cub_utils_vec3(float x, float y, float z);
-float cub_utils_vec3_dot_product(cubVec3* v1, cubVec3* v2);
-cubVec3 cub_utils_vec3_cross_product(cubVec3 v1, cubVec3 v2);
-cubVec3 cub_utils_vec3_add(cubVec3 v1, cubVec3 v2);
-cubVec3 cub_utils_vec3_sub(cubVec3 v1, cubVec3 v2);
-cubVec3 cub_utils_vec3_scalar(float scalar, cubVec3 v);
-float cub_utils_vec3_magnitude(cubVec3* v);
-cubVec3 cub_utils_vec3_normalize(cubVec3 v);
-cubQuaternion cub_utils_quaternion_normalize(cubQuaternion q);
-cubQuaternion cub_utils_quaternion_conjugate(cubQuaternion q);
-cubQuaternion cub_utils_quaternion_product(cubQuaternion q1,
-                                            cubQuaternion q2);
+vec3 vec3_new(float x, float y, float z);
+float vec3_dot_product(vec3* v1, vec3* v2);
+vec3 vec3_cross_product(vec3 v1, vec3 v2);
+vec3 vec3_add(vec3 v1, vec3 v2);
+vec3 vec3_sub(vec3 v1, vec3 v2);
+vec3 vec3_scalar(float scalar, vec3 v);
+float vec3_magnitude(vec3* v);
+vec3 vec3_normalize(vec3 v);
+quaternion quaternion_normalize(quaternion q);
+quaternion quaternion_conjugate(quaternion q);
+quaternion quaternion_product(quaternion q1,
+                                            quaternion q2);
 /* Rotates the 3D vector 'to_rotate' by 'angle' RADIANS around the rotation
  * axis 'axis'. The 3D vector axis SHOULD BE NORMALIZED in most cases ! */
-cubVec3 cub_utils_vec3_rotate(cubVec3 to_rotate, cubVec3 axis, float angle);
+vec3 vec3_rotate(vec3 to_rotate, vec3 axis, float angle);
 
 #endif

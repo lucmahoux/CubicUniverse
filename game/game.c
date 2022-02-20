@@ -25,7 +25,7 @@ void cub_game_init(cubGame* game, int width, int height) {
     // Set up the camera
     float aspect_ratio = 1.0f * width / height;
     cub_render_setup_camera(&game->camera, game->block_renderer.shader_program,
-                            CUB_VEC3(0.0f, 0.0f, 10.0f),
+                            VEC3(0.0f, 0.0f, 10.0f),
                             45.0f, aspect_ratio, 0.1f, 100.0f);
 }
 
@@ -50,11 +50,11 @@ void cub_game_process_mouse_mouvement(cubCamera* cam, float xoffset,
     if(cam->pitch < -89.0f)
         cam->pitch = -89.0f;
 
-    cubVec3 direction;
+    vec3 direction;
     direction.coords[0] = cos(RAD(cam->yaw)) * cos(RAD(cam->pitch));
     direction.coords[1] = sin(RAD(cam->pitch));
     direction.coords[2] = sin(RAD(cam->yaw)) * cos(RAD(cam->pitch));
-    cam->front = cub_utils_vec3_normalize(direction);
+    cam->front = vec3_normalize(direction);
 
 }
 
@@ -68,29 +68,29 @@ void cub_game_input_handler(cubGame* game) {
     const float cameraSpeed = 2.5f * cam->deltaTime;
     if(glfwGetKey(game->window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        cam->position = CUB_VEC3_ADD(
+        cam->position = VEC3_ADD(
                         cam->position,
-                        CUB_VEC3_SCALE(cameraSpeed, cam->front));
+                        VEC3_SCALE(cameraSpeed, cam->front));
     }
     if(glfwGetKey(game->window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        cam->position = CUB_VEC3_SUB(
+        cam->position = VEC3_SUB(
                 cam->position,
-                CUB_VEC3_SCALE(cameraSpeed, cam->front));
+                VEC3_SCALE(cameraSpeed, cam->front));
     }
     if(glfwGetKey(game->window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        cam->position = CUB_VEC3_SUB(
+        cam->position = VEC3_SUB(
                 cam->position,
-               CUB_VEC3_SCALE(cameraSpeed,
-                    CUB_VEC3_NORM(CUB_VEC3_CROSS(cam->front,cam->up_side))));
+               VEC3_SCALE(cameraSpeed,
+                    VEC3_NORM(VEC3_CROSS(cam->front,cam->up_side))));
     }
     if(glfwGetKey(game->window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        cam->position = CUB_VEC3_ADD(
+        cam->position = VEC3_ADD(
                 cam->position,
-                CUB_VEC3_SCALE(cameraSpeed,
-                    CUB_VEC3_NORM(CUB_VEC3_CROSS(cam->front,cam->up_side))));
+                VEC3_SCALE(cameraSpeed,
+                    VEC3_NORM(VEC3_CROSS(cam->front,cam->up_side))));
     }
 
     // Mouse movements
@@ -119,8 +119,8 @@ void cub_game_skybox_render(cubGame* game)
     glDepthFunc(GL_LEQUAL);
     glUseProgram(game->skybox_renderer.shader_program);
     //cub_camera_remove_translation(&game->camera);
-    cubMat4 view = CUB_MAT4_TRANS(game->camera.view_matrix,
-            CUB_VEC3(0.0,0.0,0.0));
+    mat4 view = MAT4_TRANS(game->camera.view_matrix,
+            VEC3(0.0,0.0,0.0));
     glUniformMatrix4fv(game->skybox_renderer.view_uni_loc, 1, GL_FALSE,
            view.coeffs);
     glUniformMatrix4fv(game->skybox_renderer.projection_uni_loc, 1, GL_FALSE,

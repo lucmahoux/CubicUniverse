@@ -72,7 +72,7 @@ void cub_chunk_render(cubChunk* chunk, cubBlockRenderer* renderer) {
                         continue;
                     cub_block_render(renderer,
                             &CUB_GET_BP_ELT(sc, *bp_uid)->block,
-                            CUB_VEC3(1.0f * (chunk->chunkX << 4) + 1.0f * x,
+                            VEC3(1.0f * (chunk->chunkX << 4) + 1.0f * x,
                                      1.0f * (sc->y_pos << 4) + 1.0f * y,
                                      1.0f * (chunk->chunkZ << 4) + 1.0f * z));
                 }

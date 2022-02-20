@@ -35,7 +35,7 @@ void cub_block_setup_renderer(cubBlockRenderer* renderer) {
     // Get the uniform value of the model matrix
     renderer->model_uni_loc = glGetUniformLocation(renderer->shader_program,
                                                     "model_matrix");
-    renderer->model_matrix = cub_utils_mat4(1.0f);
+    renderer->model_matrix = MAT4(1.0f);
 
     // Load all the blocks & the rendering buffers
     cub_BLloader_load(&renderer->block_list, &renderer->nb_buffers,
@@ -103,7 +103,7 @@ void cub_block_set_tex_custom(cubBlockRenderer* renderer, cubBlockData* block,
 }
 
 void cub_block_render(cubBlockRenderer* renderer, cubBlockState* bs,
-                        cubVec3 position) {
+                        vec3 position) {
     cubBlockData* block = CUB_BLOCK_DATA(renderer, bs->id);
     cubRenderBufferObject* r_obj = &renderer->buffer_objs[block->VAO_id];
     if (block->VAO_id != CUB_DEFAULT_VAO_ID) {
@@ -113,7 +113,7 @@ void cub_block_render(cubBlockRenderer* renderer, cubBlockState* bs,
         cub_block_set_tex_default(renderer, block, bs);
 
     // TODO: Apply BS transformations (rotations, ...)
-    cubMat4 new_model = CUB_MAT4_TRANS(renderer->model_matrix, position);
+    mat4 new_model = MAT4_TRANS(renderer->model_matrix, position);
      glUniformMatrix4fv(renderer->model_uni_loc, 1, GL_FALSE, new_model.coeffs);
 
      glDrawElements(GL_TRIANGLES, r_obj->nb_elements,

@@ -136,7 +136,7 @@ typedef struct cubBlockRenderer {
     // a certain face of the cube - works only for the default VAO.
     GLint tex_locations[6];
     GLint model_uni_loc; // Uniform location of model_matrix
-    cubMat4 model_matrix;
+    mat4 model_matrix;
     cubBlockList block_list;
 } cubBlockRenderer;
 

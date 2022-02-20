@@ -1,12 +1,12 @@
 #include "render/camera.h"
 
 void cub_render_setup_camera(cubCamera* camera, GLuint shader_program,
-                             cubVec3 position, float fov, float aspect_ratio,
+                             vec3 position, float fov, float aspect_ratio,
                              float near, float far) {
     camera->view_uni_loc = glGetUniformLocation(shader_program, "view_matrix");
-    camera->view_matrix = cub_utils_mat4_view_matrix(position,
-                                                CUB_VEC3(0.0f, 0.0f, 0.0f),
-                                                CUB_VEC3(0.0f, 1.0f, 0.0f));
+    camera->view_matrix = mat4_view_matrix(position,
+                                                VEC3(0.0f, 0.0f, 0.0f),
+                                                VEC3(0.0f, 1.0f, 0.0f));
     camera->projection_uni_loc = glGetUniformLocation(shader_program,
                                                       "projection_matrix");
     camera->fov = fov;
@@ -16,8 +16,8 @@ void cub_render_setup_camera(cubCamera* camera, GLuint shader_program,
 
     // New features for controlling camerA
     camera->position = position;
-    camera->up_side = CUB_VEC3(0.0f,1.0f,0.0f);
-    camera->front = CUB_VEC3(0.0f,0.0f,-1.0f);
+    camera->up_side = VEC3(0.0f,1.0f,0.0f);
+    camera->front = VEC3(0.0f,0.0f,-1.0f);
     camera->deltaTime = 0.0f;
     camera->lastFrame = 0.0f;
     camera->pitch = 0.0f;
@@ -31,7 +31,7 @@ void cub_render_setup_camera(cubCamera* camera, GLuint shader_program,
 void cub_render_update_camera_projection(cubCamera* camera,
                                          GLuint shader_program) {
     glUseProgram(shader_program);
-    camera->projection_matrix = cub_utils_mat4_perspective(
+    camera->projection_matrix = mat4_perspective(
                                     camera->fov, camera->aspect_ratio,
                                     camera->near, camera->far);
     glUniformMatrix4fv(camera->projection_uni_loc, 1, GL_FALSE,
@@ -39,9 +39,9 @@ void cub_render_update_camera_projection(cubCamera* camera,
 }
 
 void cub_render_update_camera_view(cubCamera* camera) {
-    camera->view_matrix = cub_utils_mat4_view_matrix(
+    camera->view_matrix = mat4_view_matrix(
             camera->position,
-            cub_utils_vec3_add(camera->position,camera->front),
+            vec3_add(camera->position,camera->front),
             camera->up_side);
     glUniformMatrix4fv(camera->view_uni_loc, 1, GL_FALSE,
                         camera->view_matrix.coeffs);

@@ -37,7 +37,7 @@ void cub_block_set_tex_custom(cubBlockRenderer* renderer, cubBlockData* block,
  * Calls either cub_block_set_tex_default() if the bp_elt uses the default VAO,
  * or cub_block_set_custom() */
 void cub_block_render(cubBlockRenderer* renderer, cubBlockState* bs,
-                        cubVec3 position);
+                        vec3 position);
 
 /* Should be called only at the end of the game */
 void cub_block_free_renderer(cubBlockRenderer* renderer);
