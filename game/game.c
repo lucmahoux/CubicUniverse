@@ -191,7 +191,7 @@ void game_renderer_handler(game* game) {
     cub_block_render(&game->block_renderer, &bs,
                         CUB_VEC3(5.0f, 3.0f, 0.0f));*/
 
-    cub_chunk_render(&game->chunk_test, &game->block_renderer);
+    chunk_render(&game->chunk_test, &game->block_renderer);
     game_skybox_render(game);
 }
 
@@ -203,7 +203,7 @@ void game_start(game* game) {
     bs.states = states;
     states[0] = BSV_POPPY;
     cub_chunk_fill(&game->block_renderer, &game->chunk_test, &bs);*/
-    cub_chunk_load(&game->chunk_test, &game->block_renderer);
+    chunk_load(&game->chunk_test, &game->block_renderer);
     start_window_loop(game->window,
                                 (window_callback) game_clear_screen_handler,
                                 (window_callback) game_input_handler,
@@ -214,7 +214,7 @@ void game_start(game* game) {
 
 void game_stop(game* game) {
     // TODO: Save things on disk
-    cub_chunk_save(&game->chunk_test, &game->block_renderer);
+    chunk_save(&game->chunk_test, &game->block_renderer);
     block_free_renderer(&game->block_renderer);
     cub_skybox_free_renderer(&game->skybox_renderer);
 }

@@ -15,7 +15,7 @@ typedef struct game {
     blockRenderer block_renderer;
     cubSkyboxRenderer skybox_renderer;
     camera camera;
-    cubChunk chunk_test;
+    chunk chunk_test;
 } game;
 
 void game_init(game* game, int width, int height);
