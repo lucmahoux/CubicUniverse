@@ -73,10 +73,10 @@ bool hashmap_in(hashMap* HM, size_t key) {
 void hashmap_set(hashMap* HM, size_t key, void* value) {
     cubList** bucket_list = &HM->hash_table[hash_function(HM, key)];
     if (!*bucket_list) {
-        *bucket_list = cub_utils_list(sizeof(cubBucket), CUB_REALLOC_PLUS_ONE,
+        *bucket_list = cub_list(sizeof(cubBucket), REALLOC_PLUS_ONE,
                                       HASHMAP_DEFAULT_LIST_CAPACITY);
         cubBucket elt = { .key = key, .value = value };
-        cub_utils_list_append(*bucket_list, &elt);
+        cub_list_append(*bucket_list, &elt);
         ++HM->nb_keys;
     } else {
         size_t pos;
@@ -87,7 +87,7 @@ void hashmap_set(hashMap* HM, size_t key, void* value) {
             bucket->value = value;
         } else {
             cubBucket elt = { .key = key, .value = value };
-            cub_utils_list_insert(*bucket_list, &elt, pos);
+            cub_list_insert(*bucket_list, &elt, pos);
             ++HM->nb_keys;
         }
     }
@@ -102,7 +102,7 @@ void hashmap_remove(hashMap* HM, size_t key) {
                                              bucket_list->len,
                                              key, &pos);
     if (bucket && bucket->key == key) {
-        cub_utils_list_remove_ordered(bucket_list, pos);
+        cub_list_remove_ordered(bucket_list, pos);
         --HM->nb_keys;
     }
 }
@@ -114,7 +114,7 @@ void hashmap_get_keys(hashMap* HM, size_t* keys) {
             cubList* bucket_list = HM->hash_table[k];
             for (size_t l = 0; l < bucket_list->len; ++l)
                 keys[i++] = ((cubBucket*)
-                            cub_utils_list_get(bucket_list, l))->key;
+                            cub_list_get(bucket_list, l))->key;
         }
     }
 }
@@ -126,7 +126,7 @@ void hashmap_get_keys_uint(hashMap* HM, uint32_t* keys) {
             cubList* bucket_list = HM->hash_table[k];
             for (size_t l = 0; l < bucket_list->len; ++l)
                 keys[i++] = (uint32_t)((cubBucket*)
-                            cub_utils_list_get(bucket_list, l))->key;
+                            cub_list_get(bucket_list, l))->key;
         }
     }
 }
@@ -134,7 +134,7 @@ void hashmap_get_keys_uint(hashMap* HM, uint32_t* keys) {
 void hashmap_free(hashMap* HM) {
     for (size_t i = 0; i < HM->len; ++i)
         if (HM->hash_table[i])
-            cub_utils_list_free(HM->hash_table[i]);
+            cub_list_free(HM->hash_table[i]);
     free(HM->hash_table);
     free(HM);
 }
