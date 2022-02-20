@@ -24,7 +24,7 @@ extern char SHADERS_PATH[];
 extern char TEXTURES_PATH[];
 extern char GAMEFILES_PATH[];
 
-#define cub_block_t uint16_t
+#define block_t uint16_t
 
 /* Concatenate two strings and return the total length (excluding '\0') */
 char* utils_strconcat(const char* s1, const char* s2, size_t* len);

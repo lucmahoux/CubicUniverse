@@ -4,17 +4,17 @@
 #include "utils/open_gl.h"
 #include "utils/utils.h"
 
-#define cub_bs_key uint8_t
-#define cub_bs_val uint8_t
-#define CUB_MAX_BLOCK_STRLEN 32
-#define CUB_AIR_ID 0
-#define CUB_DEFAULT_VAO_ID 0
+#define bs_key uint8_t
+#define bs_val uint8_t
+#define MAX_BLOCK_STRLEN 32
+#define AIR_ID 0
+#define DEFAULT_VAO_ID 0
 #define BLOCK_LIST_FILE "block-list.cubic"
 /* If the blockstate texturer exists, then its ID in the 'bs_keys' of a
  * cubBlockData must be 0! */
-#define CUB_BS_TEX_ID 0
+#define BS_TEX_ID 0
 
-typedef enum cubBlockStateKey {
+typedef enum blockStateKey {
     BS_FACING,  // Orientation of the block
     BS_AGE,     // Age longevity of a crop
     BS_LIT,     // When a block can be "turned on/off" (e.g. furnace)
@@ -23,9 +23,9 @@ typedef enum cubBlockStateKey {
     BS_FLOWER_TYPE,
     BS_DOUBLE_PLANT_TYPE,
     BS_WOOD_TYPE
-} cubBlockStateKey;
+} blockStateKey;
 
-typedef enum cubBlockStateValue {
+typedef enum blockStateValue {
     // BS_FACING
     BSV_NORTH = 0, BSV_SOUTH, BSV_EAST, BSV_WEST,
     // BS_AGE
@@ -46,15 +46,15 @@ typedef enum cubBlockStateValue {
     BSV_SUNFLOWER = 0, BSV_LILAC, BSV_GRASS, BSV_FERN, BSV_ROSE, BSV_PEONY,
     // BS_WOOD_TYPE
     BSV_ACACIA = 0, BSV_BIRCH, BSV_DARK_OAK, BSV_JUNGLE, BSV_OAK, BSV_SPRUCE
-} cubBlockStateValue;
+} blockStateValue;
 
 extern const uint8_t CUB_BSV_LEN[];
 
-typedef char* (*cubBS_parser) (cubBlockStateValue, char*);
+typedef char* (*BS_parser) (blockStateValue, char*);
 
 // Define how the textures file names must be formed.
 // It is also used to bind the correct textures when using the default VAO
-typedef enum cubRenderType {
+typedef enum renderType {
     RT_NONE             =   0x00,   // no texture (air)
     RT_TOP              =   0x01,   // _top suffix
     RT_BOTTOM           =   0x02,   // _bottom suffix
@@ -64,9 +64,9 @@ typedef enum cubRenderType {
     RT_RIGHT            =   0x20,   // _right suffix
     RT_SIDE             =   0x40,   // _side suffix
     RT_DEFAULT          =   0x80    // no suffix
-} cubRenderType;
+} renderType;
 
-typedef struct cubBlockInfo {
+typedef struct blockInfo {
     // Does the player collide with the block?
     uint8_t is_solid : 1;
     // Can it stand in the air without support?
@@ -79,31 +79,31 @@ typedef struct cubBlockInfo {
     uint8_t has_states : 1;
     // If has_states is TRUE, how many are there?
     uint8_t nb_states : 3;
-} cubBlockInfo;
+} blockInfo;
 
-typedef struct cubBlockData {
-    cubRenderType render_type;
-    char name[CUB_MAX_BLOCK_STRLEN];
-    cub_block_t id;
-    cubBlockInfo block_info;
+typedef struct blockData {
+    renderType render_type;
+    char name[MAX_BLOCK_STRLEN];
+    block_t id;
+    blockInfo block_info;
     uint8_t nb_tex_draw; // Nbr of different textures to load on draw call
     uint8_t VAO_id; // ID of the VAO used to render the block
     // Set to NULL if the block does not have a BS name modifier.
     // Otherwise, point to the function used to parse its values.
-    cubBS_parser bs_name_parser;
+    BS_parser bs_name_parser;
     GLuint* textures;
-    cub_bs_key* bs_keys;
-    cub_bs_val* bs_default_values;
-} cubBlockData;
+    bs_key* bs_keys;
+    bs_val* bs_default_values;
+} blockData;
 
-typedef struct cubBlockList {
+typedef struct blockList {
     // Array of all blocks
-    cubBlockData* blocks;
+    blockData* blocks;
     // Total number of blocks
     size_t nb_blocks;
-} cubBlockList;
+} blockList;
 
-typedef enum cubBlockFaceIndex {
+typedef enum blockFaceIndex {
     CUB_DEFAULT_START_ID,
     CUB_TOP_ID              =       CUB_DEFAULT_START_ID,
     CUB_BOTTOM_ID,
@@ -114,20 +114,20 @@ typedef enum cubBlockFaceIndex {
     CUB_RIGHT_ID,
     CUB_SIDE_END_ID         =       CUB_RIGHT_ID,
     CUB_DEFAULT_END_ID      =       CUB_SIDE_END_ID
-} cubBlockFaceIndex;
+} blockFaceIndex;
 
-typedef struct cubBlockState {
-    cub_block_t id;
-    cub_bs_val* states;
-} cubBlockState;
+typedef struct blockState {
+    block_t id;
+    bs_val* states;
+} blockState;
 
-typedef struct cubBlockPaletteElement {
-    cubBlockState block;
+typedef struct blockPaletteElement {
+    blockState block;
     // Nbr of blocks referencing this palette element in the subchunk
     uint16_t nb_blocks;
-} cubBP_elt;
+} BP_elt;
 
-typedef struct cubBlockRenderer {
+typedef struct blockRenderer {
     // All the buffers used to render the blocks
     renderBufferObject* buffer_objs;
     uint8_t nb_buffers;
@@ -137,18 +137,18 @@ typedef struct cubBlockRenderer {
     GLint tex_locations[6];
     GLint model_uni_loc; // Uniform location of model_matrix
     mat4 model_matrix;
-    cubBlockList block_list;
-} cubBlockRenderer;
+    blockList block_list;
+} blockRenderer;
 
 // ---------- Useful Macros ----------- //
 #define CUB_BLOCK_DATA(renderer, id) (renderer->block_list.blocks + id)
 #define CUB_NB_STATES(renderer, id) CUB_BLOCK_DATA(renderer, id)->block_info.nb_states
-#define CUB_BSK_TEX(block_data) block_data->bs_keys[CUB_BS_TEX_ID]
+#define CUB_BSK_TEX(block_data) block_data->bs_keys[BS_TEX_ID]
 
 /* Creates a new BP_elt by allocating its memory.
  * The default number of blocks is set to 1! */
-cubBP_elt* cub_block_BP_elt(cubBlockData* data, cub_block_t id,
-                            cub_bs_val* states);
+BP_elt* block_BP_elt(blockData* data, block_t id,
+                            bs_val* states);
 
 
 #endif

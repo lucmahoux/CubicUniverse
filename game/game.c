@@ -7,9 +7,9 @@ void cub_game_init(cubGame* game, int width, int height) {
     stbi_set_flip_vertically_on_load(true);
 
     // Set up the renderer & load the texture pack
-    cub_block_setup_renderer(&game->block_renderer);
+    block_setup_renderer(&game->block_renderer);
     for (size_t i = 0; i < game->block_renderer.block_list.nb_blocks; ++i) {
-        cubBlockData* block = &game->block_renderer.block_list.blocks[i];
+        blockData* block = &game->block_renderer.block_list.blocks[i];
         printf("Name: %s - ID: %u - RenderType: 0x%x - VAO_id: %u "
                 "- is_solid: %u - has_gravity: %u - has_bs_tex: %u "
                 "- is_bs_creator: %u - has_states: %u - nb_states: %u\n",
@@ -18,7 +18,7 @@ void cub_game_init(cubGame* game, int width, int height) {
                 block->block_info.has_bs_tex, block->block_info.is_bs_creator,
                 block->block_info.has_states, block->block_info.nb_states);
     }
-    cub_block_load_texture_pack(&game->block_renderer.block_list);
+    block_load_texture_pack(&game->block_renderer.block_list);
     
     cub_skybox_setup_renderer(&game->skybox_renderer);
 
@@ -141,7 +141,7 @@ void cub_game_renderer_handler(cubGame* game) {
     cub_render_update_camera(&game->camera);
 
     // World updates
-    glBindVertexArray(game->block_renderer.buffer_objs[CUB_DEFAULT_VAO_ID].VAO);
+    glBindVertexArray(game->block_renderer.buffer_objs[DEFAULT_VAO_ID].VAO);
     /*cubBlockState bs = { .id = 1, .states = NULL };
     cub_bs_val bs_vals[3] = { 0, 0, 0 };
     bs.states = bs_vals;
@@ -215,6 +215,6 @@ void cub_game_start(cubGame* game) {
 void cub_game_stop(cubGame* game) {
     // TODO: Save things on disk
     cub_chunk_save(&game->chunk_test, &game->block_renderer);
-    cub_block_free_renderer(&game->block_renderer);
+    block_free_renderer(&game->block_renderer);
     cub_skybox_free_renderer(&game->skybox_renderer);
 }

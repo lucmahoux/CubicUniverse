@@ -1,14 +1,14 @@
 #include "render/chunk.h"
 
 void cub_chunk_get_block_at(cubChunk* chunk, uint8_t x,
-                            uint8_t y, uint8_t z, cubBlockState* block) {
+                            uint8_t y, uint8_t z, blockState* block) {
     cubSubChunk* sc = &chunk->subchunks[y >> 4];
     if (sc->y_pos >= CUB_MAX_SUBCHUNKS)
-        block->id = CUB_AIR_ID; // Empty subchunk => full of air
+        block->id = AIR_ID; // Empty subchunk => full of air
     else {
         uint16_t p_id = sc->blocks[x + (z << 4) + (y << 8)];
-        if (!p_id) block->id = CUB_AIR_ID;
-        else *block = ((cubBP_elt*)hashmap_get(sc->palette, p_id))
+        if (!p_id) block->id = AIR_ID;
+        else *block = ((BP_elt*)hashmap_get(sc->palette, p_id))
                         ->block;
     }
 }
@@ -23,25 +23,25 @@ void cub_subchunk_initialise(cubSubChunk* sc, uint8_t y_pos) {
     memset(sc->blocks, 0, 4096 * sizeof(cub_palette_id));
 }
 
-cub_palette_id cub_subchunk_palette_add(cubBlockRenderer* renderer,
-                                        cubSubChunk* sc, cubBlockState* bs) {
+cub_palette_id cub_subchunk_palette_add(blockRenderer* renderer,
+                                        cubSubChunk* sc, blockState* bs) {
     cub_palette_id bp_uid = cub_chunk_blockstate_uid(renderer, bs);
-    cubBP_elt* bp_elt = CUB_GET_BP_ELT(sc, bp_uid);
+    BP_elt* bp_elt = CUB_GET_BP_ELT(sc, bp_uid);
     if (bp_elt) { // BlockState already exists in palette
         ++bp_elt->nb_blocks;
     } else { // Create a new BP_elt -> default nb_blocks is already 1
         hashmap_set(sc->palette, bp_uid,
-            cub_block_BP_elt(CUB_BLOCK_DATA(renderer, bs->id),
+            block_BP_elt(CUB_BLOCK_DATA(renderer, bs->id),
                 bs->id, bs->states));
     }
     return bp_uid;
 }
 
-void cub_chunk_set_block(cubBlockRenderer* renderer, cubChunk* chunk,
+void cub_chunk_set_block(blockRenderer* renderer, cubChunk* chunk,
                          uint8_t x, uint8_t y, uint8_t z,
-                         cubBlockState* bs) {
+                         blockState* bs) {
     cubSubChunk* sc = &chunk->subchunks[y >> 4];
-    if (bs->id == CUB_AIR_ID) { // Block is destroyed (= replaced by air)
+    if (bs->id == AIR_ID) { // Block is destroyed (= replaced by air)
         if (sc->y_pos >= CUB_MAX_SUBCHUNKS)
             return; // Already empty subchunk (full of air)
         cub_palette_id* bp_uid = CUB_SUBCHUNK_BP_UID(sc, x, y, z);
@@ -60,7 +60,7 @@ void cub_chunk_set_block(cubBlockRenderer* renderer, cubChunk* chunk,
     }
 }
 
-void cub_chunk_render(cubChunk* chunk, cubBlockRenderer* renderer) {
+void cub_chunk_render(cubChunk* chunk, blockRenderer* renderer) {
     for (uint8_t i = 0; i < CUB_MAX_SUBCHUNKS; ++i) {
         cubSubChunk* sc = chunk->subchunks + i;
         if (sc->y_pos >= CUB_MAX_SUBCHUNKS) continue;
@@ -70,7 +70,7 @@ void cub_chunk_render(cubChunk* chunk, cubBlockRenderer* renderer) {
                     cub_palette_id* bp_uid = CUB_SUBCHUNK_BP_UID(sc, x, y, z);
                     if (!*bp_uid) // Air => no rendering required
                         continue;
-                    cub_block_render(renderer,
+                    block_render(renderer,
                             &CUB_GET_BP_ELT(sc, *bp_uid)->block,
                             VEC3(1.0f * (chunk->chunkX << 4) + 1.0f * x,
                                      1.0f * (sc->y_pos << 4) + 1.0f * y,
@@ -92,8 +92,8 @@ cubChunk cub_chunk_create(uint32_t chunkX, uint32_t chunkZ) {
     return chunk;
 }
 
-void cub_chunk_fill(cubBlockRenderer* renderer,
-                    cubChunk* chunk, cubBlockState* bs) {
+void cub_chunk_fill(blockRenderer* renderer,
+                    cubChunk* chunk, blockState* bs) {
     for (uint8_t i = 0; i < CUB_MAX_SUBCHUNKS; ++i) {
         cubSubChunk* sc = chunk->subchunks + i;
         cub_subchunk_initialise(sc, i);

@@ -27,7 +27,7 @@ typedef struct cubChunk {
 } cubChunk;
 
 // ---------- Useful Macros ---------- //
-#define CUB_GET_BP_ELT(subchunk, bp_uid) ((cubBP_elt*)\
+#define CUB_GET_BP_ELT(subchunk, bp_uid) ((BP_elt*)\
         hashmap_get(subchunk->palette, (size_t)bp_uid))
 #define CUB_SUBCHUNK_BP_UID(sc, x, y, z) (sc->blocks + x + (z << 4) + (y << 8))
 

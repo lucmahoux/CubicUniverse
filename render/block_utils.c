@@ -10,15 +10,14 @@ const uint8_t CUB_BSV_LEN[] = {
     6,      // BS_DOUBLE_FLOWER_TYPE
     6       // BS_WOOD_TYPE
 };
-
-cubBP_elt* cub_block_BP_elt(cubBlockData* data, cub_block_t id,
-                            cub_bs_val* states) {
-    cubBP_elt* elt = malloc(sizeof(cubBP_elt));
-    if (!elt) errx(1, "cub_block_BP_elt: Malloc failed!");
-    elt->block.states = malloc(sizeof(cub_bs_val) * data->block_info.nb_states);
+BP_elt* block_BP_elt(blockData* data, block_t id,
+                            bs_val* states) {
+    BP_elt* elt = malloc(sizeof(BP_elt));
+    if (!elt) errx(1, "block_BP_elt: Malloc failed!");
+    elt->block.states = malloc(sizeof(bs_val) * data->block_info.nb_states);
     for (uint8_t i = 0; i < data->block_info.nb_states; ++i)
         elt->block.states[i] = states[i];
-    if (!elt->block.states) errx(1, "cub_block_BP_elt: Malloc failed!");
+    if (!elt->block.states) errx(1, "block_BP_elt: Malloc failed!");
     elt->block.id = id;
     elt->nb_blocks = 1;
     return elt;

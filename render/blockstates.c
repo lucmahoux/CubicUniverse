@@ -1,6 +1,6 @@
 #include "render/blockstates.h"
 
-char* cub_BSCRE_wood_type(cubBlockStateValue value, char* buffer) {
+char* BSCRE_wood_type(blockStateValue value, char* buffer) {
     size_t offset = 0;
     switch (value) {
         case BSV_ACACIA:
@@ -21,7 +21,7 @@ char* cub_BSCRE_wood_type(cubBlockStateValue value, char* buffer) {
     return buffer + offset;
 }
 
-char* cub_BSCRE_flower_type(cubBlockStateValue value, char* buffer) {
+char* BSCRE_flower_type(blockStateValue value, char* buffer) {
     size_t offset = 0;
     switch (value) {
         case BSV_POPPY:
@@ -52,7 +52,7 @@ char* cub_BSCRE_flower_type(cubBlockStateValue value, char* buffer) {
     return buffer + offset;
 }
 
-char* cub_BSCRE_color_type(cubBlockStateValue value, char* buffer) {
+char* BSCRE_color_type(blockStateValue value, char* buffer) {
     size_t offset = 0;
     switch (value) {
         case BSV_WHITE:
@@ -93,7 +93,7 @@ char* cub_BSCRE_color_type(cubBlockStateValue value, char* buffer) {
     return buffer + offset;
 }
 
-char* cub_BSCRE_double_plant_type(cubBlockStateValue value, char* buffer) {
+char* BSCRE_double_plant_type(blockStateValue value, char* buffer) {
     size_t offset = 0;
     switch (value) {
         case BSV_SUNFLOWER:
@@ -114,23 +114,23 @@ char* cub_BSCRE_double_plant_type(cubBlockStateValue value, char* buffer) {
     return buffer + offset;
 }
 
-cubBS_parser cub_BS_is_creator(cubBlockStateKey bsk) {
+BS_parser BS_is_creator(blockStateKey bsk) {
     switch (bsk) {
         case BS_DOUBLE_PLANT_TYPE:
-            return cub_BSCRE_double_plant_type;
+            return BSCRE_double_plant_type;
         case BS_FLOWER_TYPE:
-            return cub_BSCRE_flower_type;
+            return BSCRE_flower_type;
         case BS_COLOR:
-            return cub_BSCRE_color_type;
+            return BSCRE_color_type;
         case BS_WOOD_TYPE:
-            return cub_BSCRE_wood_type;
+            return BSCRE_wood_type;
         default:
             return NULL;
     }
     return NULL;
 }
 
-bool cub_BS_is_total_creator(cubBlockStateKey bsk) {
+bool BS_is_total_creator(blockStateKey bsk) {
     switch (bsk) {
         case BS_DOUBLE_PLANT_TYPE:
         case BS_FLOWER_TYPE:
@@ -141,7 +141,7 @@ bool cub_BS_is_total_creator(cubBlockStateKey bsk) {
     return false;
 }
 
-char* cub_BSMOD_LIT_suffix(cubBlockStateValue value, char* buffer) {
+char* BSMOD_LIT_suffix(blockStateValue value, char* buffer) {
     switch (value) {
         case BSV_FALSE:
             buffer[0] = '\0'; break;
@@ -153,7 +153,7 @@ char* cub_BSMOD_LIT_suffix(cubBlockStateValue value, char* buffer) {
     return buffer;
 }
 
-char* cub_BSMOD_AGE_suffix(cubBlockStateValue value, char* buffer) {
+char* BSMOD_AGE_suffix(blockStateValue value, char* buffer) {
     switch (value) {
         case BSV_STAGE0:
             strcpy(buffer, "_stage0"); break;
@@ -169,19 +169,19 @@ char* cub_BSMOD_AGE_suffix(cubBlockStateValue value, char* buffer) {
     return buffer;
 }
 
-cubBS_parser cub_BS_is_modificator(cubBlockStateKey bsk) {
+BS_parser BS_is_modificator(blockStateKey bsk) {
     switch (bsk) {
         case BS_LIT:
-            return cub_BSMOD_LIT_suffix;
+            return BSMOD_LIT_suffix;
         case BS_AGE:
-            return cub_BSMOD_AGE_suffix;
+            return BSMOD_AGE_suffix;
         default:
             return NULL;
     }
     return NULL;
 }
 
-uint16_t cub_BS_TEX_get_nb_modes(cubBlockStateKey bsk) {
+uint16_t BS_TEX_get_nb_modes(blockStateKey bsk) {
     switch (bsk) {
         case BS_LIT:
             return 2;
