@@ -1,13 +1,13 @@
 #include "utils/window.h"
 
-void cub_utils_framebuffer_size_callback(cub_unused GLFWwindow* window,
+void framebuffer_size_callback(cub_unused GLFWwindow* window,
                                             int width, int height) {
     // Update OpenGL viewport size
     glViewport(0, 0, width, height);
 }
 
 
-void cub_utils_setup_window(GLFWwindow** window, int width, int height,
+void setup_window(GLFWwindow** window, int width, int height,
                             const char* window_name) {
     // Initialise GLFW
     if (!glfwInit())
@@ -31,7 +31,7 @@ void cub_utils_setup_window(GLFWwindow** window, int width, int height,
     }
 
     // Callback when the window is resized
-    glfwSetFramebufferSizeCallback(*window, cub_utils_framebuffer_size_callback);
+    glfwSetFramebufferSizeCallback(*window, framebuffer_size_callback);
 
     // Set up GLFW's window input mode
     // Cursor hidden & cursor can't leave the window (3D camera)
@@ -53,7 +53,7 @@ void cub_utils_setup_window(GLFWwindow** window, int width, int height,
         errx(1, "Failed to initialise GLEW!");
 }
 
-void cub_utils_start_window_loop(GLFWwindow* window,
+void start_window_loop(GLFWwindow* window,
                                  window_callback clear_screen_handler,
                                  window_callback input_handler,
                                  window_callback renderer_handler,
@@ -74,6 +74,6 @@ void cub_utils_start_window_loop(GLFWwindow* window,
     glfwTerminate();
 }
 
-void cub_utils_close_window(GLFWwindow* window) {
+void close_window(GLFWwindow* window) {
     glfwSetWindowShouldClose(window, true);
 }

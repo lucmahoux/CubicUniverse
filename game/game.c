@@ -3,7 +3,7 @@
 
 void cub_game_init(cubGame* game, int width, int height) {
     // Set up the window
-    cub_utils_setup_window(&game->window, width, height, "Cubic Universe");
+    setup_window(&game->window, width, height, "Cubic Universe");
     stbi_set_flip_vertically_on_load(true);
 
     // Set up the renderer & load the texture pack
@@ -61,7 +61,7 @@ void cub_game_process_mouse_mouvement(cubCamera* cam, float xoffset,
 void cub_game_input_handler(cubGame* game) {
     // Exit program
     if (glfwGetKey(game->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        cub_utils_close_window(game->window);
+        close_window(game->window);
 
     // Moving commands
     cubCamera* cam = &game->camera;
@@ -204,7 +204,7 @@ void cub_game_start(cubGame* game) {
     states[0] = BSV_POPPY;
     cub_chunk_fill(&game->block_renderer, &game->chunk_test, &bs);*/
     cub_chunk_load(&game->chunk_test, &game->block_renderer);
-    cub_utils_start_window_loop(game->window,
+    start_window_loop(game->window,
                                 (window_callback) cub_game_clear_screen_handler,
                                 (window_callback) cub_game_input_handler,
                                 (window_callback) cub_game_renderer_handler,
