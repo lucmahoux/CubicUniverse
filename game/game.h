@@ -10,24 +10,24 @@
 #include "utils/utils.h"
 #include "utils/window.h"
 
-typedef struct cubGame {
+typedef struct game {
     GLFWwindow* window;
     blockRenderer block_renderer;
     cubSkyboxRenderer skybox_renderer;
     camera camera;
     cubChunk chunk_test;
-} cubGame;
+} game;
 
-void cub_game_init(cubGame* game, int width, int height);
+void game_init(game* game, int width, int height);
 
-void cub_game_clear_screen_handler(cubGame* game);
+void game_clear_screen_handler(game* game);
 
-void cub_game_input_handler(cubGame* game);
+void game_input_handler(game* game);
 
-void cub_game_renderer_handler(cubGame* game);
+void game_renderer_handler(game* game);
 
-void cub_game_start(cubGame* game);
+void game_start(game* game);
 
-void cub_game_stop(cubGame* game);
+void game_stop(game* game);
 
 #endif

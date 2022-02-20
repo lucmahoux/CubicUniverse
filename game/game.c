@@ -1,7 +1,7 @@
 #include "game/game.h"
 #include "utils/stb_image.h"
 
-void cub_game_init(cubGame* game, int width, int height) {
+void game_init(game* game, int width, int height) {
     // Set up the window
     setup_window(&game->window, width, height, "Cubic Universe");
     stbi_set_flip_vertically_on_load(true);
@@ -29,13 +29,13 @@ void cub_game_init(cubGame* game, int width, int height) {
                             45.0f, aspect_ratio, 0.1f, 100.0f);
 }
 
-void cub_game_clear_screen_handler(cub_unused cubGame* game) {
+void game_clear_screen_handler(cub_unused game* game) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 // Change values with mouse input
-void cub_game_process_mouse_mouvement(camera* cam, float xoffset,
+void game_process_mouse_mouvement(camera* cam, float xoffset,
         float yoffset)
 {
     float sensitivity = 0.1f;
@@ -58,7 +58,7 @@ void cub_game_process_mouse_mouvement(camera* cam, float xoffset,
 
 }
 
-void cub_game_input_handler(cubGame* game) {
+void game_input_handler(game* game) {
     // Exit program
     if (glfwGetKey(game->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         close_window(game->window);
@@ -109,10 +109,10 @@ void cub_game_input_handler(cubGame* game) {
     cam->lastX = xpos;
     cam->lastY = ypos;
 
-    cub_game_process_mouse_mouvement(&game->camera, xoffset, yoffset);
+    game_process_mouse_mouvement(&game->camera, xoffset, yoffset);
 }
 
-void cub_game_skybox_render(cubGame* game)
+void game_skybox_render(game* game)
 {
     // Prepare skybox rendering
     //glDepthMask(GL_FALSE);
@@ -135,7 +135,7 @@ void cub_game_skybox_render(cubGame* game)
     glDepthFunc(GL_LESS);
 }
 
-void cub_game_renderer_handler(cubGame* game) {
+void game_renderer_handler(game* game) {
     glUseProgram(game->block_renderer.shader_program);
     // Camera updates
     camera_update(&game->camera);
@@ -192,10 +192,10 @@ void cub_game_renderer_handler(cubGame* game) {
                         CUB_VEC3(5.0f, 3.0f, 0.0f));*/
 
     cub_chunk_render(&game->chunk_test, &game->block_renderer);
-    cub_game_skybox_render(game);
+    game_skybox_render(game);
 }
 
-void cub_game_start(cubGame* game) {
+void game_start(game* game) {
     /*game->chunk_test = cub_chunk_create(0, 0);
     cubBlockState bs;
     bs.id = 5;
@@ -205,14 +205,14 @@ void cub_game_start(cubGame* game) {
     cub_chunk_fill(&game->block_renderer, &game->chunk_test, &bs);*/
     cub_chunk_load(&game->chunk_test, &game->block_renderer);
     start_window_loop(game->window,
-                                (window_callback) cub_game_clear_screen_handler,
-                                (window_callback) cub_game_input_handler,
-                                (window_callback) cub_game_renderer_handler,
-                                (window_callback) cub_game_stop,
+                                (window_callback) game_clear_screen_handler,
+                                (window_callback) game_input_handler,
+                                (window_callback) game_renderer_handler,
+                                (window_callback) game_stop,
                                 (void*) game);
 }
 
-void cub_game_stop(cubGame* game) {
+void game_stop(game* game) {
     // TODO: Save things on disk
     cub_chunk_save(&game->chunk_test, &game->block_renderer);
     block_free_renderer(&game->block_renderer);

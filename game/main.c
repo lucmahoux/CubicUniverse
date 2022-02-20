@@ -112,9 +112,9 @@ void create_block_list() {
 }
 
 int main(void) {
-    cubGame game;
+    game game;
     create_block_list();
-    cub_game_init(&game, 1024, 768);
-    cub_game_start(&game);
+    game_init(&game, 1024, 768);
+    game_start(&game);
     return EXIT_SUCCESS;
 }
