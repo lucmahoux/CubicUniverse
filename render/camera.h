@@ -3,42 +3,43 @@
 
 #include "utils/utils.h"
 
-typedef struct camera {
-    GLint view_uni_loc; // Uniform location of view matrix
+struct cubPlane {
+    vec3 normal; // Coordinates (a, b, c)
+    float distance; // Plane equation is ax + by + cz + distance = 0
+};
+
+typedef struct cubViewFrustum {
+    float FOV; // Vertical FOV
+    float aspect_ratio; // = width / height
+    float near_Z, far_Z;
+    vec3 right, up, front; // Base vectors
+    vec3 world_up;
+    struct cubPlane near_plane, far_plane, left_plane,
+                    right_plane, top_plane, bottom_plane;
+} ViewFrustum;
+
+typedef struct cubCamera {
     mat4 view_matrix;
-    GLint projection_uni_loc; // Uniform location of projection matrix
     mat4 projection_matrix;
-    float fov; // Field Of View
-    float aspect_ratio; // Aspect ration = width / height
-    float near, far; // Near and Far planes distances
+    mat4 VP_matrix; // VP_matrix = projection_matrix x view_matrix
+    ViewFrustum frustum;
     vec3 position;
-    vec3 up_side;
-    vec3 front;
-    float deltaTime;
-    float lastFrame;
     float yaw;
     float pitch;
     float lastX;
     float lastY;
     int firstMouse;
-} camera;
+} Camera;
 
 /* Should be called once, at the beginning of the game to setup the camera */
-void camera_setup(camera* camera, GLuint shader_program,
-                            vec3 position, float fov, float aspect_ratio,
-                             float near, float far);
+void camera_setup(Camera* camera, vec3 position, float fov,
+                  float aspect_ratio, float near, float far);
 
-/* Update the view matrix of the camera when the player 'moves' his head.
- * It is assumed that the relevant shader_program is being used upon calling */
-void camera_update_view(camera* camera);
+/* Update the projection matrix (e.g. when window is resized by the user) */
+void camera_update_projection(Camera* camera);
 
-/* Update the projection matrix in the shader program when the window is
- * resized by the user */
-void camera_update_projection(camera* camera,
-                                         GLuint shader_program);
+void camera_update(Camera* camera);
 
-void camera_remove_translation(camera* camera);
-
-void camera_update(camera* camera);
+bool is_sphere_in_frustum(ViewFrustum* frustum, vec3 center, float radius);
 
 #endif

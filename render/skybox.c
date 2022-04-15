@@ -49,10 +49,10 @@ GLuint skybox_load_cubemap()
 }
 
 
-void skybox_setup_renderer(skyboxRenderer* renderer) {
+void skybox_setup_renderer(SkyboxRenderer* renderer)
+{
     printf("skybox_setup_renderer: Starting renderer initialisation...\n");
     const GLfloat skybox_vertices[] = {
-        // positions          
         -1.0f,  1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f,
          1.0f, -1.0f, -1.0f,
@@ -97,40 +97,57 @@ void skybox_setup_renderer(skyboxRenderer* renderer) {
     };
 
     // Generate the buffers
-    GLuint buffers[1];
-    glGenBuffers(1, buffers);
-    glGenVertexArrays(1, &renderer->VAO);
+    setup_render_buffer_object(&renderer->RBO);
+    glGenBuffers(1, &renderer->RBO.VBO);
+    glGenVertexArrays(1, &renderer->RBO.VAO);
 
     // Bind the vertex array object then set up the other buffers data
-    glBindVertexArray(renderer->VAO);
+    glBindVertexArray(renderer->RBO.VAO);
     // 1) Vertex Buffer
-    glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(skybox_vertices),
-            skybox_vertices, GL_STATIC_DRAW);
+    renderer->RBO.nb_elements = 36;
+    glBindBuffer(GL_ARRAY_BUFFER, renderer->RBO.VBO);
+    glBufferData(GL_ARRAY_BUFFER, renderer->RBO.nb_elements * 3
+                 * sizeof(GLfloat), skybox_vertices, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
-            (void*)0);
-
-    renderer->cubemapTexture = skybox_load_cubemap();
-
-    renderer->VBO = buffers[0];
-    renderer->shader_program = build_shader("skybox");
-    
-    glUseProgram(renderer->shader_program);
-    
-    renderer->view_uni_loc = glGetUniformLocation(renderer->shader_program, "view");
-    renderer->projection_uni_loc = glGetUniformLocation(renderer->shader_program, "projection");
-    glUniform1i(glGetUniformLocation(renderer->shader_program, "skybox"), 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat),
+                          (GLvoid*) 0);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    renderer->cubemapTexture = skybox_load_cubemap();
+    renderer->shader_program = build_shader("skybox");
+    glUseProgram(renderer->shader_program);
+    try_get_uniform_location(renderer->shader_program, &renderer->VP_matrix_loc,
+                             "VP_matrix", "skybox_setup_renderer");
 }
 
-void skybox_free_renderer(skyboxRenderer* renderer)
+void skybox_render(SkyboxRenderer* renderer, Camera* camera)
 {
-    glDeleteBuffers(1, &renderer->VBO);
-    glDeleteVertexArrays(1, &renderer->VAO);
-    glDeleteProgram(renderer->shader_program);
+    // Prepare skybox rendering
+    glDepthFunc(GL_LEQUAL);
+    glUseProgram(renderer->shader_program);
+    // Remove the translation part of the view matrix
+    mat4 VP_matrix = camera->view_matrix;
+    VP_matrix.coeffs[12] = 0.0f;
+    VP_matrix.coeffs[13] = 0.0f;
+    VP_matrix.coeffs[14] = 0.0f;
+    // Update the VP_matrix uniform -> VP = projection * view
+    VP_matrix = mat4_product_simd(camera->projection_matrix, VP_matrix);
+    glUniformMatrix4fv(renderer->VP_matrix_loc, 1, GL_FALSE, VP_matrix.coeffs);
 
+    // Render skybox
+    glBindVertexArray(renderer->RBO.VAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, renderer->cubemapTexture);
+    glDrawArrays(GL_TRIANGLES, 0, renderer->RBO.nb_elements);
+    glBindVertexArray(0);
+    glDepthFunc(GL_LESS);
+}
+
+void skybox_free_renderer(SkyboxRenderer* renderer)
+{
+    free_render_buffer_object(&renderer->RBO);
+    glDeleteProgram(renderer->shader_program);
 }

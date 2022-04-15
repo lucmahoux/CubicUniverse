@@ -8,6 +8,21 @@ vec3 vec3_new(float x, float y, float z) {
     return result;
 }
 
+vec4 vec4_new(vec3 xyz, float w) {
+    vec4 result;
+    result.coords[0] = xyz.coords[0];
+    result.coords[1] = xyz.coords[1];
+    result.coords[2] = xyz.coords[2];
+    result.coords[3] = w;
+    return result;
+}
+
+vec3 vec3_canonical_base(vec3 input, vec3 unit_x, vec3 unit_y, vec3 unit_z) {
+    return VEC3_ADD(VEC3_ADD(VEC3_SCALE(input.coords[0], unit_x),
+                             VEC3_SCALE(input.coords[1], unit_y)),
+                    VEC3_SCALE(input.coords[2], unit_z));
+}
+
 float vec3_dot_product(vec3* v1, vec3* v2) {
     return  v1->coords[0] * v2->coords[0] +
             v1->coords[1] * v2->coords[1] +

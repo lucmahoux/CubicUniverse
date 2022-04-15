@@ -1,14 +1,12 @@
 #include "utils/list.h"
 
-void* cub_list_get(cubList* list, size_t i) {
+void* list_get(List* list, size_t i) {
     return (char*) list->data + i * list->memb_size;
 }
 
-cubList* cub_list(size_t memb_size, reallocType type,
-                        size_t capacity) {
-    cubList* list = malloc(sizeof(cubList));
-    if (!list)
-        errx(1, "cub_list: malloc failed!");
+List* list_new(size_t memb_size, ReallocType type, size_t capacity) {
+    List* list = malloc(sizeof(List));
+    if (!list) errx(EXIT_FAILURE, "cub_list: Malloc failed!");
     list->data = malloc(memb_size * BASE_CAPACITY);
     if (!list->data) {
         free(list);
@@ -18,93 +16,95 @@ cubList* cub_list(size_t memb_size, reallocType type,
     list->memb_size = memb_size;
     list->len = 0;
     list->realloc_fun = type == REALLOC_DOUBLE
-                        ? (void(*)(void*))cub_list_check_double_capacity
-                        : (void(*)(void*))cub_list_check_plus_one_realloc;
+                        ? (void(*)(void*))list_check_double_capacity
+                        : (void(*)(void*))list_check_plus_one_realloc;
     return list;
 }
 
-void cub_list_set(cubList* list, void* elt, size_t i) {
+void list_set(List* list, void* elt, size_t i) {
+#ifdef CUB_DEBUG
     if (i >= list->len)
-        errx(1, "cub_list_set: list index out of range!");
-    memcpy(cub_list_get(list, i), elt, list->memb_size);
+        errx(EXIT_FAILURE, "list_set: list index out of range!");
+#endif
+    memcpy(list_get(list, i), elt, list->memb_size);
 }
 
-void cub_list_check_double_capacity(cubList* list) {
+void list_check_double_capacity(List* list) {
     if (list->len >= list->capacity) {
         list->capacity *= 2;
         list->data = realloc(list->data, list->memb_size * list->capacity);
         if (!list->data)
-            errx(1, "cub_list_check_double_capacity: realloc failed!");
+            errx(EXIT_FAILURE, "list_check_double_capacity: realloc!");
     }
 }
 
-void cub_list_check_plus_one_realloc(cubList* list) {
+void list_check_plus_one_realloc(List* list) {
     if (list->len >= list->capacity) {
         ++list->capacity;
         list->data = realloc(list->data, list->memb_size * list->capacity);
         if (!list->data)
-            errx(1, "cub_list_check_plus_on: realloc failed!");
+            errx(EXIT_FAILURE, "list_check_plus_on: realloc failed!");
     }
 }
 
-void cub_list_append(cubList* list, void* elt) {
+void list_append(List* list, void* elt) {
     list->realloc_fun(list);
-    memcpy(cub_list_get(list, list->len), elt, list->memb_size);
+    memcpy(list_get(list, list->len), elt, list->memb_size);
     ++list->len;
 }
 
-void cub_list_insert(cubList* list, void* elt, size_t i) {
+void list_insert(List* list, void* elt, size_t i) {
+#ifdef CUB_DEBUG
     if (i >= list->len + 1)
-        printf("cub_list_insert: list index out of range\n!");
-    else {
-        list->realloc_fun(list);
-        for (size_t k = list->len; k > i; --k)
-            memcpy( cub_list_get(list, k),
-                    cub_list_get(list, k - 1),
-                    list->memb_size );
-        memcpy(cub_list_get(list, i), elt, list->memb_size);
-        ++list->len;
-    }
+        errx(EXIT_FAILURE, "list_insert: list index out of range\n!");
+#endif
+    list->realloc_fun(list);
+    for (size_t k = list->len; k > i; --k)
+        memcpy( list_get(list, k),
+                list_get(list, k - 1),
+                list->memb_size );
+    memcpy(list_get(list, i), elt, list->memb_size);
+    ++list->len;
 }
 
-void cub_list_remove_ordered(cubList* list, size_t i) {
+void list_remove_ordered(List* list, size_t i) {
     if (i >= list->len)
-        printf("cub_list_remove_sorted: index {%lu} out of range!\n", i);
+        printf("list_remove_sorted: index {%lu} out of range!\n", i);
     else {
         for (size_t k = i + 1; k < list->len; ++k)
-            memcpy( cub_list_get(list, k - 1),
-                    cub_list_get(list, k),
+            memcpy( list_get(list, k - 1),
+                    list_get(list, k),
                     list->memb_size );
         --list->len;
     }
 }
 
-void cub_list_remove(cubList* list, size_t i) {
+void list_remove(List* list, size_t i) {
+#ifdef CUB_DEBUG
     if (i >= list->len)
-        printf("cub_list_remove: index {%lu} out of range!\n", i);
-    else {
-        --list->len;
-        // Swap the last element with the one to remove
-        void* dest = cub_list_get(list, i);
-        void* src = cub_list_get(list, list->len);
-        memcpy(dest, src, list->memb_size);
-    }
+        errx(EXIT_FAILURE, "list_remove: index {%lu} out of range!\n", i);
+#endif
+    --list->len;
+    // Swap the last element with the one to remove
+    void* dest = list_get(list, i);
+    void* src = list_get(list, list->len);
+    memcpy(dest, src, list->memb_size);
 }
 
-void cub_list_pop(cubList* list, size_t i, void* removed) {
+void list_pop(List* list, size_t i, void* removed) {
+#ifdef CUB_DEBUG
     if (i >= list->len)
-        printf("cub_list_pop: index {%lu}out of range!\n", i);
-    else {
-        memcpy(removed, cub_list_get(list, i), list->memb_size);
-        cub_list_remove(list, i);
-    }
+        errx(EXIT_FAILURE, "list_pop: index {%lu}out of range!\n", i);
+#endif
+    memcpy(removed, list_get(list, i), list->memb_size);
+    list_remove(list, i);
 }
 
-void cub_list_clear(cubList* list) {
+void list_clear(List* list) {
     list->len = 0;
 }
 
-void cub_list_free(cubList* list) {
+void list_free(List* list) {
     free(list->data);
     free(list);
 }
