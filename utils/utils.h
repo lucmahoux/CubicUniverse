@@ -19,12 +19,12 @@
 #include "matrix.h"
 #include "vector.h"
 
+#define CUB_TEX_ATLAS_WIDTH 512
+
 extern char ASSETS_PATH[];
 extern char SHADERS_PATH[];
 extern char TEXTURES_PATH[];
 extern char GAMEFILES_PATH[];
-
-#define block_t uint16_t
 
 /* Concatenate two strings and return the total length (excluding '\0') */
 char* utils_strconcat(const char* s1, const char* s2, size_t* len);
@@ -35,11 +35,15 @@ bool utils_file_exists(const char* fname);
 /* Read memb_nbr elements of memb_size from file and put it in dest.
  * Errors are handled and exit the program! */
 void utils_fread(void* dest, size_t memb_size, size_t memb_nbr,
-                     FILE* fp, const char* fname, const char* field_name);
+                 FILE* fp, const char* fname, const char* field_name);
 
 /* Write memb_nbr elements of memb_size to file from 'src'.
  * Errors are handled and exit the program! */
 void utils_fwrite(void* src, size_t memb_size, size_t memb_nbr,
-                      FILE* fp, const char* fname, const char* field_name);
+                  FILE* fp, const char* fname, const char* field_name);
+
+void* utils_malloc(size_t size, const char* fname);
+
+void* utils_realloc(void* src, size_t new_size, const char* fname);
 
 #endif

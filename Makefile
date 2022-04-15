@@ -6,7 +6,7 @@ GL_INCLUDES = $(shell pkg-config --cflags glfw3)
 GL_LIBS = $(shell pkg-config --static --libs glfw3 glew opengl)
 
 CRITERION_INCLUDES = $(shell pkg-config --cflags criterion)
-CRITERION_LIBS = $(shell pkg-config --static --libs criterion)
+CRITERION_LIBS = $(shell pkg-config --libs criterion)
 
 mode = debug
 ifeq ($(mode),debug)
@@ -19,14 +19,21 @@ EXTRA_FLAGS += -fsanitize=address
 endif
 
 LIBUTILS_DIR = ../utils
-LIBUTILS_SRC = utils.c matrix.c vector.c list.c hashmap.c \
-			   shader.c open_gl.c window.c
+LIBUTILS_SRC = utils.c matrix.c vector.c list.c hashmap.c queue.c graph_marker.c
 LIBUTILS_SRC := $(addprefix $(LIBUTILS_DIR)/,$(LIBUTILS_SRC))
 
 LIBRENDER_DIR = ../render
-LIBRENDER_SRC = block.c camera.c blockstates.c block_list_loader.c chunk.c \
-				chunk_loader.c block_utils.c skybox.c
+LIBRENDER_SRC = camera.c skybox.c axes.c shader.c open_gl.c window.c \
+								texture_atlas.c line_renderer.c
 LIBRENDER_SRC := $(addprefix $(LIBRENDER_DIR)/,$(LIBRENDER_SRC))
+
+LIBBLOCK_DIR = ../block
+LIBBLOCK_SRC = blockstates.c block.c block_utils.c block_list_loader.c
+LIBBLOCK_SRC := $(addprefix $(LIBBLOCK_DIR)/,$(LIBBLOCK_SRC))
+
+LIBCHUNK_DIR = ../chunk
+LIBCHUNK_SRC = chunk_utils.c chunk.c chunk_loader.c chunk_renderer.c
+LIBCHUNK_SRC := $(addprefix $(LIBCHUNK_DIR)/,$(LIBCHUNK_SRC))
 
 LIBINPUT_DIR = ../input
 LIBINPUT_SRC = 
