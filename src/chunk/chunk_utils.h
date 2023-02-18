@@ -1,6 +1,7 @@
 #ifndef CUB_CHUNK_CHUNK_UTILS_H
 #define CUB_CHUNK_CHUNK_UTILS_H
 
+#include "block_utils.h"
 #include "types/chunk.h"
 
 /* Convert the position of a block in CHUNK coordinates to its position in
