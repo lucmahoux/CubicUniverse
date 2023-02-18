@@ -8,6 +8,8 @@ if [ "$#" -eq 0 ]; then
         meson setup "$DIR"
     fi
     ninja -C "$DIR"
+    cd $DIR
+    ./CubicUniverse
     exit
 fi
 

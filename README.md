@@ -85,8 +85,15 @@ List prerequisites here
   sudo apt-get install freeglut3
   sudo apt-get install freeglut3-dev
   ```
-  Moreover, regarding the unit-tests part of the project, you must install Criterion.
+
+* Moreover, regarding the unit-tests part of the project, you must install Criterion.
   You can get it from the github repository [Criterion](https://github.com/Snaipe/Criterion).
+  This project uses Meson buildsystem to generate the executable along with Ninja,
+  therefore you must also install the following dependencies:
+  ```sh
+  sudo apt-get install meson
+  sudo apt-get install ninja
+  ```
 
 ### Installation
 
@@ -97,13 +104,13 @@ List prerequisites here
    ```
 3. To build the project, you simply have to go to the root of the project and run :
    ```sh
-   make game_run
+   ./compile
    ```
    if you want to build & run the project.
-    ```sh
-    make tests_run
-    ```
-    if you want to build & run the test-suite.
+   ```sh
+   ./compile debug
+   ```
+   if you want to build & run the test-suite.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
