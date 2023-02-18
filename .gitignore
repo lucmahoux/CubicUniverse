@@ -2,8 +2,8 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudio,codeblocks,vim,emacs,visualstudiocode,cmake
 
 ### OUR THINGS ###
-game/game
-tests/tests
+buildrelease
+buildtest
 tags.*
 
 ### CMake ###
