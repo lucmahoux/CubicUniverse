@@ -1,6 +1,7 @@
 #ifndef CUB_BLOCK_BLOCK_UTILS_H
 #define CUB_BLOCK_BLOCK_UTILS_H
 
+#include "physics/physics_utils.h"
 #include "render/open_gl.h"
 #include "render/texture_atlas.h"
 #include "utils/utils.h"
