@@ -22,6 +22,11 @@
 #define QUAT_PROD(q1, q2) quaternion_product(q1, q2)
 #define VEC3_ROT(u, axis, theta) vec3_rotate(u, axis, theta)
 
+typedef struct cubVec2 {
+    float x;
+    float y;
+} vec2;
+
 typedef struct cubVec3 {
     float coords[3];
 } vec3;
