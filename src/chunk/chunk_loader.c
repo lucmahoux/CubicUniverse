@@ -1,18 +1,18 @@
 #include "chunk_loader.h"
 
 // ----------------------------------------------------------------------------
-void chunk_load_blocks(SubChunk* SC, palette_id palette_len,
+static void chunk_load_blocks(SubChunk* SC, palette_id palette_len,
                        BP_elt** BP_elts, FILE* fp);
 
-void chunk_load_palette(SubChunk* SC, BlockList* block_list, FILE* fp);
+static void chunk_load_palette(SubChunk* SC, BlockList* block_list, FILE* fp);
 
-void chunk_save_blocks(palette_id* new_ids_mapper, palette_id palette_len,
-                       palette_id* blocks, FILE* fp);
+static void chunk_save_blocks(const palette_id* new_ids_mapper, palette_id palette_len,
+                       const palette_id* blocks, FILE* fp);
 
-void chunk_save_palette(SubChunk* SC, FILE* fp);
+static void chunk_save_palette(SubChunk* SC, FILE* fp);
 //-----------------------------------------------------------------------------
 
-void chunk_load_blocks(SubChunk* SC, palette_id palette_len,
+static void chunk_load_blocks(SubChunk* SC, palette_id palette_len,
                        BP_elt** BP_elts, FILE* fp) {
     const char fname[] = "chunk_load_blocks";
     SC->blocks = utils_malloc(4096 * sizeof(palette_id), fname);
@@ -41,7 +41,7 @@ void chunk_load_blocks(SubChunk* SC, palette_id palette_len,
     }
 }
 
-void chunk_load_palette(SubChunk* SC, BlockList* block_list, FILE* fp) {
+static void chunk_load_palette(SubChunk* SC, BlockList* block_list, FILE* fp) {
     const char fname[] = "chunk_load_palette";
     palette_id palette_len;
     utils_fread(&palette_len, sizeof(palette_id), 1, fp, fname, "palette_len");
@@ -115,8 +115,8 @@ void chunk_load(Chunk* chunk, BlockList* block_list,
     }
 }
 
-void chunk_save_blocks(palette_id* new_ids_mapper, palette_id palette_len,
-                       palette_id* blocks, FILE* fp) {
+static void chunk_save_blocks(const palette_id* new_ids_mapper, palette_id palette_len,
+                       const palette_id* blocks, FILE* fp) {
     const char fname[] = "chunk_save_blocks";
     if (palette_len <= 255) {
         uint8_t buffer[1024];
@@ -137,7 +137,7 @@ void chunk_save_blocks(palette_id* new_ids_mapper, palette_id palette_len,
     }
 }
 
-void chunk_save_palette(SubChunk* SC, FILE* fp) {
+static void chunk_save_palette(SubChunk* SC, FILE* fp) {
     const char fname[] = "chunk_save_palette";
     palette_id palette_len = SC->palette.BS_uid_mapper->nb_keys;
     utils_fwrite(&palette_len, sizeof(palette_id), 1, fp, fname, "palette_len");

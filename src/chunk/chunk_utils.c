@@ -8,12 +8,11 @@
  * The output is the variable 'connected_faces' which shall be equal to 0
  * upon calling. This variable is updated with the bitmasks of the faces
  * reachable by the flood fill. */
-void visibility_graph_dfs(SubChunk* sc, GraphMarker* block_marker,
+static void visibility_graph_dfs(SubChunk* sc, GraphMarker* block_marker,
                           SubChunkCoords org_pos, uint8_t* connected_faces);
 
-/* Simply updates the sc->visibility_graph with regards to
- * the flood fill results */
-void process_visibility_dfs_output(SubChunk* sc, uint8_t connected_faces);
+/* Simply updates the sc->visibility_graph with regard to the flood fill results */
+static void process_visibility_dfs_output(SubChunk* sc, uint8_t connected_faces);
 
 // ----------------------------------------------------------------------------
 
@@ -49,8 +48,8 @@ vec3 subchunk_coords_to_world(Chunk* chunk, SubChunk* sc,
 }
 
 ChunkCoords world_coords_to_chunk(vec3 w_coords) {
-    int x = (long)(w_coords.coords[0]) % 16;
-    int z = (long)(w_coords.coords[2]) % 16;
+    int x = (int)((long)(w_coords.coords[0]) % 16);
+    int z = (int)((long)(w_coords.coords[2]) % 16);
     ChunkCoords c_coords = {
         .x = (uint8_t)(x < 0 ? (x + 16) : x),
         .y = (uint8_t)w_coords.coords[1],
@@ -104,18 +103,18 @@ BP_elt* subchunk_get_BP_elt(SubChunk* SC, SubChunkCoords position) {
         org_pos.COORDINATE -= 1;\
     } else *connected_faces |= FACE_BITMASK(opposite_faceID);
 
-void visibility_graph_dfs(SubChunk* sc, GraphMarker* block_marker,
+static void visibility_graph_dfs(SubChunk* sc, GraphMarker* block_marker,
                           SubChunkCoords org_pos, uint8_t* connected_faces) {
     utils_graph_marker_mark(block_marker, CUB_SUBCHUNK_BLOCK_ID(sc, org_pos));
     uint16_t neighbor_id;
     BP_elt* neighbor;
-    VISIBILITY_GRAPH_NEIGHBOR_CHECK(x, CHUNK_WIDTH, FID_LEFT, FID_RIGHT);
-    VISIBILITY_GRAPH_NEIGHBOR_CHECK(y, SUBCHUNK_HEIGHT, FID_BOTTOM, FID_TOP);
-    VISIBILITY_GRAPH_NEIGHBOR_CHECK(z, CHUNK_DEPTH, FID_BACK, FID_FRONT);
+    VISIBILITY_GRAPH_NEIGHBOR_CHECK(x, CHUNK_WIDTH, FID_LEFT, FID_RIGHT)
+    VISIBILITY_GRAPH_NEIGHBOR_CHECK(y, SUBCHUNK_HEIGHT, FID_BOTTOM, FID_TOP)
+    VISIBILITY_GRAPH_NEIGHBOR_CHECK(z, CHUNK_DEPTH, FID_BACK, FID_FRONT)
 }
 
-void process_visibility_dfs_output(SubChunk* sc, uint8_t connected_faces) {
-    for (uint8_t faceID = FID_START; faceID <= FID_END; ++faceID)
+static void process_visibility_dfs_output(SubChunk* sc, uint8_t connected_faces) {
+    for (uint8_t faceID = FID_START; (uint8_t) faceID <= FID_END; ++faceID)
         if (connected_faces & FACE_BITMASK(faceID))
             sc->visibility_graph[faceID] |= connected_faces;
 }
@@ -140,17 +139,17 @@ void subchunk_build_visibility_graph(SubChunk* sc, GraphMarker* block_marker) {
     for (uint8_t i = 0; i < CHUNK_WIDTH; ++i) {
         for (uint8_t j = 0; j < CHUNK_DEPTH; ++j) {
             org_pos.x = i; org_pos.y = j; org_pos.z = 0;
-            VISIBILITY_GRAPH_BUILDING_ROUTINE;
+            VISIBILITY_GRAPH_BUILDING_ROUTINE
             org_pos.z = CHUNK_DEPTH - 1;
-            VISIBILITY_GRAPH_BUILDING_ROUTINE;
+            VISIBILITY_GRAPH_BUILDING_ROUTINE
             org_pos.x = i; org_pos.y = 0; org_pos.z = j;
-            VISIBILITY_GRAPH_BUILDING_ROUTINE;
+            VISIBILITY_GRAPH_BUILDING_ROUTINE
             org_pos.y = SUBCHUNK_HEIGHT - 1;
-            VISIBILITY_GRAPH_BUILDING_ROUTINE;
+            VISIBILITY_GRAPH_BUILDING_ROUTINE
             org_pos.x = 0; org_pos.y = i; org_pos.z = j;
-            VISIBILITY_GRAPH_BUILDING_ROUTINE;
+            VISIBILITY_GRAPH_BUILDING_ROUTINE
             org_pos.x = CHUNK_WIDTH - 1;
-            VISIBILITY_GRAPH_BUILDING_ROUTINE;
+            VISIBILITY_GRAPH_BUILDING_ROUTINE
         }
     }
 

@@ -63,16 +63,16 @@ void camera_update(Camera* camera) {
 
 // ------------ Frustum part ----------------
 void frustum_update_vectors(ViewFrustum* frustum, float yaw, float pitch) {
-    frustum->front = VEC3(cos(RAD(yaw)) * cos(RAD(pitch)),
-                          sin(RAD(pitch)),
-                          sin(RAD(yaw)) * cos(RAD(pitch)));
+    frustum->front = VEC3(cosf(RAD(yaw)) * cosf(RAD(pitch)),
+                          sinf(RAD(pitch)),
+                          sinf(RAD(yaw)) * cosf(RAD(pitch)));
     frustum->front = VEC3_NORM(frustum->front);
     frustum->right = VEC3_NORM(VEC3_CROSS(frustum->front, frustum->world_up));
     frustum->up = VEC3_NORM(VEC3_CROSS(frustum->right, frustum->front));
 }
 
 void frustum_update_planes(ViewFrustum* frustum, vec3 position) {
-    float H_far = frustum->far_Z * tan(frustum->FOV / 2.0f);
+    float H_far = frustum->far_Z * tanf(frustum->FOV / 2.0f);
     float W_far = H_far * frustum->aspect_ratio;
     vec3 front_mult_far = VEC3_SCALE(frustum->far_Z, frustum->front);
     // Frustum in world space

@@ -1,35 +1,50 @@
 #include "chunk_renderer.h"
 
 // ----------------------------------------------------------------------------
-void chunk_print_grid(ChunkRenderer* renderer);
+/* Must be called when the renderer has been set up.
+ * It initializes the chunk_grid by loading the chunks to render*/
+static void chunk_renderer_init_grid(ChunkRenderer* renderer, BlockList* block_list);
 
-void shift_grid_left(ChunkRenderer* renderer);
+/* Should be called when there is a need to load a brand-new chunk grid.
+ * It basically saves the current chunk grid on disk.
+ * An example of a use case would be when a player teleports somewhere
+ * or at the end of the game to free the chunks */
+static void chunk_renderer_unload_grid(ChunkRenderer* renderer);
 
-void shift_grid_right(ChunkRenderer* renderer);
+/* Calls 'subchunk_render_dfs' from the faces specified in
+ * SC->visibility_graph[FID_ENTRANCES] to render the visible blocks */
+static void subchunk_render(ChunkRenderer* renderer, BlockRenderer* block_renderer,
+                     Chunk* C, SubChunk* SC);
 
-void shift_grid_up(ChunkRenderer* renderer);
+static void chunk_print_grid(ChunkRenderer* renderer);
 
-void shift_grid_down(ChunkRenderer* renderer);
+static void shift_grid_left(ChunkRenderer* renderer);
+
+static void shift_grid_right(ChunkRenderer* renderer);
+
+static void shift_grid_up(ChunkRenderer* renderer);
+
+static void shift_grid_down(ChunkRenderer* renderer);
 
 // Called when the player moves towards the positive X axis by one chunk
-void chunk_renderer_move_right(ChunkRenderer* renderer, BlockList* block_list);
+static void chunk_renderer_move_right(ChunkRenderer* renderer, BlockList* block_list);
 
 // Called when the player moves towards the negative X axis by one chunk
-void chunk_renderer_move_left(ChunkRenderer* renderer, BlockList* block_list);
+static void chunk_renderer_move_left(ChunkRenderer* renderer, BlockList* block_list);
 
 // Called when the player moves towards the negative Z axis by one chunk
-void chunk_renderer_move_front(ChunkRenderer* renderer, BlockList* block_list);
+static void chunk_renderer_move_front(ChunkRenderer* renderer, BlockList* block_list);
 
 // Called when the player moves towards the positive Z axis by one chunk
-void chunk_renderer_move_back(ChunkRenderer* renderer, BlockList* block_list);
+static void chunk_renderer_move_back(ChunkRenderer* renderer, BlockList* block_list);
 
 /* Determines if the angle between the 'directional_vector' and the
  * face normal of 'face' is less than 90 degrees */
-bool is_front(vec3* directional_vector, FaceID face);
+static bool is_front(vec3* directional_vector, FaceID face);
 
 /* Performs a flood-fill algorithm starting at 'org_pos' which renders the
  * visible blocks. */
-void subchunk_render_dfs(BlockRenderer* block_renderer, SubChunk* SC,
+static void subchunk_render_dfs(BlockRenderer* block_renderer, SubChunk* SC,
                          GraphMarker* block_marker, SubChunkCoords org_pos);
 // ----------------------------------------------------------------------------
 
@@ -53,7 +68,7 @@ const struct cubGridPosition FACE_NORMALS_INT[] = {
     { .x = 1, .y = 0, .z = 0 }     // RIGHT
 };
 
-void chunk_print_grid(ChunkRenderer* renderer) {
+static void chunk_print_grid(ChunkRenderer* renderer) {
     printf("------------------ Chunk GRID ----------------------\n");
     for (uint8_t i = 0; i < renderer->grid_side; ++i) {
         for (uint8_t j = 0; j < renderer->grid_side; ++j) {
@@ -65,17 +80,17 @@ void chunk_print_grid(ChunkRenderer* renderer) {
     printf("----------------------------------------------------\n");
 }
 
-void shift_grid_up(ChunkRenderer* renderer) {
+static void shift_grid_up(ChunkRenderer* renderer) {
     for (size_t i = renderer->grid_side; i < renderer->nb_chunks; ++i)
         renderer->chunk_grid[i - renderer->grid_side] = renderer->chunk_grid[i];
 }
 
-void shift_grid_down(ChunkRenderer* renderer) {
+static void shift_grid_down(ChunkRenderer* renderer) {
     for (size_t i = renderer->nb_chunks - 1; i >= renderer->grid_side; --i)
         renderer->chunk_grid[i] = renderer->chunk_grid[i - renderer->grid_side];
 }
 
-void shift_grid_left(ChunkRenderer* renderer) {
+static void shift_grid_left(ChunkRenderer* renderer) {
     for (size_t z = 0; z < renderer->grid_side; ++z) {
         for (size_t x = 0; x < (size_t)(renderer->grid_side - 1); ++x) {
             size_t index = z * renderer->grid_side + x;
@@ -84,7 +99,7 @@ void shift_grid_left(ChunkRenderer* renderer) {
     }
 }
 
-void shift_grid_right(ChunkRenderer* renderer) {
+static void shift_grid_right(ChunkRenderer* renderer) {
     for (size_t z = 0; z < renderer->grid_side; ++z) {
         for (size_t x = renderer->grid_side - 1; x > 0; --x) {
             size_t index = z * renderer->grid_side + x;
@@ -93,9 +108,9 @@ void shift_grid_right(ChunkRenderer* renderer) {
     }
 }
 
-void chunk_renderer_init_grid(ChunkRenderer* renderer, BlockList* block_list) {
-    for (size_t z = 0; z < renderer->grid_side; ++z) {
-        for (size_t x = 0; x < renderer->grid_side; ++x) {
+static void chunk_renderer_init_grid(ChunkRenderer* renderer, BlockList* block_list) {
+    for (int32_t z = 0; z < renderer->grid_side; ++z) {
+        for (int32_t x = 0; x < renderer->grid_side; ++x) {
             size_t index = z * renderer->grid_side + x;
             renderer->chunk_grid[index].chunkX = renderer->last_chunkX + x -
                                                  renderer->render_distance + 1;
@@ -108,9 +123,9 @@ void chunk_renderer_init_grid(ChunkRenderer* renderer, BlockList* block_list) {
     chunk_print_grid(renderer);
 }
 
-void chunk_renderer_unload_grid(ChunkRenderer* renderer) {
-    for (size_t z = 0; z < renderer->grid_side; ++z)
-        for (size_t x = 0; x < renderer->grid_side; ++x)
+static void chunk_renderer_unload_grid(ChunkRenderer* renderer) {
+    for (int32_t z = 0; z < renderer->grid_side; ++z)
+        for (int32_t x = 0; x < renderer->grid_side; ++x)
             chunk_unload(renderer->chunk_grid + z * renderer->grid_side + x);
 }
 
@@ -130,11 +145,11 @@ void chunk_renderer_setup(ChunkRenderer* renderer, BlockList* block_list,
 }
 
 
-void chunk_renderer_move_right(ChunkRenderer* renderer, BlockList* block_list) {
-    for (size_t i = 0; i < renderer->grid_side; ++i)
+static void chunk_renderer_move_right(ChunkRenderer* renderer, BlockList* block_list) {
+    for (int32_t i = 0; i < renderer->grid_side; ++i)
         chunk_unload(renderer->chunk_grid + i * renderer->grid_side);
     shift_grid_left(renderer);
-    for (size_t i = 0; i < renderer->grid_side; ++i) {
+    for (int32_t i = 0; i < renderer->grid_side; ++i) {
         size_t index = renderer->grid_side * (i + 1) - 1;
         renderer->chunk_grid[index].chunkX = renderer->last_chunkX +
                                              renderer->render_distance - 1;
@@ -145,11 +160,11 @@ void chunk_renderer_move_right(ChunkRenderer* renderer, BlockList* block_list) {
     }
 }
 
-void chunk_renderer_move_left(ChunkRenderer* renderer, BlockList* block_list) {
-    for (size_t i = 0; i < renderer->grid_side; ++i)
+static void chunk_renderer_move_left(ChunkRenderer* renderer, BlockList* block_list) {
+    for (int32_t i = 0; i < renderer->grid_side; ++i)
         chunk_unload(renderer->chunk_grid + renderer->grid_side * (i + 1) - 1);
     shift_grid_right(renderer);
-    for (size_t i = 0; i < renderer->grid_side; ++i) {
+    for (int32_t i = 0; i < renderer->grid_side; ++i) {
         size_t index = renderer->grid_side * i;
         renderer->chunk_grid[index].chunkX = renderer->last_chunkX -
                                              renderer->render_distance + 1;
@@ -160,11 +175,11 @@ void chunk_renderer_move_left(ChunkRenderer* renderer, BlockList* block_list) {
     }
 }
 
-void chunk_renderer_move_back(ChunkRenderer* renderer, BlockList* block_list) {
-    for (size_t i = 0; i < renderer->grid_side; ++i)
+static void chunk_renderer_move_back(ChunkRenderer* renderer, BlockList* block_list) {
+    for (int32_t i = 0; i < renderer->grid_side; ++i)
         chunk_unload(renderer->chunk_grid + renderer->nb_chunks - i - 1);
     shift_grid_down(renderer);
-    for (size_t i = 0; i < renderer->grid_side; ++i) {
+    for (int32_t i = 0; i < renderer->grid_side; ++i) {
         renderer->chunk_grid[i].chunkX = renderer->last_chunkX + i -
                                          renderer->render_distance + 1;
         renderer->chunk_grid[i].chunkZ = renderer->last_chunkZ -
@@ -174,11 +189,11 @@ void chunk_renderer_move_back(ChunkRenderer* renderer, BlockList* block_list) {
     }
 }
 
-void chunk_renderer_move_front(ChunkRenderer* renderer, BlockList* block_list) {
-    for (size_t i = 0; i < renderer->grid_side; ++i)
+static void chunk_renderer_move_front(ChunkRenderer* renderer, BlockList* block_list) {
+    for (int32_t i = 0; i < renderer->grid_side; ++i)
         chunk_unload(renderer->chunk_grid + i);
     shift_grid_up(renderer);
-    for (size_t i = 0; i < renderer->grid_side; ++i) {
+    for (int32_t i = 0; i < renderer->grid_side; ++i) {
         size_t index = renderer->nb_chunks - renderer->grid_side + i;
         renderer->chunk_grid[index].chunkX = renderer->last_chunkX + i -
                                              renderer->render_distance + 1;
@@ -208,7 +223,7 @@ void chunk_renderer_update(ChunkRenderer* renderer, BlockList* block_list,
         chunk_print_grid(renderer);
 }
 
-bool is_front(vec3* directional_vector, FaceID face) {
+static bool is_front(vec3* directional_vector, FaceID face) {
     return VEC3_DOT(directional_vector, (vec3*)FACE_NORMALS + face) >= 0.0f;
 }
 
@@ -228,15 +243,15 @@ void chunk_renderer_render(ChunkRenderer* renderer,
     SubChunk* current_SC = renderer->chunk_grid[grid_center_index].subchunks
                          + SC_y_pos;
     current_SC->visibility_graph[FID_ENTRANCES] = 0xFF;
-    current_SC->BFS_data.position.x = renderer->render_distance - 1;
+    current_SC->BFS_data.position.x = (uint8_t) (renderer->render_distance - 1);
     current_SC->BFS_data.position.y = SC_y_pos;
-    current_SC->BFS_data.position.z = renderer->render_distance - 1;
+    current_SC->BFS_data.position.z = (uint8_t) (renderer->render_distance - 1);
     queue_enqueue(R, current_SC);
 
     struct cubGridPosition current_position = {
-        .x = renderer->render_distance - 1,
+        .x = (uint8_t) (renderer->render_distance - 1),
         .y = SC_y_pos,
-        .z = renderer->render_distance - 1
+        .z = (uint8_t) (renderer->render_distance - 1)
     };
     struct cubGridPosition next_position;
     Chunk* next_chunk;
@@ -245,13 +260,13 @@ void chunk_renderer_render(ChunkRenderer* renderer,
 
     for (FaceID face = FID_START; face <= FID_END; ++face) {
         if (current_SC->visibility_graph[face]) {
-            next_position.x = current_position.x + FACE_NORMALS_INT[face].x;
+            next_position.x = (int16_t) (current_position.x + FACE_NORMALS_INT[face].x);
             if (next_position.x < 0 || next_position.x >= renderer->grid_side)
                 continue; // Unreachable
-            next_position.y = current_position.y + FACE_NORMALS_INT[face].y;
+            next_position.y = (int16_t) (current_position.y + FACE_NORMALS_INT[face].y);
             if (next_position.y < 0 || next_position.y >= MAX_SUBCHUNKS)
                 continue; // Unreachable
-            next_position.z = current_position.z + FACE_NORMALS_INT[face].z;
+            next_position.z = (int16_t) (current_position.z + FACE_NORMALS_INT[face].z);
             if (next_position.z < 0 || next_position.z >= renderer->grid_side)
                 continue; // Unreachable
             next_chunk = renderer->chunk_grid +
@@ -281,15 +296,15 @@ void chunk_renderer_render(ChunkRenderer* renderer,
             if (current_SC->visibility_graph[current_SC->BFS_data.src_face]
                 & FACE_BITMASK(face)
                 && is_front(&current_SC->BFS_data.directional_vector, face)) {
-                next_position.x = current_position.x + FACE_NORMALS_INT[face].x;
+                next_position.x = (int16_t) (current_position.x + FACE_NORMALS_INT[face].x);
                 if (next_position.x < 0 ||
                     next_position.x >= renderer->grid_side)
                     continue; // Unreachable
-                next_position.y = current_position.y + FACE_NORMALS_INT[face].y;
+                next_position.y = (int16_t) (current_position.y + FACE_NORMALS_INT[face].y);
                 if (next_position.y < 0 ||
                     next_position.y >= MAX_SUBCHUNKS)
                     continue; // Unreachable
-                next_position.z = current_position.z + FACE_NORMALS_INT[face].z;
+                next_position.z = (int16_t) (current_position.z + FACE_NORMALS_INT[face].z);
                 if (next_position.z < 0 ||
                     next_position.z >= renderer->grid_side)
                     continue; // Unreachable
@@ -387,14 +402,14 @@ void chunk_renderer_render(ChunkRenderer* renderer,
         org_pos.COORDINATE -= 1;\
     }
 
-void subchunk_render_dfs(BlockRenderer* block_renderer, SubChunk* SC,
+static void subchunk_render_dfs(BlockRenderer* block_renderer, SubChunk* SC,
                          GraphMarker* block_marker, SubChunkCoords org_pos) {
     utils_graph_marker_mark(block_marker, CUB_SUBCHUNK_BLOCK_ID(SC, org_pos));
     uint16_t neighbor_id;
     BP_elt* neighbor;
-    FLOOD_FILL_NEIGHBOR_CHECK(x, CHUNK_WIDTH, FID_LEFT, FID_RIGHT);
-    FLOOD_FILL_NEIGHBOR_CHECK(y, SUBCHUNK_HEIGHT, FID_BOTTOM, FID_TOP);
-    FLOOD_FILL_NEIGHBOR_CHECK(z, CHUNK_DEPTH, FID_BACK, FID_FRONT);
+    FLOOD_FILL_NEIGHBOR_CHECK(x, CHUNK_WIDTH, FID_LEFT, FID_RIGHT)
+    FLOOD_FILL_NEIGHBOR_CHECK(y, SUBCHUNK_HEIGHT, FID_BOTTOM, FID_TOP)
+    FLOOD_FILL_NEIGHBOR_CHECK(z, CHUNK_DEPTH, FID_BACK, FID_FRONT)
 }
 
 #define FLOOD_FILL_FACE_ROUTINE(FACE, COORD_I, COORD_J,\
@@ -425,7 +440,7 @@ void subchunk_render_dfs(BlockRenderer* block_renderer, SubChunk* SC,
         }\
     }
 
-void subchunk_render(ChunkRenderer* renderer, BlockRenderer* block_renderer,
+static void subchunk_render(ChunkRenderer* renderer, BlockRenderer* block_renderer,
                      Chunk* C, SubChunk* SC) {
     utils_graph_marker_init(renderer->block_marker);
     SubChunkCoords org_pos;
@@ -437,12 +452,12 @@ void subchunk_render(ChunkRenderer* renderer, BlockRenderer* block_renderer,
     glUseProgram(block_renderer->custom.shader);
     glUniform3f(block_renderer->custom.uniforms.subchunk_pos,
                 (GLfloat)C->chunkX, (GLfloat)SC->y_pos, (GLfloat)C->chunkZ);
-    FLOOD_FILL_FACE_ROUTINE(FID_TOP, x, z, y, SUBCHUNK_HEIGHT - 1);
-    FLOOD_FILL_FACE_ROUTINE(FID_BOTTOM, x, z, y, 0);
-    FLOOD_FILL_FACE_ROUTINE(FID_FRONT, x, y, z, CHUNK_DEPTH - 1);
-    FLOOD_FILL_FACE_ROUTINE(FID_BACK, x, y, z, 0);
-    FLOOD_FILL_FACE_ROUTINE(FID_LEFT, z, y, x, 0);
-    FLOOD_FILL_FACE_ROUTINE(FID_RIGHT, z, y, x, CHUNK_WIDTH - 1);
+    FLOOD_FILL_FACE_ROUTINE(FID_TOP, x, z, y, SUBCHUNK_HEIGHT - 1)
+    FLOOD_FILL_FACE_ROUTINE(FID_BOTTOM, x, z, y, 0)
+    FLOOD_FILL_FACE_ROUTINE(FID_FRONT, x, y, z, CHUNK_DEPTH - 1)
+    FLOOD_FILL_FACE_ROUTINE(FID_BACK, x, y, z, 0)
+    FLOOD_FILL_FACE_ROUTINE(FID_LEFT, z, y, x, 0)
+    FLOOD_FILL_FACE_ROUTINE(FID_RIGHT, z, y, x, CHUNK_WIDTH - 1)
     block_cubic_flush_cache(&block_renderer->cubic);
     glUseProgram(block_renderer->custom.shader);
 }

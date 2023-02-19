@@ -1,7 +1,7 @@
 #ifndef CUB_GAME_GAME_H
 #define CUB_GAME_GAME_H
 
-#include "block.h"
+#include "block_renderer.h"
 #include "chunk.h"
 #include "chunk_loader.h"
 #include "chunk_renderer.h"

@@ -64,7 +64,7 @@ float vec3_magnitude(vec3* v) {
     float sum = v->coords[0] * v->coords[0] +
                 v->coords[1] * v->coords[1] +
                 v->coords[2] * v->coords[2];
-    return sqrt(sum);
+    return sqrtf(sum);
 }
 
 vec3 vec3_normalize(vec3 v) {
@@ -72,36 +72,36 @@ vec3 vec3_normalize(vec3 v) {
 }
 
 quaternion quaternion_normalize(quaternion q) {
-    float sum = q.vect.coords[0] * q.vect.coords[0] +
-                q.vect.coords[1] * q.vect.coords[1] +
-                q.vect.coords[2] * q.vect.coords[2] +
+    float sum = q.vector.coords[0] * q.vector.coords[0] +
+                q.vector.coords[1] * q.vector.coords[1] +
+                q.vector.coords[2] * q.vector.coords[2] +
                 q.w * q.w;
-    sum = sqrt(sum);
-    q.vect = VEC3_SCALE(1.0f / sum, q.vect);
+    sum = sqrtf(sum);
+    q.vector = VEC3_SCALE(1.0f / sum, q.vector);
     q.w /= sum;
     return q;
 }
 
 quaternion quaternion_conjugate(quaternion q) {
-    q.vect = vec3_scalar(-1.0f, q.vect);
+    q.vector = vec3_scalar(-1.0f, q.vector);
     return q;
 }
 
 quaternion quaternion_product(quaternion q1,
                                             quaternion q2) {
     quaternion result;
-    result.w = q1.w * q2.w - VEC3_DOT(&q1.vect, &q2.vect);
-    result.vect = VEC3_ADD(VEC3_SCALE(q1.w, q2.vect),
-                                VEC3_SCALE(q2.w, q1.vect) );
-    result.vect = VEC3_ADD(VEC3_CROSS(q1.vect, q2.vect), result.vect);
+    result.w = q1.w * q2.w - VEC3_DOT(&q1.vector, &q2.vector);
+    result.vector = VEC3_ADD(VEC3_SCALE(q1.w, q2.vector),
+                             VEC3_SCALE(q2.w, q1.vector) );
+    result.vector = VEC3_ADD(VEC3_CROSS(q1.vector, q2.vector), result.vector);
     return result;
 }
 
 vec3 vec3_rotate(vec3 to_rotate, vec3 axis, float angle) {
-    quaternion init = { .vect = to_rotate, .w = 0 };
+    quaternion init = { .vector = to_rotate, .w = 0 };
     quaternion axis_q;
-    axis_q.vect = vec3_scalar(sin(angle / 2.0f), axis);
-    axis_q.w = cos(angle / 2.0f);
+    axis_q.vector = vec3_scalar(sinf(angle / 2.0f), axis);
+    axis_q.w = cosf(angle / 2.0f);
     return QUAT_PROD(QUAT_PROD(axis_q, init),
-                         QUAT_CONJ(axis_q)).vect;
+                         QUAT_CONJ(axis_q)).vector;
 }

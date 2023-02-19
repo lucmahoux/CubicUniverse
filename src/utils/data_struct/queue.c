@@ -1,6 +1,6 @@
 #include "data_struct/queue.h"
 
-Queue* queue_new() {
+Queue* queue_new(void) {
     Queue* Q = malloc(sizeof(Queue));
     if (!Q) errx(EXIT_FAILURE, "queue_new: malloc failed!");
     Q->available_elts = list_new(sizeof(queueElement*), REALLOC_INCREMENT, 0);

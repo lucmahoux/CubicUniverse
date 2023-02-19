@@ -20,8 +20,8 @@
 // Shader-related macros
 #define SHADER_CUSTOM_TEXTURE_DATA_SIZE 5
 #define SHADER_CUSTOM_PACKED_DATA_SIZE 1
-#define SHADER_CUSTOM_TOTAL_UINTS SHADER_CUSTOM_TEXTURE_DATA_SIZE\
-                                  + SHADER_CUSTOM_PACKED_DATA_SIZE
+#define SHADER_CUSTOM_TOTAL_UINTS (SHADER_CUSTOM_TEXTURE_DATA_SIZE\
+                                  + SHADER_CUSTOM_PACKED_DATA_SIZE)
 #define SHADER_CUBIC_PACKED_DATA_SIZE 2
 #define SHADER_CUBIC_TOTAL_UINTS SHADER_CUBIC_PACKED_DATA_SIZE
 #define CUBIC_VBO_BUFFER_SIZE 4096
@@ -91,7 +91,7 @@ typedef struct cubBlockFlags {
     uint8_t is_cubic        :   1;
     // Does it have a blockstate modifying its textures ("bs texturer")?
     uint8_t has_bs_tex      :   1;
-    // Only if has_bs_tex is TRUE, Is this BS a block CREATOR (!= MODIFICATOR)?
+    // Only if 'has_bs_tex' is TRUE, Is this BS a block CREATOR (!= MODIFICATOR)?
     uint8_t is_bs_creator   :   1;
     // Does it have BSs? (including the bs_name_mod which must be the first)
     uint8_t has_states      :   1;

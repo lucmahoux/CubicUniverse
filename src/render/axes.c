@@ -44,12 +44,12 @@ void axes_render(AxesRenderer* renderer, Camera* camera)
     glUseProgram(renderer->shader_program);
     // Remove the translation part of the view matrix
     mat4 VP_matrix = camera->view_matrix;
-    VP_matrix.coeffs[12] = 0.0f;
-    VP_matrix.coeffs[13] = 0.0f;
-    VP_matrix.coeffs[14] = 0.0f;
+    VP_matrix.coefficients[12] = 0.0f;
+    VP_matrix.coefficients[13] = 0.0f;
+    VP_matrix.coefficients[14] = 0.0f;
     // Update the VP_matrix uniform -> VP = projection * view
     VP_matrix = mat4_product_simd(camera->projection_matrix, VP_matrix);
-    glUniformMatrix4fv(renderer->VP_matrix_loc, 1, GL_FALSE, VP_matrix.coeffs);
+    glUniformMatrix4fv(renderer->VP_matrix_loc, 1, GL_FALSE, VP_matrix.coefficients);
 
     // Render axes
     glBindVertexArray(renderer->RBO.VAO);

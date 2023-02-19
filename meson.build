@@ -26,5 +26,6 @@ executable('CubicUniverse', source,
     include_directories: inc,
     dependencies: [
       glfw3_dep, glew_dep, opengl_dep, math_dep,
-      utils_dep, render_dep, block_dep, chunk_dep, game_dep
+      utils_dep, render_dep, block_dep, chunk_dep, game_dep,
+      generation_dep
     ])

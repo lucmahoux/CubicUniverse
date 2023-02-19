@@ -1,17 +1,17 @@
-#include "block.h"
+#include "block_renderer.h"
 
 // ----------------------------------------------------------------------------
 
 /* Loads the texture formed by the concatenation of (prefix, ext, suffix)
  * and add it to the texture atlas - the value *texture_quad is set
  * to the texture insertion position in the atlas. */
-void block_load_texture(TextureAtlas* atlas, char* buffer,
+static void block_load_texture(TextureAtlas* atlas, char* buffer,
                         const char* prefix, const char* ext,
                         const char* suffix, TexAtlasQuad* texture_quad);
 
 /* Does exactly the same thing as cub_block_load_texture() but if the
  * texture file does NOT EXIST, then *tex_quad = *tex_quad_default. */
-void block_try_load_texture(TextureAtlas* atlas, char* buffer,
+static void block_try_load_texture(TextureAtlas* atlas, char* buffer,
                             const char* prefix, const char* ext,
                             const char* suffix,
                             TexAtlasQuad* tex_quad,
@@ -19,7 +19,7 @@ void block_try_load_texture(TextureAtlas* atlas, char* buffer,
 
 /* Goes through all the possible render_type and load the textures
  * accordingly via calls to cub_block_load_texture() */
-void block_tex_load_from_render_type(TextureAtlas* atlas, char* buffer,
+static void block_tex_load_from_render_type(TextureAtlas* atlas, char* buffer,
                                      const char* prefix, const char* suffix,
                                      RenderType render_type,
                                      TexAtlasQuad* tex_quad);
@@ -27,46 +27,46 @@ void block_tex_load_from_render_type(TextureAtlas* atlas, char* buffer,
 /* Loads the textures of a block which has a blockstate texturer "Modificator".
  * It means that the BS modifies the appearance of the block without changing
  * its nature (e.g. furnace off/on) */
-void block_load_texture_BS_modificator(TextureAtlas* atlas, BlockData* block);
+static void block_load_texture_BS_modificator(TextureAtlas* atlas, BlockData* block);
 
 /* Loads the textures of a block which has a blockstate texturer "Creator".
  * It means that the BS modifies the NATURE of a block
  * (e.g. acacia_planks VS dark_oak_planks) */
-void block_load_texture_BS_creator(TextureAtlas* atlas, BlockData* block);
+static void block_load_texture_BS_creator(TextureAtlas* atlas, BlockData* block);
 
-void block_get_uniforms_location_custom(CustomBlockRenderer* custom);
+static void block_get_uniforms_location_custom(CustomBlockRenderer* custom);
 
-void block_get_uniforms_location_cubic(CubicBlockRenderer* cubic);
+static void block_get_uniforms_location_cubic(CubicBlockRenderer* cubic);
 
-void block_cubic_setup_buffer_object(CubicBlockRenderer* cubic);
+static void block_cubic_setup_buffer_object(CubicBlockRenderer* cubic);
 
-void block_custom_shader_setup_rotations_matrices(CustomBlockRenderer* custom);
+static void block_custom_shader_setup_rotations_matrices(CustomBlockRenderer* custom);
 
-mat4 get_translated_rotation_matrix(vec3 T1, float angle, vec3 axis, vec3 T2);
+static mat4 get_translated_rotation_matrix(vec3 T1, float angle, vec3 axis, vec3 T2);
 
 /* Returns the texture quad that should be applied to the face identified by
  * 'face_ID' of the blockstate 'bs' (rotations handled) - CUBIC BLOCKS ONLY */
-TexAtlasQuad block_get_texture_cubic(BlockState* BS, FaceID face_ID);
+static TexAtlasQuad block_get_texture_cubic(BlockState* BS, FaceID face_ID);
 
 /* Used to retrieve the packed shader data (with bit fields) required to draw
  * CUBIC block faces */
-void block_shader_cubic_set_packed_data(BlockState* BS, FaceID face_ID,
+static void block_shader_cubic_set_packed_data(BlockState* BS, FaceID face_ID,
                                         SubChunkCoords sc_coords,
                                         GLuint* packed_data);
 
 /* Called when the block to render is NOT CUBIC.
  * Textures quad data is assigned by following the order of textures:
  * TOP(0) -> BOTTOM(1) -> FRONT(2) -> BACK(3) -> LEFT(4) -> RIGHT(5) */
-void block_shader_custom_set_texture_data(BlockState* BS, GLuint* tex_data);
+static void block_shader_custom_set_texture_data(BlockState* BS, GLuint* tex_data);
 
 /* Used to retrieve the packed shader data (with bit fields) required to draw
  * the CUSTOM block */
-void block_shader_custom_set_packed_data(BlockState* BS,
+static void block_shader_custom_set_packed_data(BlockState* BS,
                                          SubChunkCoords sc_coords,
                                          GLuint* packed_data);
 // ----------------------------------------------------------------------------
 
-void block_get_uniforms_location_custom(CustomBlockRenderer* custom) {
+static void block_get_uniforms_location_custom(CustomBlockRenderer* custom) {
     const char fname[] = "block_get_uniforms_location_custom";
     struct cubCustomBlockShaderUniforms* uniforms = &custom->uniforms;
     try_get_uniform_location(custom->shader, &uniforms->texture_atlas,
@@ -87,7 +87,7 @@ void block_get_uniforms_location_custom(CustomBlockRenderer* custom) {
                              "secondary_rotations", fname);
 }
 
-void block_get_uniforms_location_cubic(CubicBlockRenderer* cubic) {
+static void block_get_uniforms_location_cubic(CubicBlockRenderer* cubic) {
     const char fname[] = "block_get_uniforms_location_cubic";
     struct cubCubicBlockShaderUniforms* uniforms = &cubic->uniforms;
     try_get_uniform_location(cubic->shader, &uniforms->texture_atlas,
@@ -102,7 +102,7 @@ void block_get_uniforms_location_cubic(CubicBlockRenderer* cubic) {
                              "subchunk_pos", fname);
 }
 
-void block_cubic_setup_buffer_object(CubicBlockRenderer* cubic) {
+static void block_cubic_setup_buffer_object(CubicBlockRenderer* cubic) {
     RenderBufferObject* buffer_obj = &cubic->RBO;
     setup_render_buffer_object(buffer_obj);
     glGenBuffers(1, &buffer_obj->VBO);
@@ -119,78 +119,78 @@ void block_cubic_setup_buffer_object(CubicBlockRenderer* cubic) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-mat4 get_translated_rotation_matrix(vec3 T1, float angle, vec3 axis, vec3 T2) {
+static mat4 get_translated_rotation_matrix(vec3 T1, float angle, vec3 axis, vec3 T2) {
     mat4 result = MAT4(1.0f);
-    result.coeffs[12] = T2.coords[0];
-    result.coeffs[13] = T2.coords[1];
-    result.coeffs[14] = T2.coords[2];
+    result.coefficients[12] = T2.coords[0];
+    result.coefficients[13] = T2.coords[1];
+    result.coefficients[14] = T2.coords[2];
     result = MAT4_ROT(result, angle, axis);
     result = MAT4_TRANS(result, T1);
     return result;
 }
 
-void block_custom_shader_setup_rotations_matrices(CustomBlockRenderer* custom) {
+static void block_custom_shader_setup_rotations_matrices(CustomBlockRenderer* custom) {
     glUseProgram(custom->shader);
     // Primary rotations
-    GLfloat primary_coeffs[16 * 3];
+    GLfloat primary_coefficients[16 * 3];
     vec3 T1 = VEC3(-0.5f, 0.0f, -0.5f);
     vec3 T2 = VEC3(0.5f, 0.0f, 0.5f);
     vec3 axis = VEC3(0.0f, 1.0f, 0.0f);
     // -> MID 90°
     mat4 primary_rotation =
         get_translated_rotation_matrix(T1, M_PI / 2.0f, axis, T2);
-    memcpy(primary_coeffs, primary_rotation.coeffs, 16 * sizeof(float));
+    memcpy(primary_coefficients, primary_rotation.coefficients, 16 * sizeof(float));
     // -> MID 180°
     primary_rotation = get_translated_rotation_matrix(T1, M_PI, axis, T2);
-    memcpy(primary_coeffs + 16, primary_rotation.coeffs, 16 * sizeof(float));
+    memcpy(primary_coefficients + 16, primary_rotation.coefficients, 16 * sizeof(float));
     // -> MID 270°
     primary_rotation =
         get_translated_rotation_matrix(T1, -M_PI / 2.0f, axis, T2);
-    memcpy(primary_coeffs + 32, primary_rotation.coeffs, 16 * sizeof(float));
+    memcpy(primary_coefficients + 32, primary_rotation.coefficients, 16 * sizeof(float));
 
     // Secondary rotations
-    GLfloat sec_coeffs[16 * 8];
+    GLfloat sec_coefficients[16 * 8];
     mat4 identity = MAT4(1.0f);
     axis = VEC3(0.0f, 0.0f, 1.0f);
     // -> Z LEFT 90°
     mat4 secondary_rotation = MAT4_ROT(identity, M_PI / 2.0f, axis);
-    memcpy(sec_coeffs, secondary_rotation.coeffs, 16 * sizeof(float));
+    memcpy(sec_coefficients, secondary_rotation.coefficients, 16 * sizeof(float));
     // -> Z LEFT 270°
     secondary_rotation = MAT4_ROT(identity, -M_PI / 2.0f, axis);
-    memcpy(sec_coeffs + 16, secondary_rotation.coeffs, 16 * sizeof(float));
+    memcpy(sec_coefficients + 16, secondary_rotation.coefficients, 16 * sizeof(float));
     // -> Z RIGHT 90°
     T1 = VEC3(-1.0f, 0.0f, 0.0f);
     T2 = VEC3(1.0f, 0.0f, 0.0f);
     secondary_rotation =
         get_translated_rotation_matrix(T1, -M_PI / 2.0f, axis, T2);
-    memcpy(sec_coeffs + 16 * 2, secondary_rotation.coeffs, 16 * sizeof(float));
+    memcpy(sec_coefficients + 16 * 2, secondary_rotation.coefficients, 16 * sizeof(float));
     // -> Z RIGHT 270°
     secondary_rotation =
         get_translated_rotation_matrix(T1, M_PI / 2.0f, axis, T2);
-    memcpy(sec_coeffs + 16 * 3, secondary_rotation.coeffs, 16 * sizeof(float));
+    memcpy(sec_coefficients + 16 * 3, secondary_rotation.coefficients, 16 * sizeof(float));
     // -> X BACK 90°
     axis = VEC3(1.0f, 0.0f, 0.0f);
     secondary_rotation = MAT4_ROT(identity, M_PI / 2.0f, axis);
-    memcpy(sec_coeffs + 16 * 4, secondary_rotation.coeffs, 16 * sizeof(float));
+    memcpy(sec_coefficients + 16 * 4, secondary_rotation.coefficients, 16 * sizeof(float));
     // -> X BACK 270°
     secondary_rotation = MAT4_ROT(identity, -M_PI / 2.0f,  axis);
-    memcpy(sec_coeffs + 16 * 5, secondary_rotation.coeffs, 16 * sizeof(float));
+    memcpy(sec_coefficients + 16 * 5, secondary_rotation.coefficients, 16 * sizeof(float));
     // -> X FRONT 90°
     T1 = VEC3(0.0f, 0.0f, -1.0f);
     T2 = VEC3(0.0f, 0.0f, 1.0f);
     secondary_rotation =
         get_translated_rotation_matrix(T1, -M_PI / 2.0f, axis, T2);
-    memcpy(sec_coeffs + 16 * 6, secondary_rotation.coeffs, 16 * sizeof(float));
+    memcpy(sec_coefficients + 16 * 6, secondary_rotation.coefficients, 16 * sizeof(float));
     // -> X FRONT 270°
     secondary_rotation =
         get_translated_rotation_matrix(T1, M_PI / 2.0f, axis, T2);
-    memcpy(sec_coeffs + 16 * 7, secondary_rotation.coeffs, 16 * sizeof(float));
+    memcpy(sec_coefficients + 16 * 7, secondary_rotation.coefficients, 16 * sizeof(float));
 
     // Uniforms update
     glUniformMatrix4fv(custom->uniforms.primary_rotations, 3, GL_FALSE,
-                       primary_coeffs);
+                       primary_coefficients);
     glUniformMatrix4fv(custom->uniforms.secondary_rotations, 8, GL_FALSE,
-                       sec_coeffs);
+                       sec_coefficients);
 }
 
 void block_setup_renderer_and_block_list(BlockRenderer* block_renderer,
@@ -222,7 +222,7 @@ void block_setup_renderer_and_block_list(BlockRenderer* block_renderer,
     printf("block_setup_renderer: Renderer initialised!\n");
 }
 
-TexAtlasQuad block_get_texture_cubic(BlockState* BS, FaceID face_ID) {
+static TexAtlasQuad block_get_texture_cubic(BlockState* BS, FaceID face_ID) {
     // TODO: Apply rotational blockstates (= change face_ID)
     uint8_t base_offset = (BS->block->flags.has_bs_tex
                       ? BS->states[BS_TEX_ID]
@@ -259,7 +259,7 @@ TexAtlasQuad block_get_texture_cubic(BlockState* BS, FaceID face_ID) {
     }
 }
 
-void block_shader_custom_set_texture_data(BlockState* BS, GLuint* tex_data) {
+static void block_shader_custom_set_texture_data(BlockState* BS, GLuint* tex_data) {
     uint8_t offset = (BS->block->flags.has_bs_tex
                       ? BS->states[BS_TEX_ID]
                       : 0) * BS->block->nb_tex_draw;
@@ -273,7 +273,7 @@ void block_shader_custom_set_texture_data(BlockState* BS, GLuint* tex_data) {
     }
 }
 
-void block_shader_custom_set_packed_data(cub_unused BlockState* BS,
+static void block_shader_custom_set_packed_data(cub_unused BlockState* BS,
                                          SubChunkCoords sc_coords,
                                          GLuint* packed_data) {
     // TODO: rotations & all
@@ -281,7 +281,7 @@ void block_shader_custom_set_packed_data(cub_unused BlockState* BS,
                    + (sc_coords.z << 20);
 }
 
-void block_shader_cubic_set_packed_data(BlockState* BS, FaceID face_ID,
+static void block_shader_cubic_set_packed_data(BlockState* BS, FaceID face_ID,
                                         SubChunkCoords sc_coords,
                                         GLuint* packed_data) {
     TexAtlasQuad tex_quad = block_get_texture_cubic(BS, face_ID);
@@ -354,14 +354,14 @@ void block_free_renderer(BlockRenderer* renderer) {
     glDeleteTextures(1, &renderer->texture_atlas.atlas_texture_id);
 }
 
-void block_load_texture(TextureAtlas* atlas, char* buffer,
+static void block_load_texture(TextureAtlas* atlas, char* buffer,
                         const char* prefix, const char* ext,
                         const char* suffix, TexAtlasQuad* texture_quad) {
     snprintf(buffer, 2 * MAX_BLOCK_STRLEN, "%s%s%s.png", prefix, ext, suffix);
     texture_atlas_add(atlas, buffer, texture_quad);
 }
 
-void block_try_load_texture(TextureAtlas* atlas,
+static void block_try_load_texture(TextureAtlas* atlas,
                             char* buffer, const char* prefix,
                             const char* ext, const char* suffix,
                             TexAtlasQuad* tex_quad,
@@ -373,7 +373,7 @@ void block_try_load_texture(TextureAtlas* atlas,
     } else texture_atlas_add(atlas, buffer, tex_quad);
 }
 
-void block_tex_load_from_render_type(TextureAtlas* atlas,
+static void block_tex_load_from_render_type(TextureAtlas* atlas,
                                      char* buffer, const char* prefix,
                                      const char* suffix,
                                      RenderType render_type,
@@ -393,10 +393,10 @@ void block_tex_load_from_render_type(TextureAtlas* atlas,
     if (render_type & RT_SIDE)
         block_load_texture(atlas, buffer, prefix, "_side", suffix, tex_quad++);
     if (render_type & RT_DEFAULT)
-        block_load_texture(atlas, buffer, prefix, "", suffix, tex_quad++);
+        block_load_texture(atlas, buffer, prefix, "", suffix, tex_quad);
 }
 
-void block_load_texture_BS_modificator(TextureAtlas* atlas, BlockData* block) {
+static void block_load_texture_BS_modificator(TextureAtlas* atlas, BlockData* block) {
     char buffer[MAX_BLOCK_STRLEN * 2];
     char suffix[MAX_BLOCK_STRLEN];
     if (!block->bs_name_parser)
@@ -429,12 +429,12 @@ void block_load_texture_BS_modificator(TextureAtlas* atlas, BlockData* block) {
                                    suffix, tex_quad++, tex_quad_default++);
         if (block->render_type & RT_DEFAULT)
             block_try_load_texture(atlas, buffer, block->name, "",
-                                   suffix, tex_quad++, tex_quad_default++);
+                                   suffix, tex_quad, tex_quad_default);
         ++bs_value;
     }
 }
 
-void block_load_texture_BS_creator(TextureAtlas* atlas, BlockData* block) {
+static void block_load_texture_BS_creator(TextureAtlas* atlas, BlockData* block) {
     char buffer[MAX_BLOCK_STRLEN * 2];
     char prefix[MAX_BLOCK_STRLEN];
     BlockStateKey bsk_used = CUB_BSK_TEX(block);
@@ -472,7 +472,7 @@ void block_load_texture_pack(BlockRenderer* block_renderer,
             else // BS texture modificator
                 block_load_texture_BS_modificator(atlas, current);
         } else {
-            // No blockstates which add additionnal textures
+            // No blockstates which add additional textures
             char buffer[MAX_BLOCK_STRLEN * 2];
             block_tex_load_from_render_type(atlas, buffer, current->name, "",
                                             current->render_type,

@@ -1,7 +1,7 @@
 #ifndef CUB_CHUNK_CHUNK_H
 #define CUB_CHUNK_CHUNK_H
 
-#include "block.h"
+#include "block_renderer.h"
 #include "block_utils.h"
 #include "chunk_utils.h"
 
@@ -9,7 +9,7 @@
 void chunk_set_block(GraphMarker* graph_marker, Chunk* chunk,
                      ChunkCoords coords, BlockState* BS);
 
-/* Fills a chunk if the provided blockstate */
+/* Fills a chunk with the provided blockstate */
 void chunk_fill(Chunk* chunk, BlockState* BS);
 
 #endif

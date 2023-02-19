@@ -7,7 +7,7 @@
 GLchar* load_texture(GLint* width, GLint* height, GLint* nb_channels,
                      const char* img_name);
 
-/* Returns TRUE if the given textureexists */
+/* Returns TRUE if the given texture exists */
 bool texture_exists(const char* tex_name);
 
 /* Try to get the store the location of the uniform called 'uniform_name'

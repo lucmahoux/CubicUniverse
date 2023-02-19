@@ -21,7 +21,7 @@ void setup_window(GLFWwindow** window, int width, int height,
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     // Using OpenGL core profile = modern OpenGL
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    // For MacOS
+    // For macOS
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     *window = glfwCreateWindow(width, height, window_name, NULL, NULL);

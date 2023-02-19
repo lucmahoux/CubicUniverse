@@ -5,7 +5,7 @@
 #include "chunk.h"
 #include "game.h"
 
-void create_block_list() {
+static void create_block_list(void) {
     GLfloat flower_VBO[] = {
         0.0f,   0.0f,   0.0f,   0.0f,   0.0f,   0.0f,   // Diag 1
         1.0f,   0.0f,   1.0f,   1.0f,   0.0f,   0.0f,

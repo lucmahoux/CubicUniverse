@@ -1,7 +1,7 @@
 #include "blockstates.h"
 
 char* BSCRE_wood_type(BlockStateValue value, char* buffer) {
-    size_t offset = 0;
+    size_t offset;
     switch (value) {
         case BSV_ACACIA:
             strcpy(buffer, "acacia"); offset = 6; break;
@@ -22,7 +22,7 @@ char* BSCRE_wood_type(BlockStateValue value, char* buffer) {
 }
 
 char* BSCRE_flower_type(BlockStateValue value, char* buffer) {
-    size_t offset = 0;
+    size_t offset;
     switch (value) {
         case BSV_POPPY:
             strcpy(buffer, "poppy"); offset = 5; break;
@@ -53,7 +53,7 @@ char* BSCRE_flower_type(BlockStateValue value, char* buffer) {
 }
 
 char* BSCRE_color_type(BlockStateValue value, char* buffer) {
-    size_t offset = 0;
+    size_t offset;
     switch (value) {
         case BSV_WHITE:
             strcpy(buffer, "white"); offset = 5; break;
@@ -94,7 +94,7 @@ char* BSCRE_color_type(BlockStateValue value, char* buffer) {
 }
 
 char* BSCRE_double_plant_type(BlockStateValue value, char* buffer) {
-    size_t offset = 0;
+    size_t offset;
     switch (value) {
         case BSV_SUNFLOWER:
             strcpy(buffer, "sunflower"); offset = 9; break;
@@ -127,7 +127,6 @@ BS_parser BS_is_creator(BlockStateKey bsk) {
         default:
             return NULL;
     }
-    return NULL;
 }
 
 bool BS_is_total_creator(BlockStateKey bsk) {
@@ -138,7 +137,6 @@ bool BS_is_total_creator(BlockStateKey bsk) {
         default:
             return false;
     }
-    return false;
 }
 
 char* BSMOD_LIT_suffix(BlockStateValue value, char* buffer) {
@@ -178,7 +176,6 @@ BS_parser BS_is_modificator(BlockStateKey bsk) {
         default:
             return NULL;
     }
-    return NULL;
 }
 
 uint16_t BS_TEX_get_nb_modes(BlockStateKey bsk) {
@@ -197,5 +194,4 @@ uint16_t BS_TEX_get_nb_modes(BlockStateKey bsk) {
         default:
             return 0;
     }
-    return 0;
 }

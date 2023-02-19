@@ -98,7 +98,7 @@ typedef struct cubChunkRenderer {
 #define CUB_CHUNK_BP_UID(sc, c_coords) \
     CUB_SUBCHUNK_BP_UID(sc, chunk_coords_to_subchunk(c_coords))
 #define CUB_SUBCHUNK_BLOCK_ID(sc, sc_coords) \
-    sc_coords.x + (sc_coords.z << 4) + (sc_coords.y << 8)
+    (sc_coords.x + (sc_coords.z << 4) + (sc_coords.y << 8))
 #define WORLD_COORDS_TO_BLOCK(w_coords) VEC3(floorf(w_coords.coords[0]),\
                                              floorf(w_coords.coords[1]),\
                                              floorf(w_coords.coords[2]))

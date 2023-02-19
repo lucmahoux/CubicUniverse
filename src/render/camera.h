@@ -31,7 +31,7 @@ typedef struct cubCamera {
     int firstMouse;
 } Camera;
 
-/* Should be called once, at the beginning of the game to setup the camera */
+/* Should be called once, at the beginning of the game to set up the camera */
 void camera_setup(Camera* camera, vec3 position, float fov,
                   float aspect_ratio, float near, float far);
 

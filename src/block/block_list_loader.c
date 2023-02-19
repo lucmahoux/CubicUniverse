@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Determine the number of .png textures to load for one draw call
  * This number is equivalent to the field cubBlockData.nb_tex_draw */
-uint8_t BLloader_count_draw_tex(RenderType type);
+static uint8_t BLloader_count_draw_tex(RenderType type);
 
 /* Allocates the correct amount of memory to block->textures based
  * on the number of textures to load per draw call and the number
@@ -10,26 +10,26 @@ uint8_t BLloader_count_draw_tex(RenderType type);
  * e.g: for a flower, nb_tex_draw = 1 (render_type == RT_DEFAULT)
  * but the BS BS_FLOWER_TYPE has 11 modes.
  * Therefore, the memory allocated must be nb_tex_draw * 11 * sizeof(GLuint) */
-void BLloader_allocate_tex_mem(BlockData* block);
+static void BLloader_allocate_tex_mem(BlockData* block);
 
 /* Initialize the cubRenderBufferObject render_obj with the VBO & EBO buffers */
-void BLloader_create_custom_block_RBO(GLfloat* VBO, GLuint* EBO,
+static void BLloader_create_custom_block_RBO(GLfloat* VBO, GLuint* EBO,
                                       GLsizei VBO_len, GLsizei EBO_len,
                                       RenderBufferObject* render_obj);
 
 /* Load the header of the block list file & set the 'nb_buffers' & 'RBO_chunks'
  * values accordingly.
  * The memory for the array block_list->blocks is also allocated */
-void BLloader_load_header(BlockList* block_list,
+static void BLloader_load_header(BlockList* block_list,
                           struct cubCustomBlockInfoRBO** RBO_chunks,
                           RenderBufferObject* RBO, FILE* fp);
 
 /* Load the body (= the list of blocks) of the block list file */
-void BLloader_load_blocks(BlockList* block_list, FILE* fp);
+static void BLloader_load_blocks(BlockList* block_list, FILE* fp);
 
 // ----------------------------------------------------------------------------
 
-uint8_t BLloader_count_draw_tex(RenderType type) {
+static uint8_t BLloader_count_draw_tex(RenderType type) {
     uint8_t count = 0;
     if (type & RT_DEFAULT) ++count;
     if (type & RT_TOP) ++count;
@@ -42,7 +42,7 @@ uint8_t BLloader_count_draw_tex(RenderType type) {
     return count;
 }
 
-void BLloader_allocate_tex_mem(BlockData* block) {
+static void BLloader_allocate_tex_mem(BlockData* block) {
     uint16_t nb_modes = block->flags.has_bs_tex
                 ? BS_TEX_get_nb_modes(CUB_BSK_TEX(block))
                 : 1;
@@ -53,7 +53,7 @@ void BLloader_allocate_tex_mem(BlockData* block) {
             " block ID: %i!\n", nb_modes * block->nb_tex_draw, block->id);
 }
 
-void BLloader_create_custom_block_RBO(GLfloat* VBO, GLuint* EBO,
+static void BLloader_create_custom_block_RBO(GLfloat* VBO, GLuint* EBO,
                                       GLsizei VBO_len, GLsizei EBO_len,
                                       RenderBufferObject* render_obj) {
     // Generate the buffers
@@ -92,7 +92,7 @@ void BLloader_create_custom_block_RBO(GLfloat* VBO, GLuint* EBO,
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void BLloader_load_header(BlockList* block_list,
+static void BLloader_load_header(BlockList* block_list,
                           struct cubCustomBlockInfoRBO** RBO_chunks,
                           RenderBufferObject* RBO, FILE* fp) {
     const char fname[] = "BLloader_load";
@@ -137,7 +137,7 @@ void BLloader_load_header(BlockList* block_list,
     free(EBO);
 }
 
-void BLloader_load_blocks(BlockList* block_list, FILE* fp) {
+static void BLloader_load_blocks(BlockList* block_list, FILE* fp) {
     const char fname[] = "BLloader_load_blocks";
     BSuid origin_BS_uid = 0;
     for (uint32_t i = 0; i < block_list->nb_blocks; ++i) {
@@ -191,15 +191,15 @@ void BLloader_load_blocks(BlockList* block_list, FILE* fp) {
 void BLloader_load(BlockList* block_list,
                    struct cubCustomBlockInfoRBO** RBO_chunks,
                    RenderBufferObject* custom_block_RBO) {
-    char* fpath = utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
-    printf("block_load_block_list: Trying to load %s...\n", fpath);
+    char* path = utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
+    printf("block_load_block_list: Trying to load %s...\n", path);
     FILE* fp;
-    if ( (fp = fopen(fpath, "rb")) == NULL ) {
-        errx(1, "block_load_block_list: File not found: %s!", fpath);
+    if ((fp = fopen(path, "rb")) == NULL ) {
+        errx(1, "block_load_block_list: File not found: %s!", path);
     } else {
         BLloader_load_header(block_list, RBO_chunks, custom_block_RBO, fp);
         BLloader_load_blocks(block_list, fp);
-        free(fpath);
+        free(path);
         fclose(fp);
         printf("block_load_block_list: Block list loaded successfully!\n");
     }
@@ -217,18 +217,18 @@ void BLloader_free_block_list(BlockList* block_list) {
     printf("BLloader_free_block_list: Block list freed!\n");
 }
 
-void BLloader_create_block_list_file() {
-    char* fpath = utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
-    FILE* fp = fopen(fpath, "w");
+void BLloader_create_block_list_file(void) {
+    char* path = utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
+    FILE* fp = fopen(path, "w");
     if (fp) fclose(fp);
-    free(fpath);
+    free(path);
 }
 
 void BLloader_add_buffer(GLfloat* VBO, GLsizei VBO_len,
                          GLuint* EBO, GLsizei EBO_len) {
-    char* fpath = utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
+    char* path = utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
     FILE* fp;
-    if ( (fp = fopen(fpath, "r+b")) != NULL ) {
+    if ((fp = fopen(path, "r+b")) != NULL ) {
         const char fname[] = "cub_BLloader_add_buffer";
         uint8_t nb_buffers = 0;
         if (fread(&nb_buffers, sizeof(uint8_t), 1, fp) != 1) {
@@ -249,17 +249,17 @@ void BLloader_add_buffer(GLfloat* VBO, GLsizei VBO_len,
         utils_fwrite(&nb_buffers, sizeof(uint8_t), 1, fp, fname, "nb_buffers");
         fclose(fp);
     } else errx(1, "cub_BLloader_add_buffer: failed to open %s!\
-                    Please create it so that it can be populated!", fpath);
-    free(fpath);
+                    Please create it so that it can be populated!", path);
+    free(path);
 }
 
 void BLloader_add_block(const char* name, RenderType render_type,
                         uint16_t info_RBO_id, BlockFlags block_flags,
                         uint8_t nb_states, bs_key* bs_keys,
                         bs_val* bs_default_values) {
-    char* fpath = utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
+    char* path = utils_strconcat(GAMEFILES_PATH, BLOCK_LIST_FILE, NULL);
     FILE* fp;
-    if ( (fp = fopen(fpath, "r+b")) != NULL ) {
+    if ((fp = fopen(path, "r+b")) != NULL ) {
         const char fname[] = "cub_BLloader_add_block";
         fseek(fp, sizeof(uint8_t), SEEK_SET);
         BDuid nb_blocks;
@@ -283,10 +283,10 @@ void BLloader_add_block(const char* name, RenderType render_type,
                      fp, fname, "block_flags");
         utils_fwrite(&nb_states, sizeof(uint8_t), 1,
                      fp, fname, "block_nb_states");
-        for (uint8_t i = 0; i < nb_states; ++i) {
-            utils_fwrite(bs_keys + i, sizeof(bs_key), 1,
+        for (uint8_t j = 0; j < nb_states; ++j) {
+            utils_fwrite(bs_keys + j, sizeof(bs_key), 1,
                          fp, fname, "blockstate_key");
-            utils_fwrite(bs_default_values + i, sizeof(bs_val), 1,
+            utils_fwrite(bs_default_values + j, sizeof(bs_val), 1,
                          fp, fname, "blockstate_value");
         }
         fseek(fp, sizeof(uint8_t), SEEK_SET);
@@ -294,6 +294,6 @@ void BLloader_add_block(const char* name, RenderType render_type,
         utils_fwrite(&nb_blocks, sizeof(BDuid), 1, fp, fname, "nb_blocks");
         fclose(fp);
     } else errx(1, "BLloader_add_block: failed to open %s!\
-                    Please create it so that it can be populated!", fpath);
-    free(fpath);
+                    Please create it so that it can be populated!", path);
+    free(path);
 }

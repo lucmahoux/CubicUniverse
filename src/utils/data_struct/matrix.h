@@ -5,28 +5,28 @@
 #include <xmmintrin.h>
 #include "data_struct/vector.h"
 
-#define MAT4(coeff) mat4_new(coeff)
+#define MAT4(coefficient) mat4_new(coefficient)
 #define MAT4_PROD(m1, m2) mat4_product_simd(m1, m2)
 #define MAT4_TRANS(m, v) mat4_translate(m, v)
 #define MAT4_SCALE(m, v) mat4_scale(m, v)
 #define MAT4_ROT(m, theta, axis) mat4_rotate(m, theta, axis)
 
 #ifndef M_PI
-#define M_PI 3.14159265358979323846
+#define M_PI 3.14159265358979323846f
 #endif
 
-#define RAD(x) x * M_PI / 180
+#define RAD(x) (x * M_PI / 180)
 
 typedef struct cubMatrix4 {
-    float coeffs[16];
+    float coefficients[16];
 } mat4;
 
 /* Prints a matrix */
 void mat4_print(mat4* matrix);
 
-/* Create a 4x4 matrix & set the diagonal coefficients to 'diag_coeff'.
+/* Create a 4x4 matrix & set the diagonal coefficients to 'diag_coefficient'.
  * The other coefficients are set to 0 */
-mat4 mat4_new(float diag_coeff);
+mat4 mat4_new(float diag_coefficient);
 
 /* Returns the result of "m * v" where the w coordinate of 'v' is set to 1 */
 vec4 mat4_vec3_product(mat4 m, vec3 v);
@@ -38,7 +38,7 @@ mat4 mat4_product_simd(mat4 m1, mat4 m2);
 mat4 mat4_translate(mat4 matrix, vec3 translation);
 
 /* Apply a scaling transform to the matrix (= diagonal coefficients
- * multiplied by the relevant coeffs in 'scaling' vector) */
+ * multiplied by the relevant coefficients in 'scaling' vector) */
 mat4 mat4_scale(mat4 matrix, vec3 scaling);
 
 /* Apply a rotation transform to the matrix of 'angle' radians
