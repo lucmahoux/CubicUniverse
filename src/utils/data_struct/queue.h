@@ -15,7 +15,7 @@ typedef struct cubQueue {
     queueElement* tail;
 } Queue;
 
-Queue* queue_new();
+Queue* queue_new(void);
 
 bool queue_is_empty(Queue* Q);
 

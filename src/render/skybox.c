@@ -1,6 +1,6 @@
 #include "skybox.h"
 
-GLuint skybox_load_cubemap()
+static GLuint skybox_load_cubemap(void)
 {
     GLuint textureID;
     glGenTextures(1, &textureID);
@@ -34,8 +34,8 @@ GLuint skybox_load_cubemap()
         }
         else
         {
-            errx(1, "Skybox image not found avec %d",i);
             stbi_image_free(data);
+            errx(1, "Skybox image not found with %d",i);
         }
     }
     stbi_set_flip_vertically_on_load(1);
@@ -130,12 +130,12 @@ void skybox_render(SkyboxRenderer* renderer, Camera* camera)
     glUseProgram(renderer->shader_program);
     // Remove the translation part of the view matrix
     mat4 VP_matrix = camera->view_matrix;
-    VP_matrix.coeffs[12] = 0.0f;
-    VP_matrix.coeffs[13] = 0.0f;
-    VP_matrix.coeffs[14] = 0.0f;
+    VP_matrix.coefficients[12] = 0.0f;
+    VP_matrix.coefficients[13] = 0.0f;
+    VP_matrix.coefficients[14] = 0.0f;
     // Update the VP_matrix uniform -> VP = projection * view
     VP_matrix = mat4_product_simd(camera->projection_matrix, VP_matrix);
-    glUniformMatrix4fv(renderer->VP_matrix_loc, 1, GL_FALSE, VP_matrix.coeffs);
+    glUniformMatrix4fv(renderer->VP_matrix_loc, 1, GL_FALSE, VP_matrix.coefficients);
 
     // Render skybox
     glBindVertexArray(renderer->RBO.VAO);

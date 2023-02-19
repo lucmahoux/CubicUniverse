@@ -14,8 +14,6 @@ typedef struct cubSkyboxRenderer {
     GLint VP_matrix_loc;
 } SkyboxRenderer;
 
-GLuint skybox_load_cubemap();
-
 void skybox_setup_renderer(SkyboxRenderer* renderer);
 
 void skybox_render(SkyboxRenderer* renderer, Camera* camera);

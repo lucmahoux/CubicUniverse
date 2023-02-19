@@ -1,7 +1,7 @@
 #src/block/meson.build
 
 block_files = files([
-  'block.c', 'block.h',
+  'block_renderer.c', 'block_renderer.h',
   'block_utils.c', 'block_utils.h',
   'block_list_loader.c', 'block_list_loader.h',
   'blockstates.c', 'blockstates.h'

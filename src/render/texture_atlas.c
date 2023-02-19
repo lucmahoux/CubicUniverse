@@ -42,11 +42,11 @@ void setup_texture_atlas(TextureAtlas* atlas, size_t fixed_width) {
 
 bool texture_atlas_add(TextureAtlas* atlas, const char* texture_name,
                        TexAtlasQuad* texture) {
-    char* fpath = utils_strconcat(TEXTURES_PATH, texture_name, NULL);
+    char* path = utils_strconcat(TEXTURES_PATH, texture_name, NULL);
     int width, height, nb_channels;
-    uint8_t* data = stbi_load(fpath, &width, &height, &nb_channels, 4);
+    uint8_t* data = stbi_load(path, &width, &height, &nb_channels, 4);
     if (!data)
-        errx(EXIT_FAILURE, "texture_atlas_add: failed to load %s!", fpath);
+        errx(EXIT_FAILURE, "texture_atlas_add: failed to load %s!", path);
     if (width != height) {
         fprintf(stderr, "texture_atlas_add: ILLEGAL - width != height!\n");
         return false;
@@ -61,20 +61,20 @@ bool texture_atlas_add(TextureAtlas* atlas, const char* texture_name,
     uint8_t* p;
     switch (width) {
         case 16:
-            TEXTURE_ADD_DIM(16); break;
+            TEXTURE_ADD_DIM(16) break;
         case 32:
-            TEXTURE_ADD_DIM(32); break;
+            TEXTURE_ADD_DIM(32) break;
         case 64:
-            TEXTURE_ADD_DIM(64); break;
+            TEXTURE_ADD_DIM(64) break;
         case 128:
-            TEXTURE_ADD_DIM(128); break;
+            TEXTURE_ADD_DIM(128) break;
         case 256:
-            TEXTURE_ADD_DIM(256); break;
+            TEXTURE_ADD_DIM(256) break;
         default:
-            TEXTURE_ADD_DIM(512); break;
+            TEXTURE_ADD_DIM(512) break;
     }
     stbi_image_free(data);
-    free(fpath);
+    free(path);
     return true;
 }
 

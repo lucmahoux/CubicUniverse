@@ -24,7 +24,7 @@ void game_init(Game* game, int width, int height) {
     setup_window(&game->window, width, height, "Cubic Universe");
 
     // Set up the camera
-    float aspect_ratio = 1.0f * width / height;
+    float aspect_ratio = 1.0f * (float) width / (float) height;
     camera_setup(&game->camera, VEC3(0.0f, 0.0f, 10.0f),
                  RAD(90.0f), aspect_ratio, 0.1f, 100.0f);
 
@@ -53,7 +53,7 @@ void game_clear_screen_handler(cub_unused Game* game) {
 }
 
 // Change values with mouse input
-void game_process_mouse_mouvement(Camera* cam, float xoffset, float yoffset)
+void game_process_mouse_movement(Camera* cam, float xoffset, float yoffset)
 {
     float sensitivity = 0.1f;
     xoffset *= sensitivity;
@@ -103,21 +103,21 @@ void game_input_handler(Game* game) {
 
     if(cam->firstMouse == 1)
     {
-        cam->lastX = xpos;
-        cam->lastY = ypos;
+        cam->lastX = (float) xpos;
+        cam->lastY = (float) ypos;
         cam->firstMouse = 0;
     }
 
-    float xoffset = xpos - cam->lastX;
-    float yoffset = cam->lastY - ypos;
-    cam->lastX = xpos;
-    cam->lastY = ypos;
+    float xoffset = (float) xpos - cam->lastX;
+    float yoffset = cam->lastY - (float) ypos;
+    cam->lastX = (float) xpos;
+    cam->lastY = (float) ypos;
 
-    game_process_mouse_mouvement(&game->camera, xoffset, yoffset);
+    game_process_mouse_movement(&game->camera, xoffset, yoffset);
 }
 
 void game_fps_counter_update(FpsCounter* fps_counter) {
-    float current_frame = glfwGetTime();
+    float current_frame = (float) glfwGetTime();
     if (fps_counter->delta_time_since_fps_update >= 1.0f) {
         fps_counter->fps = (uint16_t)(
                 (float)fps_counter->nb_frames_since_fps_update /
@@ -157,13 +157,13 @@ void game_renderer_handler(Game* game) {
     camera_update(&game->camera);
     glUseProgram(game->line_renderer.shader_program);
     glUniformMatrix4fv(game->line_renderer.VP_matrix_loc,
-                       1, GL_FALSE, game->camera.VP_matrix.coeffs);
+                       1, GL_FALSE, game->camera.VP_matrix.coefficients);
     glUseProgram(game->block_renderer.cubic.shader);
     glUniformMatrix4fv(game->block_renderer.cubic.uniforms.VP_matrix,
-                       1, GL_FALSE, game->camera.VP_matrix.coeffs);
+                       1, GL_FALSE, game->camera.VP_matrix.coefficients);
     glUseProgram(game->block_renderer.custom.shader);
     glUniformMatrix4fv(game->block_renderer.custom.uniforms.VP_matrix,
-                       1, GL_FALSE, game->camera.VP_matrix.coeffs);
+                       1, GL_FALSE, game->camera.VP_matrix.coefficients);
 
     // World updates
     /*BlockState bs = { .block = GET_BLOCK_DATA_FROM_ID(game->block_list, 1),

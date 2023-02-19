@@ -32,7 +32,7 @@ typedef struct cubVec4 {
 
 // Vector - Scalar representation of quaternions
 typedef struct cubQuaternion {
-    vec3 vect;
+    vec3 vector;
     float w;
 } quaternion;
 

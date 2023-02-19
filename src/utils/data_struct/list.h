@@ -27,7 +27,7 @@ typedef enum cubReallocType {
 
 /* Creates a list to store elements of size 'memb_size' and initializes
  * the capacity of the list to 'capacity' if it is not 0 or to BASE_CAPACITY.
- * The realloc type 'type' defines how the list will manage the reallocs when
+ * The realloc type 'type' defines how the list will manage the re-allocation when
  * its capacity is exceeded. */
 List* list_new(size_t memb_size, ReallocType type, size_t capacity);
 
