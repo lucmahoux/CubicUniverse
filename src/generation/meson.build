@@ -1,7 +1,8 @@
 #src/generation/meson.build
 
 generation_files = files([
-    'noise.c', 'noise.h'
+    'noise.c', 'noise.h',
+    'heightmaps.c', 'heightmaps.h'
 ])
 
 generation_inc = include_directories('.')

@@ -1,6 +1,8 @@
 #include "noise.h"
 #include "stb_image_write.h"
 
+#include <alloca.h>
+
 /* Function to linearly interpolate between a0 and a1
  * Weight w should be in the range [0.0, 1.0]
  */
@@ -104,10 +106,19 @@ static void clamp_arguments_values(struct noise_generator_args *args) {
         args->persistence = 1.0f;
 }
 
-static void normalize_map(struct noise_map *noise_map, float min_height, float max_height) {
+static void normalize_map(struct noise_map *noise_map, vec2 *spline_points, size_t nb_spline_points) {
     size_t size = noise_map->width * noise_map->height;
-    for (size_t i = 0; i < size; ++i)
-        noise_map->map[i] = normalize(min_height, max_height, noise_map->map[i]);
+    float *line_slopes = alloca((nb_spline_points - 1) * sizeof(float));
+
+    for (size_t i = 1; i < nb_spline_points; ++i)
+        line_slopes[i - 1] = (spline_points[i].y - spline_points[i - 1].y) / (spline_points[i].x - spline_points[i - 1].x);
+
+    for (size_t i = 0; i < size; ++i) {
+        size_t j = 1;
+        while (j < nb_spline_points && spline_points[j].x < noise_map->map[i])
+            ++j;
+        noise_map->map[i] = spline_points[j - 1].y + (noise_map->map[i] - spline_points[j - 1].x) * line_slopes[j - 1];
+    }
 }
 
 static vec2 *generate_random_offsets(int32_t nb_octaves, unsigned int seed, vec2 offset) {
@@ -124,7 +135,7 @@ static vec2 *generate_random_offsets(int32_t nb_octaves, unsigned int seed, vec2
     return offsets;
 }
 
-struct noise_map *generate_noise_map(struct noise_generator_args *args) {
+struct noise_map *generate_noise_map(struct noise_generator_args *args, vec2 *spline_points, size_t size) {
     struct noise_map *noise_map = malloc(sizeof(struct noise_map));
 
     if (noise_map == NULL)
@@ -140,9 +151,6 @@ struct noise_map *generate_noise_map(struct noise_generator_args *args) {
         errx(EXIT_FAILURE, "generate_noise_map: malloc(3) failed");
 
     vec2 *octave_offsets = generate_random_offsets(args->nb_octaves, args->seed, args->offset);
-
-    float min_height = INFINITY;
-    float max_height = -INFINITY;
 
     for (int32_t x = 0; x < args->width; ++x) {
         for (int32_t y = 0; y < args->height; ++y) {
@@ -162,16 +170,11 @@ struct noise_map *generate_noise_map(struct noise_generator_args *args) {
             }
 
             noise_map->map[y * args->width + x] = noise_height;
-
-            if (noise_height > max_height)
-                max_height = noise_height;
-            else if (noise_height < min_height)
-                min_height = noise_height;
         }
     }
 
     free(octave_offsets);
-    normalize_map(noise_map, min_height, max_height);
+    normalize_map(noise_map, spline_points, size);
 
     return noise_map;
 }
