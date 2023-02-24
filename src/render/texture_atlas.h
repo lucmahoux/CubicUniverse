@@ -8,10 +8,11 @@
 /* Must be called when the texture_atlas needs resetting */
 void setup_texture_atlas(TextureAtlas* atlas, size_t fixed_width);
 
-/* Adds the texture with 'texture_name' to the texture atlas.
+/* Adds the texture 'texture_file' to the texture atlas.
+ * The file is closed during the call!
  * The memory pointed to by 'texture' is set to the
  * bottom-left corner of the quad texture */
-bool texture_atlas_add(TextureAtlas* atlas, const char* texture_name,
+bool texture_atlas_add(TextureAtlas* atlas, FILE* texture_file,
                        TexAtlasQuad* texture);
 
 /* Called when all the images have been added to the atlas.

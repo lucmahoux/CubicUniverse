@@ -19,11 +19,11 @@ void BLloader_free_block_list(BlockList* block_list);
 //     only then it is possible to add blocks [!]
 
 /* Create or reset the block_list file if it exists */
-void BLloader_create_block_list_file();
+void BLloader_create_block_list_file(void);
 
 /* Adds a new rendering buffer in the block_list file */
-void BLloader_add_buffer(GLfloat* VBO, uint16_t VBO_len,
-                         GLuint* EBO, uint8_t EBO_len);
+void BLloader_add_buffer(GLfloat* VBO, GLsizei VBO_len,
+                         GLuint* EBO, GLsizei EBO_len);
 
 /* Adds a new block to the block_list file */
 void BLloader_add_block(const char* name, RenderType render_type,

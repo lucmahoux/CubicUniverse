@@ -3,7 +3,11 @@
 
 #include "block_list_loader.h"
 #include "chunk.h"
+#include "fs.h"
 #include "game.h"
+#include "noise.h"
+#include "heightmaps.h"
+#include "block_renderer.h"
 
 static void create_block_list(void) {
     GLfloat flower_VBO[] = {
@@ -77,10 +81,39 @@ static void create_block_list(void) {
                         nb_states, bs_keys, bs_def_vals);
 }
 
-int main(void) {
+static void setup_dependencies(int argc, char **argv) {
+    setup_filesystem(argc, argv);
+}
+
+static void destroy_dependencies(void) {
+    destroy_filesystem();
+}
+
+int main(int argc, char **argv) {
+    setup_dependencies(argc, argv);
     Game game;
     create_block_list();
     game_init(&game, 1024, 768);
     game_start(&game);
+
+    /* struct noise_generator_args args = {
+            .width = 16,
+            .height = 16,
+            .nb_octaves = 4,
+            .lacunarity = 2.0f,
+            .persistence = 0.5f,
+            .scale = 27.6f,
+            .offset = { .x = 0, .y = 0 },
+            .seed = 125
+    };
+
+    struct noise_map *noise = generate_noise_map(&args);
+    draw_noise_map(noise, "noise_map.png");
+    free_noise_map(noise); */
+
+    //generate_and_save_heightmaps();
+
+    destroy_dependencies();
+
     return EXIT_SUCCESS;
 }

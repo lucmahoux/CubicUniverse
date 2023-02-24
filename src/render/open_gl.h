@@ -3,13 +3,6 @@
 
 #include "types/open_gl.h"
 
-/* Load the texture from the texture folder - check for errors */
-GLchar* load_texture(GLint* width, GLint* height, GLint* nb_channels,
-                     const char* img_name);
-
-/* Returns TRUE if the given texture exists */
-bool texture_exists(const char* tex_name);
-
 /* Try to get the store the location of the uniform called 'uniform_name'
  * in the shader identified by 'shader_program'. It raises an error if
  * the uniform could not be found. 'fname' is the name of the invoking

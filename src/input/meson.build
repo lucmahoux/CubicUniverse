@@ -7,6 +7,7 @@ input_lib = static_library(
   'input',
   input_files,
   dependencies: []
+)
 
 input_dep = declare_dependency(
   link_with: input_lib,

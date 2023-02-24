@@ -11,7 +11,7 @@ chunk_inc = include_directories('.')
 chunk_lib = static_library(
   'chunk',
   chunk_files,
-  dependencies: [render_dep, block_dep, utils_dep]
+  dependencies: [render_dep, block_dep, utils_dep, file_system_dep]
 )
 
 chunk_dep = declare_dependency(

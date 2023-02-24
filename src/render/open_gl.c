@@ -4,23 +4,6 @@
 #include "stb_image.h"
 #include "stb_image_write.h"
 
-GLchar* load_texture(GLint* width, GLint* height, GLint* nb_channels,
-                     const char* img_name) {
-    char* path = utils_strconcat(TEXTURES_PATH, img_name, NULL);
-    uint8_t* data = stbi_load(path, width, height, nb_channels, 0);
-    if (!data)
-        errx(1, "load_img: failed to load: %s", path);
-    free(path);
-    return (GLchar*)data;
-}
-
-bool texture_exists(const char* tex_name) {
-    char* path = utils_strconcat(TEXTURES_PATH, tex_name, NULL);
-    bool result = utils_file_exists(path);
-    free(path);
-    return result;
-}
-
 void try_get_uniform_location(GLuint shader_program, GLint* location,
                               const char* uniform_name, const char* fname) {
     *location = glGetUniformLocation(shader_program, uniform_name);

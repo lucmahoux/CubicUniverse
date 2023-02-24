@@ -21,7 +21,7 @@ struct noise_generator_args {
     unsigned int seed;
 };
 
-struct noise_map *generate_noise_map(struct noise_generator_args *args);
+struct noise_map *generate_noise_map(struct noise_generator_args *args, vec2 *spline_points, size_t size);
 
 void draw_noise_map(struct noise_map *noise_map, const char *path);
 

@@ -21,26 +21,22 @@
 
 #define CUB_TEX_ATLAS_WIDTH 512
 
-extern char ASSETS_PATH[];
-extern char SHADERS_PATH[];
-extern char TEXTURES_PATH[];
-extern char GAMEFILES_PATH[];
-
-/* Concatenate two strings and return the total length (excluding '\0') */
-char* utils_strconcat(const char* s1, const char* s2, size_t* len);
-
-/* Returns TRUE if the file 'fname' exists */
-bool utils_file_exists(const char* fname);
-
 /* Read memb_nbr elements of memb_size from file and put it in dest.
  * Errors are handled and exit the program! */
-void utils_fread(void* dest, size_t memb_size, size_t memb_nbr,
-                 FILE* fp, const char* fname, const char* field_name);
+#define UTILS_FREAD(dest, memb_size, memb_nbr, fp, fname, field_name) { \
+    if (fread(dest, memb_size, memb_nbr, fp) != memb_nbr)\
+        errx(1, "%s: Wrong format on field '%s'!", fname, field_name);\
+}
 
 /* Write memb_nbr elements of memb_size to file from 'src'.
  * Errors are handled and exit the program! */
-void utils_fwrite(void* src, size_t memb_size, size_t memb_nbr,
-                  FILE* fp, const char* fname, const char* field_name);
+#define UTILS_FWRITE(src, memb_size, memb_nbr, fp, fname, field_name) {\
+    if (fwrite(src, memb_size, memb_nbr, fp) != memb_nbr)\
+        errx(1, "%s: fwrite() failed on field '%s'!", fname, field_name);\
+}
+
+/* Concatenate two strings and return the total length (excluding '\0') */
+char* utils_strconcat(const char* s1, const char* s2, size_t* len);
 
 void* utils_malloc(size_t size, const char* fname);
 

@@ -40,13 +40,13 @@ void setup_texture_atlas(TextureAtlas* atlas, size_t fixed_width) {
         ATLAS_REALLOC(DIM);\
     }
 
-bool texture_atlas_add(TextureAtlas* atlas, const char* texture_name,
+bool texture_atlas_add(TextureAtlas* atlas, FILE *texture_file,
                        TexAtlasQuad* texture) {
-    char* path = utils_strconcat(TEXTURES_PATH, texture_name, NULL);
     int width, height, nb_channels;
-    uint8_t* data = stbi_load(path, &width, &height, &nb_channels, 4);
+    uint8_t* data = stbi_load_from_file(texture_file, &width, &height, &nb_channels, 4);
+    fclose(texture_file);
     if (!data)
-        errx(EXIT_FAILURE, "texture_atlas_add: failed to load %s!", path);
+        errx(EXIT_FAILURE, "texture_atlas_add: failed to load texture!");
     if (width != height) {
         fprintf(stderr, "texture_atlas_add: ILLEGAL - width != height!\n");
         return false;
@@ -74,7 +74,6 @@ bool texture_atlas_add(TextureAtlas* atlas, const char* texture_name,
             TEXTURE_ADD_DIM(512) break;
     }
     stbi_image_free(data);
-    free(path);
     return true;
 }
 
@@ -85,11 +84,11 @@ void texture_atlas_bind_load_GPU(TextureAtlas* texture_atlas) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_atlas->fixed_width,
-                 texture_atlas->height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (int) texture_atlas->fixed_width,
+                 (int) texture_atlas->height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
                  texture_atlas->pixels);
-    stbi_write_png("../texture_atlas.png", (int)texture_atlas->fixed_width,
-                   (int)texture_atlas->height, 4, texture_atlas->pixels,
+    stbi_write_png("../texture_atlas.png", (int) texture_atlas->fixed_width,
+                   (int) texture_atlas->height, 4, texture_atlas->pixels,
                    (int)(4 * texture_atlas->fixed_width));
     free(texture_atlas->pixels);
     glBindTexture(GL_TEXTURE_2D, 0);

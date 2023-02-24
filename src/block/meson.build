@@ -11,7 +11,7 @@ block_inc = include_directories('.')
 block_lib = static_library(
   'block',
   block_files,
-  dependencies: [utils_dep, render_dep]
+  dependencies: [utils_dep, render_dep, file_system_dep]
 )
 
 block_dep = declare_dependency(

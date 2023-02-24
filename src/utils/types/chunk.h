@@ -10,11 +10,31 @@
 #define CHUNK_WIDTH 16
 #define CHUNK_DEPTH 16
 #define CHUNK_HEIGHT 256
+#define CHUNK_SLICE 256
 #define SUBCHUNK_HEIGHT 16
 #define MAX_SUBCHUNKS 16
 #define PALETTE_DEFAULT_LEN 30
 #define PALETTE_DEFAULT_HASH_NBR 31
 #define palette_id uint16_t
+
+enum cubChunkStatus {
+    // Nothing has been generated
+    CHUNK_STATUS_EMPTY,
+    // Height maps have been generated (temperature, continentalness, ...)
+    CHUNK_STATUS_HEIGHTMAPS,
+    // Surface has been generated
+    CHUNK_STATUS_SURFACE,
+    // Caves have been generated
+    CHUNK_STATUS_CARVERS,
+    // Water has been added where necessary
+    CHUNK_STATUS_LIQUID_CARVERS,
+    // Biomes have been calculated
+    CHUNK_STATUS_BIOMES,
+    // Biomes have been generated
+    CHUNK_STATUS_FEATURES,
+    // All steps have been completed
+    CHUNK_STATUS_FULL
+};
 
 struct cubGridPosition {
     int16_t x; // Horizontal position of the chunk in the grid
@@ -36,12 +56,25 @@ struct cubSubChunkPalette {
     HashMap* BS_uid_mapper;
 };
 
+struct cubHeightMaps {
+    int64_t peaks_and_valleys[37];
+    //int64_t temperature[37];
+    //int64_t humidity[37];
+    int64_t erosion[37];
+    int64_t continentalness[37];
+    //int64_t depth[37];
+};
+
 typedef struct cubSubChunk {
     // Y position of the subchunk relative to the bottom of the chunk it belongs
     uint8_t y_pos;
     struct cubSubChunkPalette palette;
     // List of indices in 'palette' to determine the type of block
     palette_id* blocks;
+    struct cubSubChunkPalette biomes_palette;
+    // List of indices in 'biomes_palette' to determine the type of biome
+    palette_id* biomes;
+    struct cubHeightMaps heightmaps;
     /* The visibility graph of a subchunk determines how it connects to its
      * neighboring subchunks. The graph is stored as an adjacency matrix
      * where the 2nd dimension is stored as an uint8_t. Therefore,
@@ -59,6 +92,7 @@ typedef struct cubChunkFlags {
 } ChunkFlags;
 
 typedef struct cubChunk {
+    enum cubChunkStatus status;
     // X and Z coordinates of the chunk in the chunk coords system
     int32_t chunkX, chunkZ;
     uint8_t nb_subchunks;
