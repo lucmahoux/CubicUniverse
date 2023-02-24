@@ -15,7 +15,7 @@ render_inc = include_directories('.')
 render_lib = static_library(
   'render',
   render_files,
-  dependencies: [utils_dep]
+  dependencies: [utils_dep, file_system_dep]
 )
 
 render_dep = declare_dependency(

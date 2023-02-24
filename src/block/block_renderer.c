@@ -1,4 +1,5 @@
 #include "block_renderer.h"
+#include "fs.h"
 
 // ----------------------------------------------------------------------------
 
@@ -358,7 +359,8 @@ static void block_load_texture(TextureAtlas* atlas, char* buffer,
                         const char* prefix, const char* ext,
                         const char* suffix, TexAtlasQuad* texture_quad) {
     snprintf(buffer, 2 * MAX_BLOCK_STRLEN, "%s%s%s.png", prefix, ext, suffix);
-    texture_atlas_add(atlas, buffer, texture_quad);
+    FILE *texture_file = get_texture_file(buffer, "r");
+    texture_atlas_add(atlas, texture_file, texture_quad);
 }
 
 static void block_try_load_texture(TextureAtlas* atlas,
@@ -367,10 +369,11 @@ static void block_try_load_texture(TextureAtlas* atlas,
                             TexAtlasQuad* tex_quad,
                             TexAtlasQuad* tex_quad_default) {
     snprintf(buffer, 2 * MAX_BLOCK_STRLEN, "%s%s%s.png", prefix, ext, suffix);
-    if (!texture_exists(buffer)) {
+    FILE *texture_file = get_texture_file(buffer, "r");
+    if (texture_file == NULL) {
         // If the texture cannot be loaded, set *tex_id to the default value
         *tex_quad = *tex_quad_default;
-    } else texture_atlas_add(atlas, buffer, tex_quad);
+    } else texture_atlas_add(atlas, texture_file, tex_quad);
 }
 
 static void block_tex_load_from_render_type(TextureAtlas* atlas,

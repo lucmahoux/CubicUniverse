@@ -1,4 +1,5 @@
 #include "chunk_loader.h"
+#include "fs.h"
 
 // ----------------------------------------------------------------------------
 static void chunk_load_blocks(SubChunk* SC, palette_id palette_len,
@@ -19,7 +20,7 @@ static void chunk_load_blocks(SubChunk* SC, palette_id palette_len,
     if (palette_len <= 255) {
         uint8_t ids_buffer[1024];
         for (uint8_t i = 0; i < 4; ++i) {
-            utils_fread(ids_buffer, sizeof(uint8_t), 1024,
+            UTILS_FREAD(ids_buffer, sizeof(uint8_t), 1024,
                         fp, fname, "batch_of_blocks");
             for (uint16_t j = 0; j < 1024; ++j) {
                 SC->blocks[(i << 10) + j] = ids_buffer[j];
@@ -30,7 +31,7 @@ static void chunk_load_blocks(SubChunk* SC, palette_id palette_len,
     } else {
         uint16_t ids_buffer[512];
         for (uint8_t i = 0; i < 8; ++i) {
-            utils_fread(ids_buffer, sizeof(uint16_t), 512,
+            UTILS_FREAD(ids_buffer, sizeof(uint16_t), 512,
                         fp, fname, "batch_of_blocks");
             for (uint16_t j = 0; j < 512; ++j) {
                 SC->blocks[(i << 9) + j] = ids_buffer[j];
@@ -44,7 +45,7 @@ static void chunk_load_blocks(SubChunk* SC, palette_id palette_len,
 static void chunk_load_palette(SubChunk* SC, BlockList* block_list, FILE* fp) {
     const char fname[] = "chunk_load_palette";
     palette_id palette_len;
-    utils_fread(&palette_len, sizeof(palette_id), 1, fp, fname, "palette_len");
+    UTILS_FREAD(&palette_len, sizeof(palette_id), 1, fp, fname, "palette_len");
     if (palette_len > PALETTE_DEFAULT_LEN)
         SC->palette.BS_uid_mapper = hashmap_new(palette_len, 0);
     else
@@ -57,12 +58,12 @@ static void chunk_load_palette(SubChunk* SC, BlockList* block_list, FILE* fp) {
         list_append(SC->palette.BP_elts, &elt);
         // Palette Elements Loading
         BDuid BD_uid;
-        utils_fread(&BD_uid, sizeof(BDuid), 1, fp, fname, "palette_block_uid");
+        UTILS_FREAD(&BD_uid, sizeof(BDuid), 1, fp, fname, "palette_block_uid");
         elt->BS.block = block_list->blocks + BD_uid;
         elt->nb_blocks = 0;
         uint8_t nb_states = elt->BS.block->nb_states;
         elt->BS.states = utils_malloc(nb_states * sizeof(bs_val), fname);
-        utils_fread(elt->BS.states, sizeof(bs_val), nb_states,
+        UTILS_FREAD(elt->BS.states, sizeof(bs_val), nb_states,
                     fp, fname, "palette_states");
         // Set the uid of the blockstate
         block_set_BS_uid(&elt->BS);
@@ -75,18 +76,17 @@ static void chunk_load_palette(SubChunk* SC, BlockList* block_list, FILE* fp) {
 
 void chunk_load(Chunk* chunk, BlockList* block_list,
                 GraphMarker* block_marker) {
-    char path[100];
-    sprintf(path, "%schunks/%i.%i.chunk", ASSETS_PATH,
-                    chunk->chunkX, chunk->chunkZ);
+    char path[64];
+    sprintf(path, "chunks/%i.%i.chunk", chunk->chunkX, chunk->chunkZ);
     printf("chunk_load: Loading chunk at %s!\n", path);
     FILE* fp;
-    if ( (fp = fopen(path, "rb")) == NULL ) {
+    if ( (fp = get_appdata_file(path, "rb")) == NULL ) {
         printf("chunk_load: File not found: %s - assuming not generated\n",
                 path);
         chunk_init(chunk, chunk->chunkX, chunk->chunkZ);
     } else {
         const char fname[] = "chunk_load";
-        utils_fread(&chunk->nb_subchunks, sizeof(uint8_t), 1,
+        UTILS_FREAD(&chunk->nb_subchunks, sizeof(uint8_t), 1,
                     fp, fname, "nb_subchunks");
         uint8_t nb_subchunks = chunk->nb_subchunks;
         // Initialise the subchunks array
@@ -123,7 +123,7 @@ static void chunk_save_blocks(const palette_id* new_ids_mapper, palette_id palet
         for (uint8_t i = 0; i < 4; ++i) {
             for (uint16_t j = 0; j < 1024; ++j)
                 buffer[j] = new_ids_mapper[blocks[(i << 10) + j]];
-            utils_fwrite(buffer, sizeof(uint8_t), 1024,
+            UTILS_FWRITE(buffer, sizeof(uint8_t), 1024,
                          fp, fname, "batch_of_blocks");
         }
     } else {
@@ -131,7 +131,7 @@ static void chunk_save_blocks(const palette_id* new_ids_mapper, palette_id palet
         for (uint8_t i = 0; i < 8; ++i) {
             for (uint16_t j = 0; j < 512; ++j)
                 buffer[i] = new_ids_mapper[blocks[(i << 9) + j]];
-            utils_fwrite(buffer, sizeof(uint16_t), 512,
+            UTILS_FWRITE(buffer, sizeof(uint16_t), 512,
                          fp, fname, "batch_of_blocks");
         }
     }
@@ -140,10 +140,10 @@ static void chunk_save_blocks(const palette_id* new_ids_mapper, palette_id palet
 static void chunk_save_palette(SubChunk* SC, FILE* fp) {
     const char fname[] = "chunk_save_palette";
     palette_id palette_len = SC->palette.BS_uid_mapper->nb_keys;
-    utils_fwrite(&palette_len, sizeof(palette_id), 1, fp, fname, "palette_len");
+    UTILS_FWRITE(&palette_len, sizeof(palette_id), 1, fp, fname, "palette_len");
     palette_id* new_ids_mapper =
-        utils_malloc((SC->palette.BP_elts->len + 1) * sizeof(palette_id),
-                     fname);
+    utils_malloc((SC->palette.BP_elts->len + 1) * sizeof(palette_id),
+                 fname);
     BP_elt** BP_elts = SC->palette.BP_elts->data;
     palette_id last_id = 1;
     new_ids_mapper[0] = AIR_ID;
@@ -154,10 +154,10 @@ static void chunk_save_palette(SubChunk* SC, FILE* fp) {
         }
         new_ids_mapper[i + 1] = last_id++;
         // Save palette element
-        utils_fwrite(&BP_elts[i]->BS.block->id, sizeof(BDuid), 1,
+        UTILS_FWRITE(&BP_elts[i]->BS.block->id, sizeof(BDuid), 1,
                      fp, fname, "palette_block_id");
         uint8_t nb_states = BP_elts[i]->BS.block->nb_states;
-        utils_fwrite(BP_elts[i]->BS.states, sizeof(bs_val), nb_states,
+        UTILS_FWRITE(BP_elts[i]->BS.states, sizeof(bs_val), nb_states,
                      fp, fname, "palette_states");
         // Free palette element
         block_BP_elt_free(BP_elts[i]);
@@ -172,22 +172,21 @@ static void chunk_save_palette(SubChunk* SC, FILE* fp) {
 }
 
 void chunk_save(Chunk* chunk) {
-    char path[100];
-    sprintf(path, "%schunks/%i.%i.chunk", ASSETS_PATH,
-                    chunk->chunkX, chunk->chunkZ);
+    char path[64];
+    sprintf(path, "chunks/%i.%i.chunk", chunk->chunkX, chunk->chunkZ);
     printf("chunk_save: Saving chunk at %s!\n", path);
     FILE* fp;
-    if ( (fp = fopen(path, "wb")) == NULL ) {
+    if ( (fp = get_appdata_file(path, "wb")) == NULL ) {
         errx(1, "chunk_save: Error while trying to save the chunk!");
     } else {
         const char fname[] = "chunk_save";
-        utils_fwrite(&chunk->nb_subchunks, sizeof(uint8_t), 1,
+        UTILS_FWRITE(&chunk->nb_subchunks, sizeof(uint8_t), 1,
                      fp, fname, "nb_subchunks");
         for (uint8_t i = 0; i < MAX_SUBCHUNKS; ++i) {
             if (chunk->subchunks[i].y_pos >= MAX_SUBCHUNKS)
                 continue;
             SubChunk* SC = chunk->subchunks + i;
-            utils_fwrite(&SC->y_pos, sizeof(uint8_t), 1,
+            UTILS_FWRITE(&SC->y_pos, sizeof(uint8_t), 1,
                          fp, fname, "Y_pos subchunk");
             chunk_save_palette(&chunk->subchunks[i], fp);
         }

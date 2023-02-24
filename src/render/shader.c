@@ -1,25 +1,26 @@
 #include "shader.h"
+#include "fs.h"
 
 // ----------------------------------------------------------------------------
 /* Try to retrieve the source code of the shader if the shader file exists.
  * If not shader->shader_type is set to NONE.
  * Otherwise, only shader->source is set to an allocated memory area
  * representing the source code of the shader. */
-void get_shader_source(char* file, ShaderSource* shader);
+static void get_shader_source(const char* file, ShaderSource* shader);
 
 /* Retrieve all possible shader types with their associated source code.
  *  - const char* name: the shader identifier
  *  - uint8_t* len: the number of shaders in ShaderSource* returned array */
-ShaderSource* get_shaders(char* path, size_t path_len, uint8_t* len);
+static ShaderSource* get_shaders(const char* shader_name, size_t shader_name_len, uint8_t* len);
 
 /* Create the correct shader type & compile it while checking for errors */
-void create_compile_shader(ShaderSource* shader, const char* name);
+static void create_compile_shader(ShaderSource* shader, const char* name);
 // ----------------------------------------------------------------------------
 
-void get_shader_source(char* file, ShaderSource* shader) {
+static void get_shader_source(const char* file, ShaderSource* shader) {
     printf("Searching for shader: %s\n", file);
     FILE* fp;
-    if ( (fp = fopen(file, "r")) == NULL ) {
+    if ( (fp = get_shader_file(file, "r")) == NULL ) {
         shader->source = NULL;
         shader->shader_type = NONE;
     } else {
@@ -44,15 +45,15 @@ void get_shader_source(char* file, ShaderSource* shader) {
     }
 }
 
-ShaderSource* get_shaders(char* path, size_t path_len, uint8_t* len) {
+static ShaderSource* get_shaders(const char *shader_name, size_t shader_name_len, uint8_t* len) {
     ShaderSource* shader_sources = malloc(3 * sizeof(ShaderSource));
     if (!shader_sources)
         errx(1, "get_shaders: malloc failed!");
 
-    char file[path_len + 10];
-    char* type = &file[path_len + 1];
-    memcpy(file, path, path_len);
-    memcpy(&file[path_len], "_?.shader\0", 10);
+    char file[shader_name_len + 10];
+    char* type = file + shader_name_len + 1;
+    memcpy(file, shader_name, shader_name_len);
+    memcpy(&file[shader_name_len], "_?.shader", 10);
 
     // Vertex Shader
     *type = 'V';
@@ -71,7 +72,7 @@ ShaderSource* get_shaders(char* path, size_t path_len, uint8_t* len) {
     return shader_sources;
 }
 
-void create_compile_shader(ShaderSource* shader, const char* name) {
+static void create_compile_shader(ShaderSource* shader, const char* name) {
     // Create the shader
     switch (shader->shader_type) {
         case VERTEX_SHADER:
@@ -109,11 +110,8 @@ void create_compile_shader(ShaderSource* shader, const char* name) {
 }
 
 GLuint build_shader(const char* shader_name) {
-    size_t path_len;
-    char* path = utils_strconcat(SHADERS_PATH, shader_name, &path_len);
     uint8_t len;
-    ShaderSource* shader_srcs = get_shaders(path, path_len, &len);
-    free(path);
+    ShaderSource* shader_srcs = get_shaders(shader_name, strlen(shader_name), &len);
 
     GLuint shaderProgram = glCreateProgram();
     uint8_t nb_shaders = 0;
