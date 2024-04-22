@@ -54,8 +54,7 @@
 ## About The Project
 
 
-CubicUniverse is a project for the fourth semester of our curriculum at EPITA.
-Its main purpose is to be a clone of the iconic game Minecraft.
+We rebuilt some of the iconic game Minecraft.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
